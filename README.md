@@ -2,3 +2,6 @@
 Set up vercel on your local
 To see the credentials (their variable names), run
 vercel env pull .env.local --environment=production
+
+You can access the website at
+https://project3-gang-54.vercel.app/
