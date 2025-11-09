@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <nav className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+      <Script
+        src="https://accounts.google.com/gsi/client"
+        strategy="afterInteractive"
+        async
+        defer
+      />
+
+        <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-black">
           <h1 className="text-xl font-semibold">ShareTea</h1>
           <ul className="flex gap-6 text-sm font-medium">
             <li><a href="/" className="hover:underline">Home</a></li>
