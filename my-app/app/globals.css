@@ -224,3 +224,9 @@ main {
 }
 
 
+.button {
+  background: white;
+  color: black;
+  padding: 10px 20px;
+  border-radius: 12px;
+}
