@@ -25,26 +25,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-      <Script
-        src="https://accounts.google.com/gsi/client"
-        strategy="afterInteractive"
-        async
-        defer
-      />
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+          async
+          defer
+        />
 
-        <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-black">
-          <h1 className="text-xl font-semibold">ShareTea</h1>
-          <ul className="flex gap-6 text-sm font-medium">
-            <li><a href="/" className="hover:underline">Home</a></li>
-            <li><a href="/order" className="hover:underline">Order</a></li>
-            <li><a href="/dashboard" className="hover:underline">Dashboard</a></li>
-            <li><a href="/login" className="hover:underline">Login</a></li>
+        <nav>
+          <h1>ShareTea</h1>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/order">Order</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/login">Login</a></li>
           </ul>
         </nav>
-        {children}
+
+        <main>{children}</main>
       </body>
     </html>
   );
