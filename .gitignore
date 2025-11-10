@@ -1,28 +1,13 @@
 # Directories outside the Project 3 repo we do not want to track
 /8-25/
 /inClass1/
-/my-app/
 /project1-akul.ranjan.1/
 /project2/
 /csce331_web_app/
 
 # Personal workspace notes
 /git-workflow-proof.md
-/quick-proof-commands.txt
-/setup-remote.md
-
-# Node modules anywhere
-node_modules/
-# Ignore other coursework directories in the parent workspace
-/8-25/
-/inClass1/
-/my-app/
-/project1-akul.ranjan.1/
-/project2/
-/csce331_web_app/
-
-# Ignore personal notes in the workspace root
-/git-workflow-proof.md
+/about.html
 /quick-proof-commands.txt
 /setup-remote.md
 
