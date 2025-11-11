@@ -1,22 +1,89 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
+import jwt from "jsonwebtoken";
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const SESSION_COOKIE = "sharetea-session";
+const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+
+const ROLE_DIRECTORY: Record<string, "manager" | "cashier" | "customer"> = {
+  "reveille.bubbletea@gmail.com": "manager",
+};
+
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("Missing JWT_SECRET environment variable.");
+  }
+  return secret;
+}
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export async function POST(req: NextRequest) {
-    const body = await req.json();
-    const credential = body.credential;
+  try {
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      return NextResponse.json(
+        { error: "Google client not configured. Ask an admin to set GOOGLE_CLIENT_ID." },
+        { status: 500 }
+      );
+    }
 
-    if (!credential) return NextResponse.json({ error: "Failed credential" }, { status: 400 });
+    const body = await req.json().catch(() => null);
+    const credential = body?.credential;
 
-    const ticket = await client.verifyIdToken({
-        idToken: credential,
-        audience: process.env.GOOGLE_CLIENT_ID,
+    if (!credential) {
+      return NextResponse.json({ error: "Missing Google credential." }, { status: 400 });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
+
     const payload = ticket.getPayload();
-    if (!payload?.email_verified) return NextResponse.json({ error: "Email not verified" }, { status: 401 });
+    if (!payload?.email || !payload.email_verified) {
+      return NextResponse.json({ error: "Google account email is not verified." }, { status: 401 });
+    }
 
-    // TODO::check if manager/cashier/customer
+    const role = ROLE_DIRECTORY[payload.email] ?? "customer";
+    const user = {
+      sub: payload.sub,
+      name: payload.name ?? "",
+      email: payload.email,
+      picture: payload.picture ?? "",
+      role,
+    };
 
-    // TOOD::send access token/cookie/whatever
+    const token = jwt.sign(
+      {
+        sub: user.sub,
+        email: user.email,
+        name: user.name,
+        picture: user.picture,
+        role: user.role,
+      },
+      getJwtSecret(),
+      { expiresIn: SESSION_MAX_AGE }
+    );
+
+    const response = NextResponse.json({
+      user,
+      expiresIn: SESSION_MAX_AGE,
+    });
+
+    response.cookies.set({
+      name: SESSION_COOKIE,
+      value: token,
+      maxAge: SESSION_MAX_AGE,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Google OAuth error", error);
+    return NextResponse.json({ error: "Unable to authenticate with Google." }, { status: 500 });
+  }
 }
