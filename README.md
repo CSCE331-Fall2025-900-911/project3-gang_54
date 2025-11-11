@@ -1,21 +1,19 @@
 # project3-gang_54
-try
-vercel env pull .env.local --environment=production
+try\
+vercel env pull .env.local --environment=production\
 
 
-Website access:
+Website access:\
+https://project3-gang54.vercel.app/\
+should update automatically on repo push and it might take a bit to update.\
 
-https://project3-gang54.vercel.app/
-
-should update automatically on repo push and it might take a bit to update.
-
-Work inside `my-app/app`. Each subfolder is it's own page, `page.tsx` is compiled into a page. `/` is `app/page.tsx`.
+Work inside `my-app/app`. Each subfolder is it's own page, `page.tsx` is compiled into a page. `/` is `app/page.tsx`.\
 
 
-To work locally:
-cd my-app
-npm install
-npm run dev
+To work locally:\
+cd my-app\
+npm install\
+npm run dev\
 
 ## Environment variables
 
