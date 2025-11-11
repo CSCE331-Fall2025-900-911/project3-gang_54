@@ -1,6 +1,6 @@
 # project3-gang_54
 try\
-vercel env pull .env.local --environment=production\
+vercel env pull .env.local --environment=production
 
 
 Website access:\
