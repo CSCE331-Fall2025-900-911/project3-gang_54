@@ -63,6 +63,9 @@ main {
   padding-top: 72px;
 }
 
+
+
+
 nav {
   position: fixed;
   top: 0;
@@ -135,6 +138,10 @@ main {
   color: #555;
 }
 
+
+
+
+
 .home-box {
   width: 800px;
   max-width: 90%;
@@ -144,11 +151,12 @@ main {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin: 0 auto;
+  margin: 00px auto;
   gap: 30px;
 }
 
 .home-box h1 {
+
   font-size: 40px;
 }
 
@@ -174,22 +182,20 @@ main {
 .home-buttons .button:hover {
   background-color: #e68a00;
 }
-
 .home-box hr {
   border: none;
   height: 2px;
-  background-color: black;
+  background-color:black;
   width: 1000px;
   margin-top: -15px;
 }
-
 .drink-card img {
-  width: 260px;
-  height: 260px;
-  object-fit: cover;
-  border-radius: 12px;
-  display: block;
-  margin: 0 auto;
+    width: 260px;     
+    height: 260px; 
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto;
 }
 
 .login-shell {
