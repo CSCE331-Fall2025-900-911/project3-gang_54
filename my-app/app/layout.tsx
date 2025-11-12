@@ -34,25 +34,25 @@ export default function RootLayout({
           defer
         />
 
-        <nav>
-          <h1>ShareTea</h1>
-          <ul>
+        <nav className="fixed top-0 left-0 w-full bg-black text-white shadow-md flex justify-between items-center px-6 py-4 z-50">
+          <h1 className="text-2xl font-bold tracking-wide">ShareTea</h1>
+          <ul className="flex gap-6">
             <li>
-              <Link href="/">Home</Link>
+              <Link href="/" className="hover:text-orange-400 transition-colors">Home</Link>
             </li>
             <li>
-              <Link href="/order">Order</Link>
+              <Link href="/order" className="hover:text-orange-400 transition-colors">Order</Link>
             </li>
             <li>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/dashboard" className="hover:text-orange-400 transition-colors">Dashboard</Link>
             </li>
             <li>
-              <Link href="/login">Login</Link>
+              <Link href="/login" className="hover:text-orange-400 transition-colors">Login</Link>
             </li>
           </ul>
         </nav>
 
-        <main>{children}</main>
+        <main className="pt-24">{children}</main>
       </body>
     </html>
   );
