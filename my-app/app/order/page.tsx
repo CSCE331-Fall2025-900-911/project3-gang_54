@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type CategoryId =
   | "all"
@@ -161,8 +161,80 @@ const drinkMenu: Drink[] = [
   },
 ];
 
+type LanguageCode = "en" | "es" | "zh";
+
+const LANGUAGE_OPTIONS: Array<{ code: LanguageCode; label: string }> = [
+  { code: "en", label: "English" },
+  { code: "es", label: "Español" },
+  { code: "zh", label: "中文" },
+];
+
+const BASE_TRANSLATABLE_STRINGS = [
+  "In-store kiosk",
+  "Craft your ShareTea drink",
+  "Tap a drink to start customizing sweetness, ice, and toppings. Freshly brewed, ready when your name is called.",
+  "Quick order guide",
+  "Customize each drink in three intuitive steps:",
+  "Select size and ice level.",
+  "Choose sweetness and alternative milks.",
+  "Add toppings, confirm, and pay at the counter.",
+  "Need a recommendation?",
+  "Ask a team member or switch the kiosk to accessibility mode at the bottom of the screen.",
+  "Barista highlights",
+  "Language",
+  "Translating…",
+  "We couldn't translate right now. Showing original text.",
+  "Customize drink",
+  "Quick add",
+];
+
+const CATEGORY_TRANSLATABLE_STRINGS = categories.flatMap((category) =>
+  category.helper ? [category.label, category.helper] : [category.label]
+);
+
+const DRINK_TRANSLATABLE_STRINGS = drinkMenu.flatMap((drink) => {
+  const strings = [drink.name, drink.description];
+  if (drink.subtitle) {
+    strings.push(drink.subtitle);
+  }
+  if (drink.badge) {
+    strings.push(drink.badge);
+  }
+  drink.tags.forEach((tag) => strings.push(tag));
+  return strings;
+});
+
+const ORDER_SUMMARY_TRANSLATABLE_STRINGS = [
+  "Quick order guide",
+  "Customize each drink in three intuitive steps:",
+  "Select size and ice level.",
+  "Choose sweetness and alternative milks.",
+  "Add toppings, confirm, and pay at the counter.",
+  "Need a recommendation?",
+  "Ask a team member or switch the kiosk to accessibility mode at the bottom of the screen.",
+  "Barista highlights",
+  "Quick order guide",
+  "Need a recommendation?",
+  "Barista highlights",
+];
+
+const TRANSLATABLE_STRINGS = Array.from(
+  new Set([
+    ...BASE_TRANSLATABLE_STRINGS,
+    ...CATEGORY_TRANSLATABLE_STRINGS,
+    ...DRINK_TRANSLATABLE_STRINGS,
+    ...ORDER_SUMMARY_TRANSLATABLE_STRINGS,
+  ])
+);
+
 export default function OrderPage() {
   const [activeCategory, setActiveCategory] = useState<CategoryId>("seasonal");
+  const [language, setLanguage] = useState<LanguageCode>("en");
+  const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translationError, setTranslationError] = useState<string | null>(null);
+
+  const translationsCache = useRef<Partial<Record<LanguageCode, Record<string, string>>>>({});
 
   const filteredDrinks = useMemo(() => {
     if (activeCategory === "all") {
@@ -179,14 +251,124 @@ export default function OrderPage() {
     return filteredDrinks.slice(0, 3);
   }, [filteredDrinks]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const abortController = new AbortController();
+
+    if (language === "en") {
+      setTranslations({});
+      setTranslationError(null);
+      setIsTranslating(false);
+      return () => {
+        abortController.abort();
+      };
+    }
+
+    const cached = translationsCache.current[language];
+    if (cached) {
+      setTranslations(cached);
+      setTranslationError(null);
+      setIsTranslating(false);
+      return () => {
+        abortController.abort();
+      };
+    }
+
+    async function translate() {
+      try {
+        setIsTranslating(true);
+        setTranslationError(null);
+
+        const response = await fetch("/api/translate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            texts: TRANSLATABLE_STRINGS,
+            targetLanguage: language,
+          }),
+          signal: abortController.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Translation request failed.");
+        }
+
+        const data = (await response.json()) as {
+          translations?: Record<string, string>;
+        };
+
+        if (!data.translations) {
+          throw new Error("Translation data missing.");
+        }
+
+        if (!cancelled) {
+          translationsCache.current[language] = data.translations;
+          setTranslations(data.translations);
+          setIsTranslating(false);
+        }
+      } catch (error) {
+        if (cancelled || abortController.signal.aborted) {
+          return;
+        }
+        console.error("Translation error", error);
+        setTranslationError("We couldn't translate right now. Showing original text.");
+        setIsTranslating(false);
+        setTranslations({});
+      }
+    }
+
+    void translate();
+
+    return () => {
+      cancelled = true;
+      abortController.abort();
+    };
+  }, [language]);
+
+  const display = useCallback(
+    (text: string | undefined | null) => {
+      if (!text) {
+        return "";
+      }
+      return translations[text] ?? text;
+    },
+    [translations]
+  );
+
   return (
     <main className="order-page">
       <section className="order-hero" aria-labelledby="order-heading">
-        <p className="order-kicker">In-store kiosk</p>
-        <h1 id="order-heading">Craft your ShareTea drink</h1>
+        <p className="order-kicker">{display("In-store kiosk")}</p>
+        <h1 id="order-heading">{display("Craft your ShareTea drink")}</h1>
         <p className="order-subtitle">
-          Tap a drink to start customizing sweetness, ice, and toppings. Freshly brewed, ready when your name is called.
+          {display(
+            "Tap a drink to start customizing sweetness, ice, and toppings. Freshly brewed, ready when your name is called."
+          )}
         </p>
+      </section>
+
+      <section className="order-language" aria-label="Language selection">
+        <label htmlFor="order-language-select">{display("Language")}</label>
+        <select
+          id="order-language-select"
+          className="order-language__select"
+          value={language}
+          onChange={(event) => setLanguage(event.target.value as LanguageCode)}
+        >
+          {LANGUAGE_OPTIONS.map((option) => (
+            <option key={option.code} value={option.code}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <div className="order-language__status" aria-live="polite">
+          {isTranslating && <span>{display("Translating…")}</span>}
+          {!isTranslating && translationError && (
+            <span className="order-language__status--error">{display("We couldn't translate right now. Showing original text.")}</span>
+          )}
+        </div>
       </section>
 
       <section className="order-filters" aria-label="Drink categories">
@@ -198,14 +380,14 @@ export default function OrderPage() {
             aria-pressed={activeCategory === category.id}
             onClick={() => setActiveCategory(category.id)}
           >
-            {category.label}
+            {display(category.label)}
           </button>
         ))}
       </section>
 
       {categoryHelper && (
         <p className="order-category-note" role="status">
-          {categoryHelper}
+          {display(categoryHelper)}
         </p>
       )}
 
@@ -217,25 +399,25 @@ export default function OrderPage() {
                 <div className="order-card-title">
                   <span className="order-icon" aria-hidden>{drink.icon}</span>
                   <div>
-                    <h2>{drink.name}</h2>
-                    {drink.subtitle && <p className="order-card-subtitle">{drink.subtitle}</p>}
+                    <h2>{display(drink.name)}</h2>
+                    {drink.subtitle && <p className="order-card-subtitle">{display(drink.subtitle)}</p>}
                   </div>
                 </div>
-                {drink.badge && <span className="order-card-badge">{drink.badge}</span>}
+                {drink.badge && <span className="order-card-badge">{display(drink.badge)}</span>}
                 <span className="order-price">${drink.price.toFixed(2)}</span>
               </header>
-              <p className="order-description">{drink.description}</p>
+              <p className="order-description">{display(drink.description)}</p>
               <ul className="order-tags">
                 {drink.tags.map((tag) => (
-                  <li key={tag}>{tag}</li>
+                  <li key={tag}>{display(tag)}</li>
                 ))}
               </ul>
               <div className="order-card-actions">
                 <button type="button" className="order-button">
-                  Customize drink
+                  {display("Customize drink")}
                 </button>
                 <button type="button" className="order-button order-button--ghost">
-                  Quick add
+                  {display("Quick add")}
                 </button>
               </div>
             </article>
@@ -243,19 +425,19 @@ export default function OrderPage() {
         </div>
 
         <aside className="order-summary" aria-label="Order summary">
-          <h2>Quick order guide</h2>
-          <p>Customize each drink in three intuitive steps:</p>
+          <h2>{display("Quick order guide")}</h2>
+          <p>{display("Customize each drink in three intuitive steps:")}</p>
           <ol>
-            <li>Select size and ice level.</li>
-            <li>Choose sweetness and alternative milks.</li>
-            <li>Add toppings, confirm, and pay at the counter.</li>
+            <li>{display("Select size and ice level.")}</li>
+            <li>{display("Choose sweetness and alternative milks.")}</li>
+            <li>{display("Add toppings, confirm, and pay at the counter.")}</li>
           </ol>
           <div className="order-tip">
-            <h3>Need a recommendation?</h3>
-            <p>Ask a team member or switch the kiosk to accessibility mode at the bottom of the screen.</p>
+            <h3>{display("Need a recommendation?")}</h3>
+            <p>{display("Ask a team member or switch the kiosk to accessibility mode at the bottom of the screen.")}</p>
           </div>
           <div className="order-recommendations">
-            <h3>Barista highlights</h3>
+            <h3>{display("Barista highlights")}</h3>
             <ul>
               {recommendedDrinks.map((drink) => (
                 <li key={drink.name}>
@@ -263,8 +445,12 @@ export default function OrderPage() {
                     {drink.icon}
                   </span>
                   <div>
-                    <p className="order-recommendations__name">{drink.name}</p>
-                    <p className="order-recommendations__note">{drink.subtitle ?? drink.tags.join(" • ")}</p>
+                    <p className="order-recommendations__name">{display(drink.name)}</p>
+                    <p className="order-recommendations__note">
+                      {drink.subtitle
+                        ? display(drink.subtitle)
+                        : drink.tags.map((tag) => display(tag)).join(" • ")}
+                    </p>
                   </div>
                 </li>
               ))}

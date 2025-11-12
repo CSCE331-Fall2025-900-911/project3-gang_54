@@ -484,6 +484,44 @@ main {
   gap: 32px;
 }
 
+.order-language {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.order-language label {
+  font-weight: 600;
+  color: #3a3129;
+}
+
+.order-language__select {
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  padding: 10px 18px;
+  font-size: 14px;
+  background: #fff;
+  color: #33271f;
+  cursor: pointer;
+}
+
+.order-language__select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.25);
+  border-color: #ff9900;
+}
+
+.order-language__status {
+  min-height: 24px;
+  font-size: 14px;
+  color: #5b5249;
+}
+
+.order-language__status--error {
+  color: #a11c1c;
+}
+
 .order-category-note {
   font-size: 15px;
   color: #5b5249;

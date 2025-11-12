@@ -23,6 +23,7 @@ Create a `.env.local` file in `my-app/` with:
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=<your-client-id>.apps.googleusercontent.com
 GOOGLE_CLIENT_ID=<your-client-id>.apps.googleusercontent.com
 JWT_SECRET=<random-long-secret>
+GOOGLE_TRANSLATE_API_KEY=<your-google-translate-api-key>
 ```
 
 You can pull the production values directly from Vercel:
