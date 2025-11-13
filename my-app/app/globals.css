@@ -860,4 +860,9 @@ main {
     padding: 18px;
   }
 }
+.weather-text {
+  font-size: 18px;
+  margin-top: -10px;
+  color: #555;
+}
 

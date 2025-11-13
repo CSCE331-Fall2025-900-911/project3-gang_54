@@ -15,19 +15,26 @@ export default function Home() {
   return (
     <main className="home-container">
 
-      {/* Weather */}
-      <p>Current Weather: {weather}°F</p>
+      
 
       <div className="home-box">
-        <h1>Welcome to ShareTea</h1>
-        <p>Your favorite bubble tea, just a click away!</p>
-        <hr />
 
-        <div className="home-buttons">
-          <a href="/login" className="button">Login</a>
-          <a href="/order" className="button">Order Now</a>
-        </div>
-      </div>
+  <h1>Welcome to ShareTea</h1>
+
+  <p className="weather-text">
+    Current Weather: {weather}°F
+  </p>
+
+  <p>Your favorite bubble tea, just a click away!</p>
+  <hr />
+
+  <div className="home-buttons">
+    <a href="/login" className="button">Login</a>
+    <a href="/order" className="button">Order Now</a>
+  </div>
+
+</div>
+
 
       <section className="featured-drinks">
         <h2>Featured Drinks</h2>
