@@ -866,3 +866,54 @@ main {
   color: #555;
 }
 
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #ff9800;
+  border-radius: 6px;
+}
+/* Accessibility toggle button */
+.a11y-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: black;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  z-index: 999999;
+  font-size: 14px;
+  opacity: 0.85;
+}
+.a11y-toggle:hover {
+  opacity: 1;
+}
+
+/* When accessibility mode is ON */
+body.a11y-mode {
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+body.a11y-mode button,
+body.a11y-mode a.button {
+  padding: 18px 28px !important;
+  font-size: 1.05rem !important;
+}
+
+body.a11y-mode p,
+body.a11y-mode h1,
+body.a11y-mode h2,
+body.a11y-mode h3 {
+  color: black !important;
+}
+
+body.a11y-mode nav {
+  background: #000 !important;
+}
+
+body.a11y-mode a {
+  color: #000 !important;
+  text-decoration: underline;
+}
