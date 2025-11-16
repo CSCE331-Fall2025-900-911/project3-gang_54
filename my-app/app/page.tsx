@@ -15,44 +15,88 @@ export default function Home() {
   return (
     <main className="home-container">
 
-      
-
       <div className="home-box">
 
-  <h1>Welcome to ShareTea</h1>
+        {/* TITLE — always shows EN or ES based on body class */}
+        <h1 className="title-heading">
+          <span className="translate-en">Welcome to ShareTea</span>
+          <span className="translate-es">Bienvenido a ShareTea</span>
+        </h1>
 
-  <p className="weather-text">
-    Current Weather: {weather}°F
-  </p>
+        {/* WEATHER */}
+        <p className="weather-text">
+          <span className="translate-en">Current Weather: {weather}°F</span>
+          <span className="translate-es">Clima Actual: {weather}°F</span>
+        </p>
 
-  <p>Your favorite bubble tea, just a click away!</p>
-  <hr />
+        {/* SUBTITLE */}
+        <p>
+          <span className="translate-en">
+            Your favorite bubble tea, just a click away!
+          </span>
+          <span className="translate-es">
+            ¡Tu bubble tea favorito, a solo un clic!
+          </span>
+        </p>
 
-  <div className="home-buttons">
-    <a href="/login" className="button">Login</a>
-    <a href="/order" className="button">Order Now</a>
-  </div>
+        <hr />
 
-</div>
+        {/* BUTTONS */}
+        <div className="home-buttons">
 
+          <a href="/login" className="button">
+            <span className="translate-en">Login</span>
+            <span className="translate-es">Iniciar Sesión</span>
+          </a>
 
+          <a href="/order" className="button">
+            <span className="translate-en">Order Now</span>
+            <span className="translate-es">Ordenar Ahora</span>
+          </a>
+
+        </div>
+
+      </div>
+
+      {/* FEATURED DRINKS */}
       <section className="featured-drinks">
-        <h2>Featured Drinks</h2>
+        <h2>
+          <span className="translate-en">Featured Drinks</span>
+          <span className="translate-es">Bebidas Destacadas</span>
+        </h2>
+
         <div className="drinks-grid">
+
+          {/* DRINK 1 */}
           <div className="drink-card">
-            <img src="/coffee.jpg" alt="Coffee Milk Tea"/>
-            <p>Coffee Milk Tea</p>
+            <img src="/coffee.jpg" alt="Coffee Milk Tea" />
+            <p>
+              <span className="translate-en">Coffee Milk Tea</span>
+              <span className="translate-es">Té con Leche y Café</span>
+            </p>
           </div>
+
+          {/* DRINK 2 */}
           <div className="drink-card">
-            <img src="/green.jpg" alt="Classic Green Tea"/>
-            <p>Classic Green Tea</p>
+            <img src="/green.jpg" alt="Classic Green Tea" />
+            <p>
+              <span className="translate-en">Classic Green Tea</span>
+              <span className="translate-es">Té Verde Clásico</span>
+            </p>
           </div>
+
+          {/* DRINK 3 */}
           <div className="drink-card">
-            <img src="/mango.jpg" alt="Mango Fruit Tea"/>
-            <p>Mango Fruit Tea</p>
+            <img src="/mango.jpg" alt="Mango Fruit Tea" />
+            <p>
+              <span className="translate-en">Mango Fruit Tea</span>
+              <span className="translate-es">Té de Mango</span>
+            </p>
           </div>
+
         </div>
       </section>
+
     </main>
   );
 }

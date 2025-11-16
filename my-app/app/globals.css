@@ -5,6 +5,7 @@
   --foreground: #171717;
 }
 
+
 /* @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -917,3 +918,61 @@ body.a11y-mode a {
   color: #000 !important;
   text-decoration: underline;
 }
+/* HIGH CONTRAST MODE */
+.a11y-high-contrast * {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+.a11y-high-contrast a,
+.a11y-high-contrast button {
+  background-color: #ff9900 !important;
+  color: black !important;
+  border: 2px solid white !important;
+}
+/* LARGE TEXT MODE */
+.a11y-large-text * {
+  font-size: 1.25em !important;
+  line-height: 1.4 !important;
+}
+/* TRANSLATION: Spanish Mode */
+.a11y-spanish .translate-en {
+  display: none;
+}
+
+.a11y-spanish .translate-es {
+  display: inline;
+}
+.a11y-simple * {
+  font-size: 1.15em !important;
+  line-height: 1.5 !important;
+  font-weight: 500 !important;
+}
+
+.a11y-simple .simple-hidden {
+  display: none !important;
+}
+
+.a11y-simple .simple-only {
+  display: inline !important;
+}
+/* Ensure Spanish/English swap cleanly */
+.translate-es {
+  display: none;
+}
+
+.a11y-spanish .translate-en {
+  display: none;
+}
+
+.a11y-spanish .translate-es {
+  display: inline;
+}
+.title-heading {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
