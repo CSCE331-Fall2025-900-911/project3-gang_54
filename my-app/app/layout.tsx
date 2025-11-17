@@ -65,8 +65,8 @@ export default function RootLayout({
               </Link>
             </li>
             <li>
-              <Link href="/login" className="hover:text-orange-400 transition-colors">
-                Login
+              <Link href="/login" className="hover:text-orange-400 transition-colors login_box">
+                <strong>Login</strong>
               </Link>
             </li>
           </ul>

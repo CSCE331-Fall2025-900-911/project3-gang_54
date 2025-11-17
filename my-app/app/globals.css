@@ -101,6 +101,17 @@ nav ul li a:hover {
   text-decoration: underline;
 }
 
+.login_box {
+  background-color: #ff9900;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.login_box:hover {
+  background-color: #e68a00;
+}
+
 main {
   min-height: 100vh;
   display: flex;
