@@ -227,6 +227,7 @@ const TRANSLATABLE_STRINGS = Array.from(
   ])
 );
 
+
 export default function OrderPage() {
   const [activeCategory, setActiveCategory] = useState<CategoryId>("seasonal");
   const [language, setLanguage] = useState<LanguageCode>("en");
@@ -235,6 +236,9 @@ export default function OrderPage() {
   const [translationError, setTranslationError] = useState<string | null>(null);
 
   const translationsCache = useRef<Partial<Record<LanguageCode, Record<string, string>>>>({});
+
+  const [cart, setCart] = useState<Drink[]>([]);
+
 
   const filteredDrinks = useMemo(() => {
     if (activeCategory === "all") {
@@ -337,6 +341,19 @@ export default function OrderPage() {
     [translations]
   );
 
+  const addToCart = useCallback((drink: Drink) => {
+    setCart(prev => [...prev, drink]);
+  }, []);
+  const removeFromCart = useCallback((index: number) => {
+    setCart(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const cartTotal = useMemo(() => {
+    return cart.reduce((sum, item) => sum + item.price, 0);
+  }, [cart]);
+
+  const [cartOpen, setCartOpen] = useState(false);
+
   return (
     <main className="order-page">
       <section className="order-hero" aria-labelledby="order-heading">
@@ -416,7 +433,15 @@ export default function OrderPage() {
                 <button type="button" className="order-button">
                   {display("Customize drink")}
                 </button>
-                <button type="button" className="order-button order-button--ghost">
+
+                <button
+                  type="button"
+                  className="order-button order-button--ghost"
+                  onClick={() => {
+                    addToCart(drink);
+                    setCartOpen(true);
+                  }}
+                >
                   {display("Quick add")}
                 </button>
               </div>
@@ -458,7 +483,44 @@ export default function OrderPage() {
           </div>
         </aside>
       </section>
-    </main>
+      
+
+
+  <div className={"cart-sidebar" + (cartOpen && " open")}>
+      <div className="cart-header">
+        <h2>Your Order</h2>
+        <button className="cart-close" onClick={() => setCartOpen(false)}>✕</button>
+      </div>
+
+      {cart.length === 0 && <p className="cart-empty">Your cart is empty.</p>}
+
+      <ul className="cart-items">
+        {cart.map((item, index) => (
+          <li key={index} className="cart-item">
+            <div className="cart-item-info">
+              <span className="cart-item-name">{item.icon} {item.name}</span>
+              <span className="cart-item-price">${item.price.toFixed(2)}</span>
+            </div>
+            <button className="cart-remove" onClick={() => removeFromCart(index)}>
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {cart.length > 0 && (
+        <div className="cart-footer">
+          <p className="cart-total">Total: ${cartTotal.toFixed(2)}</p>
+          <button className="cart-checkout">Checkout</button>
+        </div>
+      )}
+    </div>
+    <button type="button" className="cart-toggle-button" onClick={() => setCartOpen(true)}>
+      View Cart ({cart.length})
+    </button>
+
+
+
+        </main>
   );
 }
-
