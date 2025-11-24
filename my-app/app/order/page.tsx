@@ -68,11 +68,10 @@ const BASE_TRANSLATABLE_STRINGS = [
 export default function OrderPage() {
   const [drinkMenu, setDrinkMenu] = useState<Drink[]>([]);
 
-  // Fetch menu from API
   useEffect(() => {
     async function fetchMenu() {
       try {
-        const res = await fetch("http://localhost:3001/api/menu");
+        const res = await fetch("/api/menu_items");
         if (!res.ok) throw new Error("Failed to fetch menu");
         const data: Drink[] = await res.json();
         setDrinkMenu(data);
@@ -330,7 +329,7 @@ export default function OrderPage() {
             <li key={index} className="cart-item">
               <div className="cart-item-info">
                 <span className="cart-item-name">{item.icon} {item.name}</span>
-                <span className="cart-item-price">${item.price.toFixed(2)}</span>
+                <span className="cart-item-price">${Number(item.price).toFixed(2)}</span>
               </div>
               <button className="cart-remove" onClick={() => removeFromCart(index)}>Remove</button>
             </li>
@@ -339,7 +338,7 @@ export default function OrderPage() {
 
         {cart.length > 0 && (
           <div className="cart-footer">
-            <p className="cart-total">Total: ${cartTotal.toFixed(2)}</p>
+            <p className="cart-total">Total: ${Number(cartTotal).toFixed(2)}</p>
             <button className="cart-checkout">Checkout</button>
           </div>
         )}
