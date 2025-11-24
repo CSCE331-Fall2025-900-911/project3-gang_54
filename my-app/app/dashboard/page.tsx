@@ -293,11 +293,10 @@ function ManageMenuView() {
                   />
                 </td>
 
-                {/* ✔️ Delete button */}
                 <td style={{ padding: "8px" }}>
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // don’t trigger row select
+                      e.stopPropagation();
                       handleDelete(item.item_id);
                     }}
                     style={{
