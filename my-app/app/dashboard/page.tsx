@@ -421,7 +421,7 @@ function ManageInventoryView() {
     }
 
     try {
-      const res = await fetch("/api/ingredients", {
+      const res = await fetch("/api/inventory", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, quantity: quantityNum }),
@@ -459,7 +459,7 @@ function ManageInventoryView() {
     }
 
     try {
-      const res = await fetch("/api/ingredients", {
+      const res = await fetch("/api/inventory", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -486,7 +486,7 @@ function ManageInventoryView() {
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch("/api/ingredients", {
+      const res = await fetch("/api/inventory", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
