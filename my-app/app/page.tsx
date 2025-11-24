@@ -5,12 +5,13 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const [weather, setWeather] = useState(null);
 
-  useEffect(() => {
-    fetch("/api/weather")
-      .then((res) => res.json())
-      .then((data) => setWeather(data.temp))
-      .catch(() => setWeather("Unavailable"));
-  }, []);
+  // not working rn
+  // useEffect(() => {
+  //   fetch("/api/weather")
+  //     .then((res) => res.json())
+  //     .then((data) => setWeather(data.temp))
+  //     .catch(() => setWeather("Unavailable"));
+  // }, []);
 
   return (
     <main className="home-container">
