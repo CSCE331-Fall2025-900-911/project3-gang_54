@@ -38,129 +38,6 @@ const categories: Category[] = [
   { id: "dessert", label: "Dessert Bar", helper: "Sweet treats & creamy finishes" },
 ];
 
-const drinkMenu: Drink[] = [
-  {
-    name: "Roasted Oolong Latte",
-    subtitle: "Oat milk • Toasted sugar cap",
-    description: "Slow-roasted oolong balanced with velvety oat milk and caramelized sugar cap.",
-    price: 6.45,
-    tags: ["Seasonal", "Barista Crafted"],
-    category: "seasonal",
-    icon: "🔥",
-    badge: "New Harvest",
-  },
-  {
-    name: "Black Sesame Okinawa",
-    subtitle: "Molasses • Roasted sesame",
-    description: "Earthy black sesame paste whisked with Okinawa brown sugar and layered milk foam.",
-    price: 6.95,
-    tags: ["Limited", "Nutty"],
-    category: "seasonal",
-    icon: "🌙",
-    badge: "Chef's pick",
-  },
-  {
-    name: "Brown Sugar Boba Milk",
-    subtitle: "Warm pearls • House syrup",
-    description: "Charred brown sugar syrup folded through fresh milk and soft boba pearls.",
-    price: 5.95,
-    tags: ["Classic", "Customer Favorite"],
-    category: "classics",
-    icon: "🧋",
-  },
-  {
-    name: "Hong Kong Milk Tea",
-    subtitle: "Ceylon black • Condensed milk",
-    description: "Velvety HK-style milk tea brewed strong and finished with silky condensed milk.",
-    price: 5.50,
-    tags: ["Rich", "Caffeine Boost"],
-    category: "classics",
-    icon: "🏮",
-  },
-  {
-    name: "Jasmine Green Breeze",
-    subtitle: "Light floral • Cane sugar",
-    description: "Fragrant jasmine tea shaken cold with a touch of cane syrup and soft foam.",
-    price: 4.95,
-    tags: ["Light", "Caffeine Boost"],
-    category: "fruit-tea",
-    icon: "🌿",
-  },
-  {
-    name: "Lychee Aloe Refresher",
-    subtitle: "Jasmine tea • Lychee pearls",
-    description: "Bright lychee syrup, aloe bites, and sparkling jasmine tea over pebble ice.",
-    price: 5.45,
-    tags: ["Refresh", "No Dairy"],
-    category: "sparkling",
-    icon: "💧",
-  },
-  {
-    name: "Mango Coconut Breeze",
-    subtitle: "Thai coconut • Golden mango",
-    description: "Sun-ripe mango nectar blended with coconut milk, topped with mango jelly.",
-    price: 6.15,
-    tags: ["Icy", "Dairy Free"],
-    category: "fruit-tea",
-    icon: "🥭",
-  },
-  {
-    name: "Strawberry Matcha Swirl",
-    subtitle: "Ceremonial matcha • Berry purée",
-    description: "Organic matcha layered over strawberries and milk snow for a bold, sweet finish.",
-    price: 6.75,
-    tags: ["Signature", "Instagram Ready"],
-    category: "milk-tea",
-    icon: "🍓",
-    badge: "Best Seller",
-  },
-  {
-    name: "Salted Caramel Cream Brûlée",
-    subtitle: "Salt cream • Torched sugar",
-    description: "Butter-toasted caramel infused into Assam tea with a brûléed sea-salt cream cap.",
-    price: 6.35,
-    tags: ["Indulgent", "Warm"],
-    category: "milk-tea",
-    icon: "🍮",
-  },
-  {
-    name: "Grapefruit Sunrise",
-    subtitle: "Ruby red • Basil seed",
-    description: "Fresh grapefruit segments, basil seeds, and sparkling jasmine tea—bright & tart.",
-    price: 5.65,
-    tags: ["Vitamin C", "Zesty"],
-    category: "sparkling",
-    icon: "🍊",
-  },
-  {
-    name: "Dragonfruit Kiwi Glow",
-    subtitle: "Cold brew white tea • Aloe",
-    description: "Vibrant dragonfruit and kiwi purée layered with aloe and white tea.",
-    price: 6.05,
-    tags: ["Antioxidant", "Vegan"],
-    category: "fruit-tea",
-    icon: "🐉",
-  },
-  {
-    name: "Toffee Pudding Macchiato",
-    subtitle: "Espresso crema • Toffee whip",
-    description: "House espresso shot over pudding milk tea with torched toffee whip.",
-    price: 6.85,
-    tags: ["Dessert", "Bold"],
-    category: "dessert",
-    icon: "☕️",
-  },
-  {
-    name: "Cookie Butter Cream Float",
-    subtitle: "Speculoos crumble • Vanilla milk",
-    description: "Chilled vanilla milk topped with speculoos cookie butter cream and crunch.",
-    price: 6.45,
-    tags: ["Sweet", "No Tea"],
-    category: "dessert",
-    icon: "🍪",
-  },
-];
-
 type LanguageCode = "en" | "es" | "zh";
 
 const LANGUAGE_OPTIONS: Array<{ code: LanguageCode; label: string }> = [
@@ -188,47 +65,24 @@ const BASE_TRANSLATABLE_STRINGS = [
   "Quick add",
 ];
 
-const CATEGORY_TRANSLATABLE_STRINGS = categories.flatMap((category) =>
-  category.helper ? [category.label, category.helper] : [category.label]
-);
-
-const DRINK_TRANSLATABLE_STRINGS = drinkMenu.flatMap((drink) => {
-  const strings = [drink.name, drink.description];
-  if (drink.subtitle) {
-    strings.push(drink.subtitle);
-  }
-  if (drink.badge) {
-    strings.push(drink.badge);
-  }
-  drink.tags.forEach((tag) => strings.push(tag));
-  return strings;
-});
-
-const ORDER_SUMMARY_TRANSLATABLE_STRINGS = [
-  "Quick order guide",
-  "Customize each drink in three intuitive steps:",
-  "Select size and ice level.",
-  "Choose sweetness and alternative milks.",
-  "Add toppings, confirm, and pay at the counter.",
-  "Need a recommendation?",
-  "Ask a team member or switch the kiosk to accessibility mode at the bottom of the screen.",
-  "Barista highlights",
-  "Quick order guide",
-  "Need a recommendation?",
-  "Barista highlights",
-];
-
-const TRANSLATABLE_STRINGS = Array.from(
-  new Set([
-    ...BASE_TRANSLATABLE_STRINGS,
-    ...CATEGORY_TRANSLATABLE_STRINGS,
-    ...DRINK_TRANSLATABLE_STRINGS,
-    ...ORDER_SUMMARY_TRANSLATABLE_STRINGS,
-  ])
-);
-
-
 export default function OrderPage() {
+  const [drinkMenu, setDrinkMenu] = useState<Drink[]>([]);
+
+  // Fetch menu from API
+  useEffect(() => {
+    async function fetchMenu() {
+      try {
+        const res = await fetch("http://localhost:3001/api/menu");
+        if (!res.ok) throw new Error("Failed to fetch menu");
+        const data: Drink[] = await res.json();
+        setDrinkMenu(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchMenu();
+  }, []);
+
   const [activeCategory, setActiveCategory] = useState<CategoryId>("seasonal");
   const [language, setLanguage] = useState<LanguageCode>("en");
   const [translations, setTranslations] = useState<Record<string, string>>({});
@@ -236,24 +90,46 @@ export default function OrderPage() {
   const [translationError, setTranslationError] = useState<string | null>(null);
 
   const translationsCache = useRef<Partial<Record<LanguageCode, Record<string, string>>>>({});
-
   const [cart, setCart] = useState<Drink[]>([]);
 
-
   const filteredDrinks = useMemo(() => {
-    if (activeCategory === "all") {
-      return drinkMenu;
-    }
+    if (activeCategory === "all") return drinkMenu;
     return drinkMenu.filter((drink) => drink.category === activeCategory);
-  }, [activeCategory]);
+  }, [activeCategory, drinkMenu]);
 
   const categoryHelper = useMemo(() => {
     return categories.find((category) => category.id === activeCategory)?.helper;
   }, [activeCategory]);
 
-  const recommendedDrinks = useMemo(() => {
-    return filteredDrinks.slice(0, 3);
-  }, [filteredDrinks]);
+  const recommendedDrinks = useMemo(() => filteredDrinks.slice(0, 3), [filteredDrinks]);
+
+  // Memoize translatable strings to prevent infinite loops
+  const TRANSLATABLE_STRINGS = useMemo(() => {
+    const categoryStrings = categories.flatMap((category) =>
+      category.helper ? [category.label, category.helper] : [category.label]
+    );
+
+    const drinkStrings = drinkMenu.flatMap((drink) => {
+      const strings = [drink.name, drink.description];
+      if (drink.subtitle) strings.push(drink.subtitle);
+      if (drink.badge) strings.push(drink.badge);
+      drink.tags.forEach((tag) => strings.push(tag));
+      return strings;
+    });
+
+    const orderStrings = [
+      "Quick order guide",
+      "Customize each drink in three intuitive steps:",
+      "Select size and ice level.",
+      "Choose sweetness and alternative milks.",
+      "Add toppings, confirm, and pay at the counter.",
+      "Need a recommendation?",
+      "Ask a team member or switch the kiosk to accessibility mode at the bottom of the screen.",
+      "Barista highlights",
+    ];
+
+    return Array.from(new Set([...BASE_TRANSLATABLE_STRINGS, ...categoryStrings, ...drinkStrings, ...orderStrings]));
+  }, [drinkMenu]);
 
   useEffect(() => {
     let cancelled = false;
@@ -263,9 +139,7 @@ export default function OrderPage() {
       setTranslations({});
       setTranslationError(null);
       setIsTranslating(false);
-      return () => {
-        abortController.abort();
-      };
+      return () => abortController.abort();
     }
 
     const cached = translationsCache.current[language];
@@ -273,9 +147,7 @@ export default function OrderPage() {
       setTranslations(cached);
       setTranslationError(null);
       setIsTranslating(false);
-      return () => {
-        abortController.abort();
-      };
+      return () => abortController.abort();
     }
 
     async function translate() {
@@ -285,27 +157,15 @@ export default function OrderPage() {
 
         const response = await fetch("/api/translate", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            texts: TRANSLATABLE_STRINGS,
-            targetLanguage: language,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ texts: TRANSLATABLE_STRINGS, targetLanguage: language }),
           signal: abortController.signal,
         });
 
-        if (!response.ok) {
-          throw new Error("Translation request failed.");
-        }
+        if (!response.ok) throw new Error("Translation request failed.");
 
-        const data = (await response.json()) as {
-          translations?: Record<string, string>;
-        };
-
-        if (!data.translations) {
-          throw new Error("Translation data missing.");
-        }
+        const data = (await response.json()) as { translations?: Record<string, string> };
+        if (!data.translations) throw new Error("Translation data missing.");
 
         if (!cancelled) {
           translationsCache.current[language] = data.translations;
@@ -313,9 +173,7 @@ export default function OrderPage() {
           setIsTranslating(false);
         }
       } catch (error) {
-        if (cancelled || abortController.signal.aborted) {
-          return;
-        }
+        if (cancelled || abortController.signal.aborted) return;
         console.error("Translation error", error);
         setTranslationError("We couldn't translate right now. Showing original text.");
         setIsTranslating(false);
@@ -329,33 +187,24 @@ export default function OrderPage() {
       cancelled = true;
       abortController.abort();
     };
-  }, [language]);
+  }, [language]); 
 
   const display = useCallback(
     (text: string | undefined | null) => {
-      if (!text) {
-        return "";
-      }
+      if (!text) return "";
       return translations[text] ?? text;
     },
     [translations]
   );
 
-  const addToCart = useCallback((drink: Drink) => {
-    setCart(prev => [...prev, drink]);
-  }, []);
-  const removeFromCart = useCallback((index: number) => {
-    setCart(prev => prev.filter((_, i) => i !== index));
-  }, []);
-
-  const cartTotal = useMemo(() => {
-    return cart.reduce((sum, item) => sum + item.price, 0);
-  }, [cart]);
-
+  const addToCart = useCallback((drink: Drink) => setCart((prev) => [...prev, drink]), []);
+  const removeFromCart = useCallback((index: number) => setCart((prev) => prev.filter((_, i) => i !== index)), []);
+  const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + item.price, 0), [cart]);
   const [cartOpen, setCartOpen] = useState(false);
 
   return (
     <main className="order-page">
+      {/* ... your JSX unchanged ... */}
       <section className="order-hero" aria-labelledby="order-heading">
         <p className="order-kicker">{display("In-store kiosk")}</p>
         <h1 id="order-heading">{display("Craft your ShareTea drink")}</h1>
@@ -402,11 +251,7 @@ export default function OrderPage() {
         ))}
       </section>
 
-      {categoryHelper && (
-        <p className="order-category-note" role="status">
-          {display(categoryHelper)}
-        </p>
-      )}
+      {categoryHelper && <p className="order-category-note" role="status">{display(categoryHelper)}</p>}
 
       <section className="order-layout">
         <div className="order-menu" aria-label="Menu items">
@@ -421,26 +266,18 @@ export default function OrderPage() {
                   </div>
                 </div>
                 {drink.badge && <span className="order-card-badge">{display(drink.badge)}</span>}
-                <span className="order-price">${drink.price.toFixed(2)}</span>
+                <span className="order-price">${Number(drink.price).toFixed(2)}</span>
               </header>
               <p className="order-description">{display(drink.description)}</p>
               <ul className="order-tags">
-                {drink.tags.map((tag) => (
-                  <li key={tag}>{display(tag)}</li>
-                ))}
+                {drink.tags.map((tag) => (<li key={tag}>{display(tag)}</li>))}
               </ul>
               <div className="order-card-actions">
-                <button type="button" className="order-button">
-                  {display("Customize drink")}
-                </button>
-
+                <button type="button" className="order-button">{display("Customize drink")}</button>
                 <button
                   type="button"
                   className="order-button order-button--ghost"
-                  onClick={() => {
-                    addToCart(drink);
-                    setCartOpen(true);
-                  }}
+                  onClick={() => { addToCart(drink); setCartOpen(true); }}
                 >
                   {display("Quick add")}
                 </button>
@@ -466,15 +303,11 @@ export default function OrderPage() {
             <ul>
               {recommendedDrinks.map((drink) => (
                 <li key={drink.name}>
-                  <span className="order-recommendations__icon" aria-hidden>
-                    {drink.icon}
-                  </span>
+                  <span className="order-recommendations__icon" aria-hidden>{drink.icon}</span>
                   <div>
                     <p className="order-recommendations__name">{display(drink.name)}</p>
                     <p className="order-recommendations__note">
-                      {drink.subtitle
-                        ? display(drink.subtitle)
-                        : drink.tags.map((tag) => display(tag)).join(" • ")}
+                      {drink.subtitle ? display(drink.subtitle) : drink.tags.map((tag) => display(tag)).join(" • ")}
                     </p>
                   </div>
                 </li>
@@ -483,44 +316,37 @@ export default function OrderPage() {
           </div>
         </aside>
       </section>
-      
 
-
-  <div className={"cart-sidebar" + (cartOpen && " open")}>
-      <div className="cart-header">
-        <h2>Your Order</h2>
-        <button className="cart-close" onClick={() => setCartOpen(false)}>✕</button>
-      </div>
-
-      {cart.length === 0 && <p className="cart-empty">Your cart is empty.</p>}
-
-      <ul className="cart-items">
-        {cart.map((item, index) => (
-          <li key={index} className="cart-item">
-            <div className="cart-item-info">
-              <span className="cart-item-name">{item.icon} {item.name}</span>
-              <span className="cart-item-price">${item.price.toFixed(2)}</span>
-            </div>
-            <button className="cart-remove" onClick={() => removeFromCart(index)}>
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      {cart.length > 0 && (
-        <div className="cart-footer">
-          <p className="cart-total">Total: ${cartTotal.toFixed(2)}</p>
-          <button className="cart-checkout">Checkout</button>
+      <div className={"cart-sidebar" + (cartOpen && " open")}>
+        <div className="cart-header">
+          <h2>Your Order</h2>
+          <button className="cart-close" onClick={() => setCartOpen(false)}>✕</button>
         </div>
-      )}
-    </div>
-    <button type="button" className="cart-toggle-button" onClick={() => setCartOpen(true)}>
-      View Cart ({cart.length})
-    </button>
 
+        {cart.length === 0 && <p className="cart-empty">Your cart is empty.</p>}
 
+        <ul className="cart-items">
+          {cart.map((item, index) => (
+            <li key={index} className="cart-item">
+              <div className="cart-item-info">
+                <span className="cart-item-name">{item.icon} {item.name}</span>
+                <span className="cart-item-price">${item.price.toFixed(2)}</span>
+              </div>
+              <button className="cart-remove" onClick={() => removeFromCart(index)}>Remove</button>
+            </li>
+          ))}
+        </ul>
 
-        </main>
+        {cart.length > 0 && (
+          <div className="cart-footer">
+            <p className="cart-total">Total: ${cartTotal.toFixed(2)}</p>
+            <button className="cart-checkout">Checkout</button>
+          </div>
+        )}
+      </div>
+      <button type="button" className="cart-toggle-button" onClick={() => setCartOpen(true)}>
+        View Cart ({cart.length})
+      </button>
+    </main>
   );
 }
