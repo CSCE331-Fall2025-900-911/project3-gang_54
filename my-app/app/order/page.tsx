@@ -71,7 +71,7 @@ export default function OrderPage() {
   useEffect(() => {
     async function fetchMenu() {
       try {
-        const res = await fetch("/api/menu_items");
+        const res = await fetch("/api/ordermenu");
         if (!res.ok) throw new Error("Failed to fetch menu");
         const data: Drink[] = await res.json();
         setDrinkMenu(data);
@@ -112,7 +112,7 @@ export default function OrderPage() {
       const strings = [drink.name, drink.description];
       if (drink.subtitle) strings.push(drink.subtitle);
       if (drink.badge) strings.push(drink.badge);
-      drink.tags.forEach((tag) => strings.push(tag));
+      drink.tags?.forEach((tag) => strings.push(tag));
       return strings;
     });
 
