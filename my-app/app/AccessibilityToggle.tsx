@@ -9,6 +9,11 @@ export default function AccessibilityToggle() {
     document.body.classList.toggle(mode);
   }
 
+  // Helper for marking ON/OFF state without replacing buttons
+  function isOn(mode: string) {
+    return document.body.classList.contains(mode) ? " ✓" : "";
+  }
+
   return (
     <div className="fixed bottom-6 right-6 z-[9999]">
       {/* FAB Button */}
@@ -22,26 +27,27 @@ export default function AccessibilityToggle() {
       {/* Panel */}
       {open && (
         <div className="mt-3 bg-white shadow-xl rounded-lg p-4 w-48 text-black">
+
           <button
             onClick={() => toggleMode("a11y-high-contrast")}
             className="block w-full py-2 px-3 text-left hover:bg-gray-200 rounded"
           >
-            High Contrast
+            High Contrast <span>{isOn("a11y-high-contrast")}</span>
           </button>
+
           <button
-          onClick={() => toggleMode("a11y-spanish")}
-          className="block w-full py-2 px-3 text-left hover:bg-gray-200 rounded"
+            onClick={() => toggleMode("a11y-spanish")}
+            className="block w-full py-2 px-3 text-left hover:bg-gray-200 rounded"
           >
-          Translate: Español / English
+            Translate: Español / English <span>{isOn("a11y-spanish")}</span>
           </button>
 
           <button
             onClick={() => toggleMode("a11y-large-text")}
             className="block w-full py-2 px-3 text-left hover:bg-gray-200 rounded"
           >
-            Large Text
+            Large Text <span>{isOn("a11y-large-text")}</span>
           </button>
-
 
         </div>
       )}
