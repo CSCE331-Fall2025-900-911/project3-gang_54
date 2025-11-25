@@ -97,7 +97,7 @@ function ManageMenuView() {
   type MenuItem = {
     item_id: number;
     item_name: string;
-    category: string;
+    // category: string;
     price: number;
   };
 
@@ -106,7 +106,7 @@ function ManageMenuView() {
   const [error, setError] = useState<string | null>(null);
 
   const [newName, setNewName] = useState("");
-  const [newCategory, setNewCategory] = useState("");
+  // const [newCategory, setNewCategory] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
@@ -130,7 +130,7 @@ function ManageMenuView() {
 
   const handleCellChange = (
     id: number,
-    field: "item_name" | "category" | "price",
+    field: "item_name" | "price",
     value: string
   ) => {
     setItems((prev) =>
@@ -147,10 +147,10 @@ function ManageMenuView() {
 
   const handleAdd = async () => {
     const name = newName.trim();
-    const category = newCategory.trim();
+    // const category = newCategory.trim();
     const priceNum = Number(newPrice);
-    if (!name || !category || Number.isNaN(priceNum)) {
-      alert("Enter valid name, category, and price");
+    if (!name || Number.isNaN(priceNum)) {
+      alert("Enter valid name and price");
       return;
     }
 
@@ -158,7 +158,8 @@ function ManageMenuView() {
       const res = await fetch("/api/menu_items", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, category, price: priceNum }),
+        // body: JSON.stringify({ name, category, price: priceNum }),
+        body: JSON.stringify({ name, price: priceNum }),
       });
       if (!res.ok) throw new Error("Failed to add item");
 
@@ -166,7 +167,7 @@ function ManageMenuView() {
       setItems((prev) => [...prev, created]);
 
       setNewName("");
-      setNewCategory("");
+      // setNewCategory("");
       setNewPrice("");
     } catch (err: any) {
       alert(err.message ?? "Error adding item");
@@ -182,9 +183,9 @@ function ManageMenuView() {
     if (!item) return;
 
     const name = item.item_name.trim();
-    const category = item.category.trim();
+    // const category = item.category.trim();
     const priceNum = Number(item.price);
-    if (!name || !category || Number.isNaN(priceNum)) {
+    if (!name || Number.isNaN(priceNum)) {
       alert("Invalid values on selected row");
       return;
     }
@@ -196,7 +197,6 @@ function ManageMenuView() {
         body: JSON.stringify({
           id: selectedId,
           name,
-          category,
           price: priceNum,
         }),
       });
@@ -241,7 +241,6 @@ function ManageMenuView() {
             <tr>
               <th style={{ textAlign: "left", padding: "8px" }}>ID</th>
               <th style={{ textAlign: "left", padding: "8px" }}>Name</th>
-              <th style={{ textAlign: "left", padding: "8px" }}>Category</th>
               <th style={{ textAlign: "left", padding: "8px" }}>Price</th>
             </tr>
           </thead>
@@ -271,16 +270,16 @@ function ManageMenuView() {
                     style={{ width: "100%" }}
                   />
                 </td>
-                <td style={{ padding: "8px" }}>
-                  <input
+                {/* <td style={{ padding: "8px" }}> */}
+                  {/* <input
                     type="text"
                     value={item.category}
                     onChange={(e) =>
                       handleCellChange(item.item_id, "category", e.target.value)
                     }
                     style={{ width: "100%" }}
-                  />
-                </td>
+                  /> */}
+                {/* </td> */}
                 <td style={{ padding: "8px" }}>
                   <input
                     type="number"
@@ -334,13 +333,13 @@ function ManageMenuView() {
           onChange={(e) => setNewName(e.target.value)}
           className={styles.inputField}
         />
-        <input
+        {/* <input
           type="text"
           placeholder="Category"
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
           className={styles.inputField}
-        />
+        /> */}
         <input
           type="number"
           step="0.01"

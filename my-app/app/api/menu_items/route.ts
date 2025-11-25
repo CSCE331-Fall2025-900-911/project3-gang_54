@@ -12,7 +12,7 @@ export async function GET() {
 
   try {
     await client.connect();
-    const result = await client.query("SELECT * FROM menu_items");
+    const result = await client.query("SELECT * FROM items");
     return NextResponse.json(result.rows);
   } catch (error) {
     console.error(error);
@@ -26,7 +26,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const { name, category, price } = await request.json();
+  // const { name, category, price } = await request.json();
+  const { name, price } = await request.json();
 
   const client = new Client({
     user: process.env.DB_user,
@@ -39,8 +40,10 @@ export async function POST(request: NextRequest) {
   try {
     await client.connect();
     const insertResult = await client.query(
-      "INSERT INTO menu_items (item_name, category, price) VALUES ($1, $2, $3) RETURNING item_id, item_name, category, price",
-      [name, category, price]
+      // "INSERT INTO menu_items (item_name, category, price) VALUES ($1, $2, $3) RETURNING item_id, item_name, category, price",
+      // [name, category, price]
+      "INSERT INTO items (item_name, price) VALUES ($1, $2) RETURNING item_id, item_name, price",
+      [name, price]
     );
 
     const createdRow = insertResult.rows[0];
@@ -57,7 +60,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  const { id, name, category, price } = await request.json();
+  // const { id, name, category, price } = await request.json();
+  const { id, name, price } = await request.json();
 
   const client = new Client({
     user: process.env.DB_user,
@@ -70,11 +74,13 @@ export async function PUT(request: NextRequest) {
   try {
     await client.connect();
     await client.query(
-      "UPDATE menu_items SET item_name = $1, category = $2, price = $3 WHERE item_id = $4",
-      [name, category, price, id]
+      // "UPDATE menu_items SET item_name = $1, category = $2, price = $3 WHERE item_id = $4",
+      // [name, category, price, id]
+      "UPDATE items SET item_name = $1, price = $2 WHERE item_id = $3",
+      [name, price, id]
     );
 
-    const updatedResult = await client.query("SELECT * FROM menu_items");
+    const updatedResult = await client.query("SELECT * FROM items");
     return NextResponse.json(updatedResult.rows);
   } catch (error) {
     console.error(error);
@@ -100,7 +106,7 @@ export async function DELETE(request: NextRequest) {
 
   try {
     await client.connect();
-    await client.query("DELETE FROM menu_items WHERE item_id = $1", [id]);
+    await client.query("DELETE FROM items WHERE item_id = $1", [id]);
 
     return NextResponse.json({ success: true });
   } catch (error) {
