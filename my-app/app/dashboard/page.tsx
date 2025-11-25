@@ -618,15 +618,229 @@ function ManageInventoryView() {
 }
 
 function ManageEmployeesView() {
+  type Employee = {
+    employee_id: number;
+    name: string;
+    role: string;
+  };
+
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [newName, setNewName] = useState("");
+  const [newRole, setNewRole] = useState("");
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const loadEmployees = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/employees");
+        if (!res.ok) throw new Error("Failed to load employees");
+        const data = await res.json();
+        setEmployees(data);
+      } catch (err: any) {
+        setError(err.message ?? "Error loading employees");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadEmployees();
+  }, []);
+
+  const handleCellChange = (id: number, field: "name" | "role", value: string) => {
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        emp.employee_id === id ? { ...emp, [field]: value } : emp
+      )
+    );
+  };
+
+  const handleAdd = async () => {
+    const name = newName.trim();
+    const role = newRole.trim();
+
+    if (!name || !role) {
+      alert("Enter valid name and role");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/employees", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, role }),
+      });
+
+      if (!res.ok) throw new Error("Failed to add employee");
+
+      const created: Employee = await res.json();
+      setEmployees((prev) => [...prev, created]);
+
+      setNewName("");
+      setNewRole("");
+    } catch (err: any) {
+      alert(err.message ?? "Error adding employee");
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (selectedId == null) {
+      alert("Select a row to update");
+      return;
+    }
+
+    const emp = employees.find((e) => e.employee_id === selectedId);
+    if (!emp) return;
+
+    const name = emp.name.trim();
+    const role = emp.role.trim();
+
+    if (!name || !role) {
+      alert("Invalid values on selected row");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/employees", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedId, name, role }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update employee");
+
+      const data = await res.json();
+      setEmployees(data);
+    } catch (err: any) {
+      alert(err.message ?? "Error updating employee");
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    const confirmDelete = confirm("Are you sure you want to delete this employee?");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch("/api/employees", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!res.ok) throw new Error("Failed to delete employee");
+
+      setEmployees((prev) => prev.filter((e) => e.employee_id !== id));
+      if (selectedId === id) setSelectedId(null);
+    } catch (err: any) {
+      alert(err.message ?? "Error deleting employee");
+    }
+  };
+
   return (
     <div>
-      <p className={styles.helperText}>implement backend</p>
+      {loading && <p className={styles.helperText}>Loading employees...</p>}
+      {error && <p className={styles.helperText}>Error: {error}</p>}
+
       <div className={styles.tablePlaceholder}>
-        <p>Employees table will go here.</p>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={{ padding: "8px" }}>ID</th>
+              <th style={{ padding: "8px" }}>Name</th>
+              <th style={{ padding: "8px" }}>Role</th>
+              <th style={{ padding: "8px" }}>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {employees.map((emp) => (
+              <tr
+                key={emp.employee_id}
+                onClick={() => setSelectedId(emp.employee_id)}
+                style={{
+                  backgroundColor:
+                    selectedId === emp.employee_id ? "#ffe0b3" : "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                <td style={{ padding: "8px" }}>{emp.employee_id}</td>
+
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={emp.name}
+                    onChange={(e) => handleCellChange(emp.employee_id, "name", e.target.value)}
+                    className={styles.inputField}
+                  />
+                </td>
+
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={emp.role}
+                    onChange={(e) => handleCellChange(emp.employee_id, "role", e.target.value)}
+                    className={styles.inputField}
+                  />
+                </td>
+
+                <td style={{ padding: "8px" }}>
+                  <button
+                    className={styles.deleteButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(emp.employee_id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <button className={styles.updateButton} onClick={handleUpdate}>
+          Update Selected
+        </button>
+      </div>
+
+      <div
+        style={{
+          marginTop: "20px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Name"
+          value={newName}
+          className={styles.inputField}
+          onChange={(e) => setNewName(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Role"
+          value={newRole}
+          className={styles.inputField}
+          onChange={(e) => setNewRole(e.target.value)}
+        />
+
+        <button className={styles.addButton} onClick={handleAdd}>
+          Add
+        </button>
       </div>
     </div>
   );
 }
+
 
 function ProductUsageView() {
   return (
