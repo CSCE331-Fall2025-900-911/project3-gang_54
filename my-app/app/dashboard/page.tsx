@@ -10,7 +10,8 @@ type View =
   | "employees"
   | "productUsage"
   | "xReports"
-  | "zReports";
+  | "zReports"
+  | "kitchen";   // ← ADD THIS
 
 export default function ManagerDashboard() {
   const [view, setView] = useState<View>("dashboard");
@@ -31,35 +32,48 @@ export default function ManagerDashboard() {
             >
               Manage Menu Items
             </button>
+
             <button
               className={styles.actionButton}
               onClick={() => setView("inventory")}
             >
               Manage Inventory
             </button>
+
             <button
               className={styles.actionButton}
               onClick={() => setView("employees")}
             >
               Manage Employees
             </button>
+
             <button
               className={styles.actionButton}
               onClick={() => setView("productUsage")}
             >
               Product Usage
             </button>
+
             <button
               className={styles.actionButton}
               onClick={() => setView("xReports")}
             >
               X Reports
             </button>
+
             <button
               className={styles.actionButton}
               onClick={() => setView("zReports")}
             >
               Z Reports
+            </button>
+
+            {/* ★ KITCHEN BUTTON */}
+            <button
+              className={styles.actionButton}
+              onClick={() => setView("kitchen")}
+            >
+              Kitchen Display
             </button>
           </div>
         </>
@@ -69,6 +83,7 @@ export default function ManagerDashboard() {
             <button className={styles.backButton} onClick={goBack}>
               ← Back to Dashboard
             </button>
+
             <h1 className={styles.title}>
               {view === "menu" && "Manage Menu Items"}
               {view === "inventory" && "Manage Inventory"}
@@ -76,9 +91,11 @@ export default function ManagerDashboard() {
               {view === "productUsage" && "Product Usage"}
               {view === "xReports" && "X Reports"}
               {view === "zReports" && "Z Reports"}
+              {view === "kitchen" && "Kitchen Display"}  {/* ★ TITLE */}
             </h1>
           </div>
 
+          {/* ★ WHERE DIFFERENT VIEWS RENDER */}
           <div className={styles.contentArea}>
             {view === "menu" && <ManageMenuView />}
             {view === "inventory" && <ManageInventoryView />}
@@ -86,6 +103,7 @@ export default function ManagerDashboard() {
             {view === "productUsage" && <ProductUsageView />}
             {view === "xReports" && <XReportsView />}
             {view === "zReports" && <ZReportsView />}
+            {view === "kitchen" && <KitchenView />}   {/* ★ FULL FIX */}
           </div>
         </>
       )}
@@ -93,11 +111,14 @@ export default function ManagerDashboard() {
   );
 }
 
+/* ====================================================================== */
+/*                           MANAGE MENU VIEW                             */
+/* ====================================================================== */
+
 function ManageMenuView() {
   type MenuItem = {
     item_id: number;
     item_name: string;
-    // category: string;
     price: number;
   };
 
@@ -106,7 +127,6 @@ function ManageMenuView() {
   const [error, setError] = useState<string | null>(null);
 
   const [newName, setNewName] = useState("");
-  // const [newCategory, setNewCategory] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
@@ -147,7 +167,6 @@ function ManageMenuView() {
 
   const handleAdd = async () => {
     const name = newName.trim();
-    // const category = newCategory.trim();
     const priceNum = Number(newPrice);
     if (!name || Number.isNaN(priceNum)) {
       alert("Enter valid name and price");
@@ -158,16 +177,15 @@ function ManageMenuView() {
       const res = await fetch("/api/menu_items", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // body: JSON.stringify({ name, category, price: priceNum }),
         body: JSON.stringify({ name, price: priceNum }),
       });
+
       if (!res.ok) throw new Error("Failed to add item");
 
       const created: MenuItem = await res.json();
       setItems((prev) => [...prev, created]);
 
       setNewName("");
-      // setNewCategory("");
       setNewPrice("");
     } catch (err: any) {
       alert(err.message ?? "Error adding item");
@@ -183,7 +201,6 @@ function ManageMenuView() {
     if (!item) return;
 
     const name = item.item_name.trim();
-    // const category = item.category.trim();
     const priceNum = Number(item.price);
     if (!name || Number.isNaN(priceNum)) {
       alert("Invalid values on selected row");
@@ -200,6 +217,7 @@ function ManageMenuView() {
           price: priceNum,
         }),
       });
+
       if (!res.ok) throw new Error("Failed to update item");
       const data = await res.json();
       setItems(data);
@@ -270,16 +288,7 @@ function ManageMenuView() {
                     style={{ width: "100%" }}
                   />
                 </td>
-                {/* <td style={{ padding: "8px" }}> */}
-                  {/* <input
-                    type="text"
-                    value={item.category}
-                    onChange={(e) =>
-                      handleCellChange(item.item_id, "category", e.target.value)
-                    }
-                    style={{ width: "100%" }}
-                  /> */}
-                {/* </td> */}
+
                 <td style={{ padding: "8px" }}>
                   <input
                     type="number"
@@ -310,10 +319,7 @@ function ManageMenuView() {
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <button
-          onClick={handleUpdate}
-          className={styles.updateButton}
-        >
+        <button onClick={handleUpdate} className={styles.updateButton}>
           Update Selected
         </button>
       </div>
@@ -333,13 +339,7 @@ function ManageMenuView() {
           onChange={(e) => setNewName(e.target.value)}
           className={styles.inputField}
         />
-        {/* <input
-          type="text"
-          placeholder="Category"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-          className={styles.inputField}
-        /> */}
+
         <input
           type="number"
           step="0.01"
@@ -349,16 +349,17 @@ function ManageMenuView() {
           className={styles.inputField}
         />
 
-        <button
-          onClick={handleAdd}
-          className={styles.addButton}
-        >
+        <button onClick={handleAdd} className={styles.addButton}>
           Add
         </button>
       </div>
     </div>
   );
 }
+
+/* ====================================================================== */
+/*                           INVENTORY VIEW                               */
+/* ====================================================================== */
 
 function ManageInventoryView() {
   type Ingredient = {
@@ -617,6 +618,10 @@ function ManageInventoryView() {
   );
 }
 
+/* ====================================================================== */
+/*                           EMPLOYEES VIEW                               */
+/* ====================================================================== */
+
 function ManageEmployeesView() {
   type Employee = {
     employee_id: number;
@@ -841,6 +846,9 @@ function ManageEmployeesView() {
   );
 }
 
+/* ====================================================================== */
+/*                           PRODUCT USAGE VIEW                           */
+/* ====================================================================== */
 
 function ProductUsageView() {
   return (
@@ -853,6 +861,26 @@ function ProductUsageView() {
   );
 }
 
+/* ====================================================================== */
+/*                           ★ KITCHEN VIEW ★                              */
+/* ====================================================================== */
+
+function KitchenView() {
+  return (
+    <div>
+      <h2 className={styles.subtitle}>Kitchen Display</h2>
+      <div className={styles.tablePlaceholder}>
+        <p>Incoming orders will appear here automatically.</p>
+        <p style={{ marginTop: "8px" }}>(Read-only kitchen interface)</p>
+      </div>
+    </div>
+  );
+}
+
+/* ====================================================================== */
+/*                           X-REPORTS VIEW                                */
+/* ====================================================================== */
+
 function XReportsView() {
   return (
     <div>
@@ -863,6 +891,10 @@ function XReportsView() {
     </div>
   );
 }
+
+/* ====================================================================== */
+/*                           Z-REPORTS VIEW                                */
+/* ====================================================================== */
 
 function ZReportsView() {
   return (
