@@ -198,7 +198,7 @@ export default function OrderPage() {
 
   const addToCart = useCallback((drink: Drink) => setCart((prev) => [...prev, drink]), []);
   const removeFromCart = useCallback((index: number) => setCart((prev) => prev.filter((_, i) => i !== index)), []);
-  const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + item.price, 0), [cart]);
+  const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + Number(item.price), 0), [cart]);
   const [cartOpen, setCartOpen] = useState(false);
 
   return (
