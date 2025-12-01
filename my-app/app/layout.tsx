@@ -33,6 +33,7 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/antijingoist/open-dyslexic@v1.0.0/open-dyslexic.css"
         />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
       </head>
 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
