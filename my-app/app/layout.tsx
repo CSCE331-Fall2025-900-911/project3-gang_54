@@ -28,15 +28,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" /> */}
+        {/* <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.2/dist/css/bootstrap.min.css" /> */}
         {/* Dyslexia-friendly font */}
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/antijingoist/open-dyslexic@v1.0.0/open-dyslexic.css"
         />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
       </head>
 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}>
         
         {/* Google OAuth script */}
         <Script
