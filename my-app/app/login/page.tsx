@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation, LANGUAGE_OPTIONS } from "./hooks/useTranslation";
+import { useTranslation, LANGUAGE_OPTIONS } from "../hooks/useTranslation";
 
 declare global {
   interface Window {

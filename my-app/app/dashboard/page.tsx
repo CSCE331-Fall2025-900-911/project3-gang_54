@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import styles from "./dashboard.module.css";
-import { useTranslation, LANGUAGE_OPTIONS } from "./hooks/useTranslation";
+import { useTranslation, LANGUAGE_OPTIONS } from "../hooks/useTranslation";
 
 type View =
   | "dashboard"

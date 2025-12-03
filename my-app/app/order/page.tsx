@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation, LANGUAGE_OPTIONS } from "./hooks/useTranslation";
+import { useTranslation, LANGUAGE_OPTIONS } from "../hooks/useTranslation";
 
 type CategoryId =
   | "all"
