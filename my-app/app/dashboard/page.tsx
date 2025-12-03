@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import styles from "./dashboard.module.css";
+import { useTranslation, LANGUAGE_OPTIONS } from "./hooks/useTranslation";
 
 type View =
   | "dashboard"
@@ -16,56 +17,90 @@ type View =
 export default function ManagerDashboard() {
   const [view, setView] = useState<View>("dashboard");
 
+  const TRANSLATABLE_STRINGS = [
+    "Manager Dashboard",
+    "Select a function to manage:",
+    "Manage Menu Items",
+    "Manage Inventory",
+    "Manage Employees",
+    "Product Usage",
+    "X Reports",
+    "Z Reports",
+    "Kitchen Display",
+    "← Back to Dashboard",
+    "Language",
+    "Translating…",
+  ];
+
+  const { language, setLanguage, display, isTranslating } = useTranslation(TRANSLATABLE_STRINGS);
+
   const goBack = () => setView("dashboard");
 
   return (
     <div className={styles.container}>
+      <section className="dashboard-language" aria-label="Language selection" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'flex-end', paddingRight: '20px' }}>
+        <label htmlFor="dashboard-language-select">{display("Language")}</label>
+        <select
+          id="dashboard-language-select"
+          value={language}
+          onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
+          style={{ padding: '8px 16px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(0,0,0,0.2)', color: '#fff' }}
+        >
+          {LANGUAGE_OPTIONS.map((option) => (
+            <option key={option.code} value={option.code}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {isTranslating && <span>{display("Translating…")}</span>}
+      </section>
+
       {view === "dashboard" ? (
         <>
-          <h1 className={styles.title}>Manager Dashboard</h1>
-          <p className={styles.subtitle}>Select a function to manage:</p>
+          <h1 className={styles.title}>{display("Manager Dashboard")}</h1>
+          <p className={styles.subtitle}>{display("Select a function to manage:")}</p>
 
           <div className={styles.buttonGrid}>
             <button
               className={styles.actionButton}
               onClick={() => setView("menu")}
             >
-              Manage Menu Items
+              {display("Manage Menu Items")}
             </button>
 
             <button
               className={styles.actionButton}
               onClick={() => setView("inventory")}
             >
-              Manage Inventory
+              {display("Manage Inventory")}
             </button>
 
             <button
               className={styles.actionButton}
               onClick={() => setView("employees")}
             >
-              Manage Employees
+              {display("Manage Employees")}
             </button>
 
             <button
               className={styles.actionButton}
               onClick={() => setView("productUsage")}
             >
-              Product Usage
+              {display("Product Usage")}
             </button>
 
             <button
               className={styles.actionButton}
               onClick={() => setView("xReports")}
             >
-              X Reports
+              {display("X Reports")}
             </button>
 
             <button
               className={styles.actionButton}
               onClick={() => setView("zReports")}
             >
-              Z Reports
+              {display("Z Reports")}
             </button>
 
             {/* ★ KITCHEN BUTTON */}
@@ -73,7 +108,7 @@ export default function ManagerDashboard() {
               className={styles.actionButton}
               onClick={() => setView("kitchen")}
             >
-              Kitchen Display
+              {display("Kitchen Display")}
             </button>
           </div>
         </>
@@ -81,17 +116,17 @@ export default function ManagerDashboard() {
         <>
           <div className={styles.topBar}>
             <button className={styles.backButton} onClick={goBack}>
-              ← Back to Dashboard
+              {display("← Back to Dashboard")}
             </button>
 
             <h1 className={styles.title}>
-              {view === "menu" && "Manage Menu Items"}
-              {view === "inventory" && "Manage Inventory"}
-              {view === "employees" && "Manage Employees"}
-              {view === "productUsage" && "Product Usage"}
-              {view === "xReports" && "X Reports"}
-              {view === "zReports" && "Z Reports"}
-              {view === "kitchen" && "Kitchen Display"}  {/* ★ TITLE */}
+              {view === "menu" && display("Manage Menu Items")}
+              {view === "inventory" && display("Manage Inventory")}
+              {view === "employees" && display("Manage Employees")}
+              {view === "productUsage" && display("Product Usage")}
+              {view === "xReports" && display("X Reports")}
+              {view === "zReports" && display("Z Reports")}
+              {view === "kitchen" && display("Kitchen Display")}  {/* ★ TITLE */}
             </h1>
           </div>
 

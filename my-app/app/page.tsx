@@ -1,9 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation, LANGUAGE_OPTIONS } from "./hooks/useTranslation";
 
 export default function Home() {
   const [weather, setWeather] = useState(null);
+
+  const TRANSLATABLE_STRINGS = [
+    "Welcome to ShareTea",
+    "Current Weather:",
+    "Your favorite bubble tea, just a click away!",
+    "Login",
+    "Order Now",
+    "Featured Drinks",
+    "Coffee Milk Tea",
+    "Classic Green Tea",
+    "Mango Fruit Tea",
+    "Language",
+    "Translating…",
+  ];
+
+  const { language, setLanguage, display, isTranslating } = useTranslation(TRANSLATABLE_STRINGS);
 
   // not working rn
   // useEffect(() => {
@@ -15,89 +32,64 @@ export default function Home() {
 
   return (
     <main className="home-container">
+      <section className="home-language" aria-label="Language selection" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center' }}>
+        <label htmlFor="home-language-select">{display("Language")}</label>
+        <select
+          id="home-language-select"
+          value={language}
+          onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
+          style={{ padding: '8px 16px', borderRadius: '999px', border: '1px solid rgba(0,0,0,0.2)' }}
+        >
+          {LANGUAGE_OPTIONS.map((option) => (
+            <option key={option.code} value={option.code}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {isTranslating && <span>{display("Translating…")}</span>}
+      </section>
 
       <div className="home-box">
+        <h1 className="title-heading">{display("Welcome to ShareTea")}</h1>
 
-        {/* TITLE — always shows EN or ES based on body class */}
-        <h1 className="title-heading">
-          <span className="translate-en">Welcome to ShareTea</span>
-          <span className="translate-es">Bienvenido a ShareTea</span>
-        </h1>
-
-        {/* WEATHER */}
         <p className="weather-text">
-          <span className="translate-en">Current Weather: {weather}°F</span>
-          <span className="translate-es">Clima Actual: {weather}°F</span>
+          {display("Current Weather:")} {weather}°F
         </p>
 
-        {/* SUBTITLE */}
-        <p>
-          <span className="translate-en">
-            Your favorite bubble tea, just a click away!
-          </span>
-          <span className="translate-es">
-            ¡Tu bubble tea favorito, a solo un clic!
-          </span>
-        </p>
+        <p>{display("Your favorite bubble tea, just a click away!")}</p>
 
         <hr />
 
-        {/* BUTTONS */}
         <div className="home-buttons">
-
           <a href="/login" className="button">
-            <span className="translate-en">Login</span>
-            <span className="translate-es">Iniciar Sesión</span>
+            {display("Login")}
           </a>
-
           <a href="/order" className="button">
-            <span className="translate-en">Order Now</span>
-            <span className="translate-es">Ordenar Ahora</span>
+            {display("Order Now")}
           </a>
-
         </div>
-
       </div>
 
-      {/* FEATURED DRINKS */}
       <section className="featured-drinks">
-        <h2>
-          <span className="translate-en">Featured Drinks</span>
-          <span className="translate-es">Bebidas Destacadas</span>
-        </h2>
+        <h2>{display("Featured Drinks")}</h2>
 
         <div className="drinks-grid">
-
-          {/* DRINK 1 */}
           <div className="drink-card">
-            <img src="/coffee.jpg" alt="Coffee Milk Tea" />
-            <p>
-              <span className="translate-en">Coffee Milk Tea</span>
-              <span className="translate-es">Té con Leche y Café</span>
-            </p>
+            <img src="/coffee.jpg" alt={display("Coffee Milk Tea")} />
+            <p>{display("Coffee Milk Tea")}</p>
           </div>
 
-          {/* DRINK 2 */}
           <div className="drink-card">
-            <img src="/green.jpg" alt="Classic Green Tea" />
-            <p>
-              <span className="translate-en">Classic Green Tea</span>
-              <span className="translate-es">Té Verde Clásico</span>
-            </p>
+            <img src="/green.jpg" alt={display("Classic Green Tea")} />
+            <p>{display("Classic Green Tea")}</p>
           </div>
 
-          {/* DRINK 3 */}
           <div className="drink-card">
-            <img src="/mango.jpg" alt="Mango Fruit Tea" />
-            <p>
-              <span className="translate-en">Mango Fruit Tea</span>
-              <span className="translate-es">Té de Mango</span>
-            </p>
+            <img src="/mango.jpg" alt={display("Mango Fruit Tea")} />
+            <p>{display("Mango Fruit Tea")}</p>
           </div>
-
         </div>
       </section>
-
     </main>
   );
 }

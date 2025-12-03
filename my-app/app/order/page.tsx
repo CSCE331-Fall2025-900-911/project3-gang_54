@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation, LANGUAGE_OPTIONS } from "./hooks/useTranslation";
 
 type CategoryId =
   | "all"
@@ -36,14 +37,6 @@ const categories: Category[] = [
   { id: "fruit-tea", label: "Fruit Tea", helper: "Bright, juicy infusions" },
   { id: "sparkling", label: "Sparkling", helper: "Fizz-forward refreshers" },
   { id: "dessert", label: "Dessert Bar", helper: "Sweet treats & creamy finishes" },
-];
-
-type LanguageCode = "en" | "es" | "zh";
-
-const LANGUAGE_OPTIONS: Array<{ code: LanguageCode; label: string }> = [
-  { code: "en", label: "English" },
-  { code: "es", label: "Español" },
-  { code: "zh", label: "中文" },
 ];
 
 const BASE_TRANSLATABLE_STRINGS = [
@@ -83,12 +76,6 @@ export default function OrderPage() {
   }, []);
 
   const [activeCategory, setActiveCategory] = useState<CategoryId>("seasonal");
-  const [language, setLanguage] = useState<LanguageCode>("en");
-  const [translations, setTranslations] = useState<Record<string, string>>({});
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [translationError, setTranslationError] = useState<string | null>(null);
-
-  const translationsCache = useRef<Partial<Record<LanguageCode, Record<string, string>>>>({});
   const [cart, setCart] = useState<Drink[]>([]);
 
   const filteredDrinks = useMemo(() => {
@@ -130,71 +117,7 @@ export default function OrderPage() {
     return Array.from(new Set([...BASE_TRANSLATABLE_STRINGS, ...categoryStrings, ...drinkStrings, ...orderStrings]));
   }, [drinkMenu]);
 
-  useEffect(() => {
-    let cancelled = false;
-    const abortController = new AbortController();
-
-    if (language === "en") {
-      setTranslations({});
-      setTranslationError(null);
-      setIsTranslating(false);
-      return () => abortController.abort();
-    }
-
-    const cached = translationsCache.current[language];
-    if (cached) {
-      setTranslations(cached);
-      setTranslationError(null);
-      setIsTranslating(false);
-      return () => abortController.abort();
-    }
-
-    async function translate() {
-      try {
-        setIsTranslating(true);
-        setTranslationError(null);
-
-        const response = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ texts: TRANSLATABLE_STRINGS, targetLanguage: language }),
-          signal: abortController.signal,
-        });
-
-        if (!response.ok) throw new Error("Translation request failed.");
-
-        const data = (await response.json()) as { translations?: Record<string, string> };
-        if (!data.translations) throw new Error("Translation data missing.");
-
-        if (!cancelled) {
-          translationsCache.current[language] = data.translations;
-          setTranslations(data.translations);
-          setIsTranslating(false);
-        }
-      } catch (error) {
-        if (cancelled || abortController.signal.aborted) return;
-        console.error("Translation error", error);
-        setTranslationError("We couldn't translate right now. Showing original text.");
-        setIsTranslating(false);
-        setTranslations({});
-      }
-    }
-
-    void translate();
-
-    return () => {
-      cancelled = true;
-      abortController.abort();
-    };
-  }, [language]); 
-
-  const display = useCallback(
-    (text: string | undefined | null) => {
-      if (!text) return "";
-      return translations[text] ?? text;
-    },
-    [translations]
-  );
+  const { language, setLanguage, display, isTranslating, translationError } = useTranslation(TRANSLATABLE_STRINGS);
 
   const addToCart = useCallback((drink: Drink) => setCart((prev) => [...prev, drink]), []);
   const removeFromCart = useCallback((index: number) => setCart((prev) => prev.filter((_, i) => i !== index)), []);
@@ -220,7 +143,7 @@ export default function OrderPage() {
           id="order-language-select"
           className="order-language__select"
           value={language}
-          onChange={(event) => setLanguage(event.target.value as LanguageCode)}
+          onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
         >
           {LANGUAGE_OPTIONS.map((option) => (
             <option key={option.code} value={option.code}>
