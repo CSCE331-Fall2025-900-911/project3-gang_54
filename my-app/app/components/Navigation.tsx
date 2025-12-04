@@ -1,17 +1,9 @@
 'use client';
 
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Navigation() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-
-  // Ensure component is mounted before using router
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -19,61 +11,6 @@ export default function Navigation() {
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/login', label: 'Login', isButton: true },
   ];
-
-  // Use anchor tags - they work even if JavaScript fails
-  const NavLink = ({ link }: { link: typeof navLinks[0] }) => {
-    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-      // Only prevent default if we can use client-side navigation
-      // Otherwise, let the anchor tag work naturally
-      if (mounted && router) {
-        try {
-          e.preventDefault();
-          console.log('Navigating to:', link.href);
-          router.push(link.href);
-        } catch (err) {
-          console.error('Router push failed, using default navigation:', err);
-          // Don't prevent default - let the anchor tag work
-        }
-      }
-      // If not mounted or router fails, let default anchor behavior work
-    };
-
-    return (
-      <a
-        href={link.href}
-        onClick={handleClick}
-        className={link.isButton ? "login_box" : "hover:text-orange-400 transition-colors"}
-        style={{ 
-          color: pathname === link.href ? '#ff9900' : '#fff', 
-          textDecoration: 'none', 
-          cursor: 'pointer',
-          display: 'inline-block',
-          padding: link.isButton ? '10px 18px' : '4px 8px',
-          backgroundColor: link.isButton ? '#ff9900' : 'transparent',
-          borderRadius: link.isButton ? '8px' : '0',
-          fontSize: '16px',
-          textAlign: 'center',
-          whiteSpace: 'nowrap'
-        }}
-      >
-        {link.isButton ? <strong>{link.label}</strong> : link.label}
-      </a>
-    );
-  };
-
-  const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (mounted && router) {
-      try {
-        e.preventDefault();
-        console.log('Navigating to home');
-        router.push('/');
-      } catch (err) {
-        console.error('Router push failed, using default navigation:', err);
-        // Let default anchor behavior work
-      }
-    }
-    // If not mounted or router fails, let default anchor behavior work
-  };
 
   return (
     <nav 
@@ -95,7 +32,6 @@ export default function Navigation() {
     >
       <a
         href="/"
-        onClick={handleHomeClick}
         style={{ 
           textDecoration: 'none', 
           color: 'inherit',
@@ -116,7 +52,24 @@ export default function Navigation() {
       >
         {navLinks.map((link) => (
           <li key={link.href}>
-            <NavLink link={link} />
+            <a
+              href={link.href}
+              className={link.isButton ? "login_box" : "hover:text-orange-400 transition-colors"}
+              style={{ 
+                color: pathname === link.href ? '#ff9900' : '#fff', 
+                textDecoration: 'none', 
+                cursor: 'pointer',
+                display: 'inline-block',
+                padding: link.isButton ? '10px 18px' : '4px 8px',
+                backgroundColor: link.isButton ? '#ff9900' : 'transparent',
+                borderRadius: link.isButton ? '8px' : '0',
+                fontSize: '16px',
+                textAlign: 'center',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {link.isButton ? <strong>{link.label}</strong> : link.label}
+            </a>
           </li>
         ))}
       </ul>
