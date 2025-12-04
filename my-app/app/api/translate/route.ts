@@ -26,8 +26,13 @@ export async function POST(req: NextRequest) {
   try {
     const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
     if (!apiKey) {
+      console.error("GOOGLE_TRANSLATE_API_KEY not set");
+      console.error("To enable translation: Set GOOGLE_TRANSLATE_API_KEY in Vercel environment variables");
       return NextResponse.json(
-        { error: "Missing Google Translate API key. Set GOOGLE_TRANSLATE_API_KEY." },
+        { 
+          error: "Missing Google Translate API key. Set GOOGLE_TRANSLATE_API_KEY in Vercel.",
+          details: "Get your API key at: https://console.cloud.google.com/apis/credentials"
+        },
         { status: 500 }
       );
     }

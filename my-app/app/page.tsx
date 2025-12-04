@@ -28,9 +28,17 @@ export default function Home() {
       try {
         setWeatherLoading(true);
         const res = await fetch("/api/weather");
-        if (!res.ok) throw new Error("Weather API failed");
         const data = await res.json();
-        setWeather(data.temp ?? "N/A");
+        if (!res.ok) {
+          console.error("Weather API error:", data.error || "Unknown error");
+          setWeather(data.temp ?? "N/A");
+        } else {
+          setWeather(data.temp ?? "N/A");
+        }
+        // Show error in console if API key is missing
+        if (data.error && data.error.includes("not configured")) {
+          console.warn("Weather API:", data.error);
+        }
       } catch (error) {
         console.error("Weather fetch error", error);
         setWeather("N/A");

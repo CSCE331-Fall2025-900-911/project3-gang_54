@@ -33,11 +33,22 @@ OPENWEATHER_API_KEY=<your-openweather-api-key>
   - Source: https://api.openweathermap.org/data/2.5/weather
   - Get free API key at: https://openweathermap.org/api
   - Default location: College Station, TX
+  - **To set up in Vercel:**
+    1. Go to Vercel project settings → Environment Variables
+    2. Add `OPENWEATHER_API_KEY` with your API key
+    3. Redeploy the application
 
 - **Google Translate API**: Uses Google Cloud Translation API v2
   - Endpoint: https://translation.googleapis.com/language/translate/v2
   - Enable in Google Cloud Console: https://console.cloud.google.com/apis/credentials
   - Requires Cloud Translation API to be enabled
+  - **To set up in Vercel:**
+    1. Go to Vercel project settings → Environment Variables
+    2. Add `GOOGLE_TRANSLATE_API_KEY` with your API key
+    3. Make sure Cloud Translation API is enabled in Google Cloud Console
+    4. Redeploy the application
+
+**Important:** Environment variables must be set in Vercel for production. They are not automatically pulled from `.env.local`.
 
 You can pull the production values directly from Vercel:
 

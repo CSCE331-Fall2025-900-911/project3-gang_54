@@ -54,6 +54,13 @@ export function useTranslation(texts: string[]) {
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
           console.error("Translation API error:", errorData);
+          
+          // Log helpful message if API key is missing
+          if (errorData.error && errorData.error.includes("Missing Google Translate API key")) {
+            console.warn("Translation API:", errorData.error);
+            console.warn("Set GOOGLE_TRANSLATE_API_KEY in Vercel environment variables");
+          }
+          
           throw new Error(errorData.error || errorData.details || "Translation request failed.");
         }
 

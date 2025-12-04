@@ -21,12 +21,13 @@ export async function GET(req: NextRequest) {
     // If no API key, return a fallback response
     if (!OPENWEATHER_API_KEY) {
       console.warn("OPENWEATHER_API_KEY not set, returning fallback weather data");
+      console.warn("To enable weather API: Set OPENWEATHER_API_KEY in Vercel environment variables");
       return NextResponse.json({
         temp: 72,
         condition: "Sunny",
         feels_like: 70,
         city: DEFAULT_CITY,
-        error: "Weather API key not configured",
+        error: "Weather API key not configured. Set OPENWEATHER_API_KEY in Vercel.",
       });
     }
 
@@ -48,13 +49,25 @@ export async function GET(req: NextRequest) {
       const errorText = await response.text();
       console.error("OpenWeather API error", response.status, errorText);
       
+      let errorMessage = "Weather service temporarily unavailable";
+      try {
+        const errorJson = JSON.parse(errorText);
+        if (errorJson.message) {
+          errorMessage = errorJson.message;
+        } else if (response.status === 401) {
+          errorMessage = "Invalid API key. Check OPENWEATHER_API_KEY in Vercel.";
+        }
+      } catch {
+        // Use default error message
+      }
+      
       // Return fallback on API error
       return NextResponse.json({
         temp: 72,
         condition: "Sunny",
         feels_like: 70,
         city: city,
-        error: "Weather service temporarily unavailable",
+        error: errorMessage,
       });
     }
 
