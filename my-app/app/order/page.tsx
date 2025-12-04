@@ -66,16 +66,27 @@ const BASE_TRANSLATABLE_STRINGS = [
 
 export default function OrderPage() {
   const [drinkMenu, setDrinkMenu] = useState<Drink[]>([]);
+  const [menuLoading, setMenuLoading] = useState(true);
+  const [menuError, setMenuError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchMenu() {
       try {
+        setMenuLoading(true);
+        setMenuError(null);
         const res = await fetch("/api/ordermenu");
-        if (!res.ok) throw new Error("Failed to fetch menu");
+        if (!res.ok) {
+          throw new Error(`Failed to fetch menu: ${res.status}`);
+        }
         const data: Drink[] = await res.json();
-        setDrinkMenu(data);
+        setDrinkMenu(data || []);
       } catch (err) {
-        console.error(err);
+        console.error("Menu fetch error:", err);
+        setMenuError(err instanceof Error ? err.message : "Failed to load menu");
+        // Set empty array so page can still render
+        setDrinkMenu([]);
+      } finally {
+        setMenuLoading(false);
       }
     }
     fetchMenu();
@@ -161,7 +172,25 @@ export default function OrderPage() {
 
       <section className="order-layout">
         <div className="order-menu" aria-label="Menu items">
-          {filteredDrinks.map((drink) => (
+          {menuLoading && (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+              <p>Loading menu...</p>
+            </div>
+          )}
+          {menuError && !menuLoading && (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: '#ff6b6b' }}>
+              <p>Error loading menu: {menuError}</p>
+              <p style={{ fontSize: '14px', marginTop: '10px', opacity: 0.8 }}>
+                Please refresh the page or contact support if the problem persists.
+              </p>
+            </div>
+          )}
+          {!menuLoading && !menuError && filteredDrinks.length === 0 && (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+              <p>No drinks available at this time.</p>
+            </div>
+          )}
+          {!menuLoading && filteredDrinks.map((drink) => (
             <article key={drink.name} className="order-card">
               <header className="order-card-header">
                 <div className="order-card-title">

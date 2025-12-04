@@ -23,7 +23,9 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
 export function useTranslationContext() {
   const context = useContext(TranslationContext);
   if (!context) {
-    throw new Error('useTranslationContext must be used within TranslationProvider');
+    // Return default values instead of throwing to prevent page crashes
+    console.warn('useTranslationContext used outside TranslationProvider, using defaults');
+    return { language: 'en' as LanguageCode, setLanguage: () => {} };
   }
   return context;
 }
