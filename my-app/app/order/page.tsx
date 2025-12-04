@@ -56,6 +56,12 @@ const BASE_TRANSLATABLE_STRINGS = [
   "We couldn't translate right now. Showing original text.",
   "Customize drink",
   "Quick add",
+  "Your Order",
+  "Your cart is empty.",
+  "Remove",
+  "Total:",
+  "Checkout",
+  "View Cart",
 ];
 
 export default function OrderPage() {
@@ -239,35 +245,35 @@ export default function OrderPage() {
         </aside>
       </section>
 
-      <div className={"cart-sidebar" + (cartOpen && " open")}>
+      <div className={"cart-sidebar" + (cartOpen ? " open" : "")}>
         <div className="cart-header">
-          <h2>Your Order</h2>
-          <button className="cart-close" onClick={() => setCartOpen(false)}>✕</button>
+          <h2>{display("Your Order")}</h2>
+          <button className="cart-close" onClick={() => setCartOpen(false)} aria-label="Close cart">✕</button>
         </div>
 
-        {cart.length === 0 && <p className="cart-empty">Your cart is empty.</p>}
+        {cart.length === 0 && <p className="cart-empty">{display("Your cart is empty.")}</p>}
 
         <ul className="cart-items">
           {cart.map((item, index) => (
             <li key={index} className="cart-item">
               <div className="cart-item-info">
-                <span className="cart-item-name">{item.icon} {item.name}</span>
+                <span className="cart-item-name">{item.icon} {display(item.name)}</span>
                 <span className="cart-item-price">${Number(item.price).toFixed(2)}</span>
               </div>
-              <button className="cart-remove" onClick={() => removeFromCart(index)}>Remove</button>
+              <button className="cart-remove" onClick={() => removeFromCart(index)}>{display("Remove")}</button>
             </li>
           ))}
         </ul>
 
         {cart.length > 0 && (
           <div className="cart-footer">
-            <p className="cart-total">Total: ${Number(cartTotal).toFixed(2)}</p>
-            <button className="cart-checkout">Checkout</button>
+            <p className="cart-total">{display("Total:")} <span>${Number(cartTotal).toFixed(2)}</span></p>
+            <button className="cart-checkout">{display("Checkout")}</button>
           </div>
         )}
       </div>
       <button type="button" className="cart-toggle-button" onClick={() => setCartOpen(true)}>
-        View Cart ({cart.length})
+        {display("View Cart")} ({cart.length})
       </button>
     </main>
   );
