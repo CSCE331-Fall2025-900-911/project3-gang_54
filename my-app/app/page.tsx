@@ -43,21 +43,30 @@ export default function Home() {
 
   return (
     <main className="home-container">
-      <section className="home-language" aria-label="Language selection" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center' }}>
-        <label htmlFor="home-language-select">{display("Language")}</label>
+      <section className="home-language" aria-label="Language selection" style={{ marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <label htmlFor="home-language-select" style={{ color: '#fff', fontSize: '16px', fontWeight: '500' }}>{display("Language")}</label>
         <select
           id="home-language-select"
           value={language}
           onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
-          style={{ padding: '8px 16px', borderRadius: '999px', border: '1px solid rgba(0,0,0,0.2)' }}
+          style={{ 
+            padding: '10px 20px', 
+            borderRadius: '8px', 
+            border: '2px solid rgba(255, 153, 0, 0.3)',
+            background: 'rgba(255, 153, 0, 0.1)',
+            color: '#fff',
+            fontSize: '16px',
+            cursor: 'pointer',
+            outline: 'none'
+          }}
         >
           {LANGUAGE_OPTIONS.map((option) => (
-            <option key={option.code} value={option.code}>
+            <option key={option.code} value={option.code} style={{ background: '#1a1a1a', color: '#fff' }}>
               {option.label}
             </option>
           ))}
         </select>
-        {isTranslating && <span>{display("Translating…")}</span>}
+        {isTranslating && <span style={{ color: '#ff9900', fontSize: '14px' }}>{display("Translating…")}</span>}
       </section>
 
       <div className="home-box">
