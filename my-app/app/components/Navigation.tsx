@@ -88,15 +88,15 @@ export default function Navigation() {
                 color: pathname === link.href ? '#ff9900' : '#fff', 
                 textDecoration: 'none', 
                 cursor: 'pointer',
-                display: 'block',
+                display: 'inline-block',
                 padding: link.isButton ? '10px 18px' : '4px 8px',
                 backgroundColor: link.isButton ? '#ff9900' : 'transparent',
                 borderRadius: link.isButton ? '8px' : '0',
                 fontSize: '16px',
                 border: 'none',
                 font: 'inherit',
-                width: '100%',
-                textAlign: 'left'
+                textAlign: 'center',
+                whiteSpace: 'nowrap'
               }}
             >
               {link.isButton ? <strong>{link.label}</strong> : link.label}
