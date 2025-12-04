@@ -12,7 +12,7 @@ type View =
   | "productUsage"
   | "xReports"
   | "zReports"
-  | "kitchen";   // ← ADD THIS
+  | "kitchen"; // ← ADD THIS
 
 export default function ManagerDashboard() {
   const [view, setView] = useState<View>("dashboard");
@@ -32,19 +32,39 @@ export default function ManagerDashboard() {
     "Translating…",
   ];
 
-  const { language, setLanguage, display, isTranslating } = useTranslation(TRANSLATABLE_STRINGS);
+  const { language, setLanguage, display, isTranslating } =
+    useTranslation(TRANSLATABLE_STRINGS);
 
   const goBack = () => setView("dashboard");
 
   return (
     <div className={styles.container}>
-      <section className="dashboard-language" aria-label="Language selection" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'flex-end', paddingRight: '20px' }}>
+      <section
+        className="dashboard-language"
+        aria-label="Language selection"
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          justifyContent: "flex-end",
+          paddingRight: "20px",
+        }}
+      >
         <label htmlFor="dashboard-language-select">{display("Language")}</label>
         <select
           id="dashboard-language-select"
           value={language}
-          onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
-          style={{ padding: '8px 16px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(0,0,0,0.2)', color: '#fff' }}
+          onChange={(event) =>
+            setLanguage(event.target.value as "en" | "es" | "zh")
+          }
+          style={{
+            padding: "8px 16px",
+            borderRadius: "999px",
+            border: "1px solid rgba(255,255,255,0.3)",
+            background: "rgba(0,0,0,0.2)",
+            color: "#fff",
+          }}
         >
           {LANGUAGE_OPTIONS.map((option) => (
             <option key={option.code} value={option.code}>
@@ -58,7 +78,9 @@ export default function ManagerDashboard() {
       {view === "dashboard" ? (
         <>
           <h1 className={styles.title}>{display("Manager Dashboard")}</h1>
-          <p className={styles.subtitle}>{display("Select a function to manage:")}</p>
+          <p className={styles.subtitle}>
+            {display("Select a function to manage:")}
+          </p>
 
           <div className={styles.buttonGrid}>
             <button
@@ -126,7 +148,7 @@ export default function ManagerDashboard() {
               {view === "productUsage" && display("Product Usage")}
               {view === "xReports" && display("X Reports")}
               {view === "zReports" && display("Z Reports")}
-              {view === "kitchen" && display("Kitchen Display")}  {/* ★ TITLE */}
+              {view === "kitchen" && display("Kitchen Display")} {/* ★ TITLE */}
             </h1>
           </div>
 
@@ -138,7 +160,7 @@ export default function ManagerDashboard() {
             {view === "productUsage" && <ProductUsageView />}
             {view === "xReports" && <XReportsView />}
             {view === "zReports" && <ZReportsView />}
-            {view === "kitchen" && <KitchenView />}   {/* ★ FULL FIX */}
+            {view === "kitchen" && <KitchenView />} {/* ★ FULL FIX */}
           </div>
         </>
       )}
@@ -541,9 +563,7 @@ function ManageInventoryView() {
 
   return (
     <div>
-      {loading && (
-        <p className={styles.helperText}>Loading ingredients...</p>
-      )}
+      {loading && <p className={styles.helperText}>Loading ingredients...</p>}
       {error && <p className={styles.helperText}>Error: {error}</p>}
 
       <div className={styles.tablePlaceholder}>
@@ -690,7 +710,11 @@ function ManageEmployeesView() {
     loadEmployees();
   }, []);
 
-  const handleCellChange = (id: number, field: "name" | "role", value: string) => {
+  const handleCellChange = (
+    id: number,
+    field: "name" | "role",
+    value: string
+  ) => {
     setEmployees((prev) =>
       prev.map((emp) =>
         emp.employee_id === id ? { ...emp, [field]: value } : emp
@@ -760,7 +784,9 @@ function ManageEmployeesView() {
   };
 
   const handleDelete = async (id: number) => {
-    const confirmDelete = confirm("Are you sure you want to delete this employee?");
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this employee?"
+    );
     if (!confirmDelete) return;
 
     try {
@@ -812,7 +838,9 @@ function ManageEmployeesView() {
                   <input
                     type="text"
                     value={emp.name}
-                    onChange={(e) => handleCellChange(emp.employee_id, "name", e.target.value)}
+                    onChange={(e) =>
+                      handleCellChange(emp.employee_id, "name", e.target.value)
+                    }
                     className={styles.inputField}
                   />
                 </td>
@@ -821,7 +849,9 @@ function ManageEmployeesView() {
                   <input
                     type="text"
                     value={emp.role}
-                    onChange={(e) => handleCellChange(emp.employee_id, "role", e.target.value)}
+                    onChange={(e) =>
+                      handleCellChange(emp.employee_id, "role", e.target.value)
+                    }
                     className={styles.inputField}
                   />
                 </td>
@@ -886,12 +916,89 @@ function ManageEmployeesView() {
 /* ====================================================================== */
 
 function ProductUsageView() {
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [rows, setRows] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchUsage = async () => {
+    setError(null);
+    setRows([]);
+
+    if (!startDate || !endDate) {
+      setError("Please enter both start and end dates.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/product_usage", {
+        method: "POST",
+        body: JSON.stringify({ startDate, endDate }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch product usage");
+      }
+
+      const data = await res.json();
+      setRows(data);
+
+      if (data.length === 0) {
+        setError("No inventory usage data for that range.");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   return (
     <div>
-      <p className={styles.helperText}>implement backend</p>
-      <div className={styles.tablePlaceholder}>
-        <p>Product usage report UI will go here.</p>
+      <h2 className={styles.title}>Ingredient Usage Report</h2>
+
+      <div className={styles.filterRow}>
+        <label>Start Date (YYYY-MM-DD):</label>
+        <input
+          type="text"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className={styles.inputField}
+        />
+
+        <label>End Date (YYYY-MM-DD):</label>
+        <input
+          type="text"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className={styles.inputField}
+        />
+
+        <button className={styles.actionButton} onClick={fetchUsage}>
+          Inventory Usage
+        </button>
       </div>
+
+      {error && <p className={styles.errorText}>{error}</p>}
+
+      {rows.length > 0 && (
+        <table className={styles.table} style={{ borderSpacing: "20px 10px" }}>
+          <thead>
+            <tr>
+              <th>Ingredient ID</th>
+              <th>Ingredient Name</th>
+              <th>Total Used</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, idx) => (
+              <tr key={idx}>
+                <td>{r.ingredient_id}</td>
+                <td>{r.ingredient_name}</td>
+                <td>{r.total_used}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
