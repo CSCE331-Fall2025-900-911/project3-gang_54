@@ -3,7 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import Script from "next/script";
-import AccessibilityToggle from "./AccessibilityToggle"; 
+import AccessibilityToggle from "./AccessibilityToggle";
+import { TranslationProvider } from "./contexts/TranslationContext"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,47 +39,48 @@ export default function RootLayout({
       </head>
 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}>
-        
-        {/* Google OAuth script */}
-        <Script
-          src="https://accounts.google.com/gsi/client"
-          strategy="afterInteractive"
-          async
-          defer
-        />
+        <TranslationProvider>
+          {/* Google OAuth script */}
+          <Script
+            src="https://accounts.google.com/gsi/client"
+            strategy="afterInteractive"
+            async
+            defer
+          />
 
-        {/* NAVBAR */}
-        <nav className="fixed top-0 left-0 w-full bg-black text-white shadow-md flex justify-between items-center px-6 py-4 z-50">
-          <h1 className="text-2xl font-bold tracking-wide">ShareTea</h1>
-          <ul className="flex gap-6">
-            <li>
-              <Link href="/" className="hover:text-orange-400 transition-colors">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link href="/order" className="hover:text-orange-400 transition-colors">
-                Order
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard" className="hover:text-orange-400 transition-colors">
-                Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link href="/login" className="hover:text-orange-400 transition-colors login_box">
-                <strong>Login</strong>
-              </Link>
-            </li>
-          </ul>
-        </nav>
+          {/* NAVBAR */}
+          <nav className="fixed top-0 left-0 w-full bg-black text-white shadow-md flex justify-between items-center px-6 py-4 z-50">
+            <h1 className="text-2xl font-bold tracking-wide">ShareTea</h1>
+            <ul className="flex gap-6">
+              <li>
+                <Link href="/" className="hover:text-orange-400 transition-colors">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link href="/order" className="hover:text-orange-400 transition-colors">
+                  Order
+                </Link>
+              </li>
+              <li>
+                <Link href="/dashboard" className="hover:text-orange-400 transition-colors">
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link href="/login" className="hover:text-orange-400 transition-colors login_box">
+                  <strong>Login</strong>
+                </Link>
+              </li>
+            </ul>
+          </nav>
 
-        {/* ACCESSIBILITY MENU */}
-        <AccessibilityToggle />
+          {/* ACCESSIBILITY MENU */}
+          <AccessibilityToggle />
 
-        {/* MAIN CONTENT (pushed down so nav doesn't overlap) */}
-        <main className="pt-24">{children}</main>
+          {/* MAIN CONTENT (pushed down so nav doesn't overlap) */}
+          <main className="pt-24">{children}</main>
+        </TranslationProvider>
       </body>
     </html>
   );

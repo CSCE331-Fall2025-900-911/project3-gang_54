@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslationContext } from "../contexts/TranslationContext";
 
 export type LanguageCode = "en" | "es" | "zh";
 
@@ -11,7 +12,7 @@ export const LANGUAGE_OPTIONS: Array<{ code: LanguageCode; label: string }> = [
 ];
 
 export function useTranslation(texts: string[]) {
-  const [language, setLanguage] = useState<LanguageCode>("en");
+  const { language, setLanguage: setGlobalLanguage } = useTranslationContext();
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationError, setTranslationError] = useState<string | null>(null);
@@ -87,7 +88,7 @@ export function useTranslation(texts: string[]) {
 
   return {
     language,
-    setLanguage,
+    setLanguage: setGlobalLanguage,
     display,
     isTranslating,
     translationError,

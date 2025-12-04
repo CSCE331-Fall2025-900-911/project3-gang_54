@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation, LANGUAGE_OPTIONS } from "../hooks/useTranslation";
+import { useTranslation } from "../hooks/useTranslation";
 
 type CategoryId =
   | "all"
@@ -141,28 +141,6 @@ export default function OrderPage() {
             "Tap a drink to start customizing sweetness, ice, and toppings. Freshly brewed, ready when your name is called."
           )}
         </p>
-      </section>
-
-      <section className="order-language" aria-label="Language selection">
-        <label htmlFor="order-language-select">{display("Language")}</label>
-        <select
-          id="order-language-select"
-          className="order-language__select"
-          value={language}
-          onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
-        >
-          {LANGUAGE_OPTIONS.map((option) => (
-            <option key={option.code} value={option.code}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <div className="order-language__status" aria-live="polite">
-          {isTranslating && <span>{display("Translating…")}</span>}
-          {!isTranslating && translationError && (
-            <span className="order-language__status--error">{display("We couldn't translate right now. Showing original text.")}</span>
-          )}
-        </div>
       </section>
 
       <section className="order-filters" aria-label="Drink categories">

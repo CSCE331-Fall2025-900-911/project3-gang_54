@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * Google Translate API Route
+ * 
+ * Uses Google Cloud Translation API v2
+ * Endpoint: https://translation.googleapis.com/language/translate/v2
+ * 
+ * Requires GOOGLE_TRANSLATE_API_KEY environment variable
+ * Enable the Cloud Translation API in Google Cloud Console
+ * Get your API key at: https://console.cloud.google.com/apis/credentials
+ */
+
 const GOOGLE_TRANSLATE_ENDPOINT = "https://translation.googleapis.com/language/translate/v2";
 
 function decodeHtmlEntities(text: string): string {
@@ -36,27 +47,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Request must include a valid targetLanguage." }, { status: 400 });
     }
 
-    const params = new URLSearchParams();
-    texts.forEach((text) => {
-      if (typeof text === "string" && text.trim().length > 0) {
-        params.append("q", text);
-      }
-    });
+    // Filter valid text strings
+    const validTexts = texts.filter((text): text is string => 
+      typeof text === "string" && text.trim().length > 0
+    );
 
-    if (params.getAll("q").length === 0) {
+    if (validTexts.length === 0) {
       return NextResponse.json({ error: "No valid text strings provided for translation." }, { status: 400 });
     }
 
-    params.append("target", targetLanguage);
-    params.append("format", "text");
-    params.append("source", "en"); // Specify source language
+    // Use JSON format for Google Translate API
+    const requestBody = {
+      q: validTexts,
+      target: targetLanguage,
+      source: "en",
+      format: "text",
+    };
 
     const response = await fetch(`${GOOGLE_TRANSLATE_ENDPOINT}?key=${apiKey}`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
-      body: params.toString(),
+      body: JSON.stringify(requestBody),
       cache: "no-store",
     });
 

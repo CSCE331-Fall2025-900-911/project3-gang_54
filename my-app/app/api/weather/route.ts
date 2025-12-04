@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * Weather API Route
+ * 
+ * Fetches weather data from OpenWeatherMap API (https://openweathermap.org/api)
+ * 
+ * Source: OpenWeatherMap Current Weather Data API
+ * Endpoint: https://api.openweathermap.org/data/2.5/weather
+ * 
+ * Requires OPENWEATHER_API_KEY environment variable
+ * Get your free API key at: https://openweathermap.org/api
+ */
+
 const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 const DEFAULT_CITY = "College Station";
 const DEFAULT_STATE = "TX";

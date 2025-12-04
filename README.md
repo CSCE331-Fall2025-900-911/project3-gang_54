@@ -27,6 +27,18 @@ GOOGLE_TRANSLATE_API_KEY=<your-google-translate-api-key>
 OPENWEATHER_API_KEY=<your-openweather-api-key>
 ```
 
+### API Sources
+
+- **Weather API**: Uses OpenWeatherMap Current Weather Data API
+  - Source: https://api.openweathermap.org/data/2.5/weather
+  - Get free API key at: https://openweathermap.org/api
+  - Default location: College Station, TX
+
+- **Google Translate API**: Uses Google Cloud Translation API v2
+  - Endpoint: https://translation.googleapis.com/language/translate/v2
+  - Enable in Google Cloud Console: https://console.cloud.google.com/apis/credentials
+  - Requires Cloud Translation API to be enabled
+
 You can pull the production values directly from Vercel:
 
 ```
