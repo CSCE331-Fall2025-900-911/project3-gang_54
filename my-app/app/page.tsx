@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useTranslation, LANGUAGE_OPTIONS } from "./hooks/useTranslation";
 
 export default function Home() {
-  const [weather, setWeather] = useState(null);
+  const [weather, setWeather] = useState<string | number | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(true);
 
   const TRANSLATABLE_STRINGS = [
     "Welcome to ShareTea",
@@ -22,13 +23,23 @@ export default function Home() {
 
   const { language, setLanguage, display, isTranslating } = useTranslation(TRANSLATABLE_STRINGS);
 
-  // not working rn
-  // useEffect(() => {
-  //   fetch("/api/weather")
-  //     .then((res) => res.json())
-  //     .then((data) => setWeather(data.temp))
-  //     .catch(() => setWeather("Unavailable"));
-  // }, []);
+  useEffect(() => {
+    async function fetchWeather() {
+      try {
+        setWeatherLoading(true);
+        const res = await fetch("/api/weather");
+        if (!res.ok) throw new Error("Weather API failed");
+        const data = await res.json();
+        setWeather(data.temp ?? "N/A");
+      } catch (error) {
+        console.error("Weather fetch error", error);
+        setWeather("N/A");
+      } finally {
+        setWeatherLoading(false);
+      }
+    }
+    fetchWeather();
+  }, []);
 
   return (
     <main className="home-container">
@@ -53,7 +64,7 @@ export default function Home() {
         <h1 className="title-heading">{display("Welcome to ShareTea")}</h1>
 
         <p className="weather-text">
-          {display("Current Weather:")} {weather}°F
+          {display("Current Weather:")} {weatherLoading ? "Loading..." : `${weather}°F`}
         </p>
 
         <p>{display("Your favorite bubble tea, just a click away!")}</p>

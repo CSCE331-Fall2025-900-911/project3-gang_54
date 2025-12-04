@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
 
     params.append("target", targetLanguage);
     params.append("format", "text");
+    params.append("source", "en"); // Specify source language
 
     const response = await fetch(`${GOOGLE_TRANSLATE_ENDPOINT}?key=${apiKey}`, {
       method: "POST",
@@ -61,8 +62,23 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error("Google Translate API error", response.status, errorBody);
-      return NextResponse.json({ error: "Translation service error." }, { status: 502 });
+      let errorMessage = "Translation service error.";
+      
+      try {
+        const errorJson = JSON.parse(errorBody);
+        errorMessage = errorJson.error?.message || errorJson.error || errorMessage;
+        console.error("Google Translate API error", response.status, errorJson);
+      } catch {
+        console.error("Google Translate API error", response.status, errorBody);
+      }
+      
+      return NextResponse.json(
+        { 
+          error: errorMessage,
+          details: "Check that GOOGLE_TRANSLATE_API_KEY is set correctly and has Translate API enabled."
+        }, 
+        { status: 502 }
+      );
     }
 
     const data = (await response.json()) as {
@@ -73,15 +89,19 @@ export async function POST(req: NextRequest) {
 
     const translatedRecord: Record<string, string> = {};
 
-    let index = 0;
+    // Map translations back to original texts in order
+    let translationIndex = 0;
     for (const original of texts) {
-      if (typeof original !== "string" || original.trim().length === 0) {
-        // skip invalid original entries to maintain alignment
-        continue;
+      if (typeof original === "string" && original.trim().length > 0) {
+        const translated = translationList[translationIndex]?.translatedText ?? original;
+        translatedRecord[original] = decodeHtmlEntities(translated);
+        translationIndex += 1;
+      } else {
+        // For invalid entries, use original as-is
+        if (typeof original === "string") {
+          translatedRecord[original] = original;
+        }
       }
-      const translated = translationList[index]?.translatedText ?? original;
-      translatedRecord[original] = decodeHtmlEntities(translated);
-      index += 1;
     }
 
     return NextResponse.json({ translations: translatedRecord });
