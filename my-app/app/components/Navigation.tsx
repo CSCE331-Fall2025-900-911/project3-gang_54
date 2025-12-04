@@ -1,10 +1,11 @@
 'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback } from "react";
 
 export default function Navigation() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -13,11 +14,34 @@ export default function Navigation() {
     { href: '/login', label: 'Login', isButton: true },
   ];
 
+  const handleNavigation = useCallback((href: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      router.push(href);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Fallback to window.location if router fails
+      window.location.href = href;
+    }
+  }, [router]);
+
+  const handleHomeClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      router.push('/');
+    } catch (error) {
+      console.error('Navigation error:', error);
+      window.location.href = '/';
+    }
+  }, [router]);
+
   return (
     <nav 
       className="fixed top-0 left-0 w-full bg-black text-white shadow-md flex justify-between items-center px-6 py-4"
       style={{ 
-        zIndex: 50, 
+        zIndex: 9999, 
         pointerEvents: 'auto', 
         position: 'fixed',
         top: 0,
@@ -31,16 +55,20 @@ export default function Navigation() {
         padding: '16px 24px'
       }}
     >
-      <Link 
-        href="/" 
+      <button
+        onClick={handleHomeClick}
         style={{ 
           textDecoration: 'none', 
           color: 'inherit',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          font: 'inherit'
         }}
       >
         <h1 className="text-2xl font-bold tracking-wide" style={{ margin: 0 }}>ShareTea</h1>
-      </Link>
+      </button>
       <ul 
         style={{ 
           listStyle: 'none', 
@@ -53,8 +81,8 @@ export default function Navigation() {
       >
         {navLinks.map((link) => (
           <li key={link.href}>
-            <Link 
-              href={link.href}
+            <button
+              onClick={(e) => handleNavigation(link.href, e)}
               className={link.isButton ? "login_box" : "hover:text-orange-400 transition-colors"}
               style={{ 
                 color: pathname === link.href ? '#ff9900' : '#fff', 
@@ -64,11 +92,15 @@ export default function Navigation() {
                 padding: link.isButton ? '10px 18px' : '4px 8px',
                 backgroundColor: link.isButton ? '#ff9900' : 'transparent',
                 borderRadius: link.isButton ? '8px' : '0',
-                fontSize: '16px'
+                fontSize: '16px',
+                border: 'none',
+                font: 'inherit',
+                width: '100%',
+                textAlign: 'left'
               }}
             >
               {link.isButton ? <strong>{link.label}</strong> : link.label}
-            </Link>
+            </button>
           </li>
         ))}
       </ul>
