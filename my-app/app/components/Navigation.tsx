@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -20,62 +20,22 @@ export default function Navigation() {
     { href: '/login', label: 'Login', isButton: true },
   ];
 
-  const handleNavigation = useCallback((href: string, e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    console.log('Navigation clicked:', href);
-    
-    if (!mounted) {
-      console.log('Not mounted yet, using window.location');
-      window.location.href = href;
-      return;
-    }
-
-    try {
-      console.log('Attempting router.push:', href);
-      router.push(href);
-    } catch (error) {
-      console.error('Navigation error:', error);
-      console.log('Falling back to window.location');
-      window.location.href = href;
-    }
-  }, [router, mounted]);
-
-  const handleHomeClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    console.log('Home clicked');
-    
-    if (!mounted) {
-      window.location.href = '/';
-      return;
-    }
-
-    try {
-      router.push('/');
-    } catch (error) {
-      console.error('Navigation error:', error);
-      window.location.href = '/';
-    }
-  }, [router, mounted]);
-
-  // Use anchor tags as fallback - they always work even without JavaScript
+  // Use anchor tags - they work even if JavaScript fails
   const NavLink = ({ link }: { link: typeof navLinks[0] }) => {
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-      e.preventDefault();
-      console.log('Nav link clicked:', link.href);
+      // Only prevent default if we can use client-side navigation
+      // Otherwise, let the anchor tag work naturally
       if (mounted && router) {
         try {
+          e.preventDefault();
+          console.log('Navigating to:', link.href);
           router.push(link.href);
         } catch (err) {
-          console.error('Router push failed, using window.location:', err);
-          window.location.href = link.href;
+          console.error('Router push failed, using default navigation:', err);
+          // Don't prevent default - let the anchor tag work
         }
-      } else {
-        window.location.href = link.href;
       }
+      // If not mounted or router fails, let default anchor behavior work
     };
 
     return (
@@ -101,6 +61,20 @@ export default function Navigation() {
     );
   };
 
+  const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (mounted && router) {
+      try {
+        e.preventDefault();
+        console.log('Navigating to home');
+        router.push('/');
+      } catch (err) {
+        console.error('Router push failed, using default navigation:', err);
+        // Let default anchor behavior work
+      }
+    }
+    // If not mounted or router fails, let default anchor behavior work
+  };
+
   return (
     <nav 
       className="fixed top-0 left-0 w-full bg-black text-white shadow-md flex justify-between items-center px-6 py-4"
@@ -121,10 +95,7 @@ export default function Navigation() {
     >
       <a
         href="/"
-        onClick={(e) => {
-          e.preventDefault();
-          handleHomeClick(e as any);
-        }}
+        onClick={handleHomeClick}
         style={{ 
           textDecoration: 'none', 
           color: 'inherit',
