@@ -61,84 +61,45 @@ export default function Navigation() {
     }
   }, [router, mounted]);
 
-  // Don't render until mounted to avoid hydration issues
-  if (!mounted) {
+  // Use anchor tags as fallback - they always work even without JavaScript
+  const NavLink = ({ link }: { link: typeof navLinks[0] }) => {
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      console.log('Nav link clicked:', link.href);
+      if (mounted && router) {
+        try {
+          router.push(link.href);
+        } catch (err) {
+          console.error('Router push failed, using window.location:', err);
+          window.location.href = link.href;
+        }
+      } else {
+        window.location.href = link.href;
+      }
+    };
+
     return (
-      <nav 
-        className="fixed top-0 left-0 w-full bg-black text-white shadow-md flex justify-between items-center px-6 py-4"
+      <a
+        href={link.href}
+        onClick={handleClick}
+        className={link.isButton ? "login_box" : "hover:text-orange-400 transition-colors"}
         style={{ 
-          zIndex: 9999, 
-          pointerEvents: 'auto', 
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          backgroundColor: '#000',
-          color: '#fff',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '16px 24px'
+          color: pathname === link.href ? '#ff9900' : '#fff', 
+          textDecoration: 'none', 
+          cursor: 'pointer',
+          display: 'inline-block',
+          padding: link.isButton ? '10px 18px' : '4px 8px',
+          backgroundColor: link.isButton ? '#ff9900' : 'transparent',
+          borderRadius: link.isButton ? '8px' : '0',
+          fontSize: '16px',
+          textAlign: 'center',
+          whiteSpace: 'nowrap'
         }}
       >
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            window.location.href = '/';
-          }}
-          style={{ 
-            textDecoration: 'none', 
-            color: 'inherit',
-            cursor: 'pointer',
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            font: 'inherit'
-          }}
-        >
-          <h1 className="text-2xl font-bold tracking-wide" style={{ margin: 0 }}>ShareTea</h1>
-        </button>
-        <ul 
-          style={{ 
-            listStyle: 'none', 
-            margin: 0, 
-            padding: 0, 
-            display: 'flex', 
-            alignItems: 'center',
-            gap: '24px'
-          }}
-        >
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = link.href;
-                }}
-                className={link.isButton ? "login_box" : "hover:text-orange-400 transition-colors"}
-                style={{ 
-                  color: '#fff', 
-                  textDecoration: 'none', 
-                  cursor: 'pointer',
-                  display: 'inline-block',
-                  padding: link.isButton ? '10px 18px' : '4px 8px',
-                  backgroundColor: link.isButton ? '#ff9900' : 'transparent',
-                  borderRadius: link.isButton ? '8px' : '0',
-                  fontSize: '16px',
-                  border: 'none',
-                  font: 'inherit',
-                  textAlign: 'center',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {link.isButton ? <strong>{link.label}</strong> : link.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
+        {link.isButton ? <strong>{link.label}</strong> : link.label}
+      </a>
     );
-  }
+  };
 
   return (
     <nav 
@@ -158,20 +119,20 @@ export default function Navigation() {
         padding: '16px 24px'
       }}
     >
-      <button
-        onClick={handleHomeClick}
+      <a
+        href="/"
+        onClick={(e) => {
+          e.preventDefault();
+          handleHomeClick(e as any);
+        }}
         style={{ 
           textDecoration: 'none', 
           color: 'inherit',
-          cursor: 'pointer',
-          background: 'none',
-          border: 'none',
-          padding: 0,
-          font: 'inherit'
+          cursor: 'pointer'
         }}
       >
         <h1 className="text-2xl font-bold tracking-wide" style={{ margin: 0 }}>ShareTea</h1>
-      </button>
+      </a>
       <ul 
         style={{ 
           listStyle: 'none', 
@@ -184,26 +145,7 @@ export default function Navigation() {
       >
         {navLinks.map((link) => (
           <li key={link.href}>
-            <button
-              onClick={(e) => handleNavigation(link.href, e)}
-              className={link.isButton ? "login_box" : "hover:text-orange-400 transition-colors"}
-              style={{ 
-                color: pathname === link.href ? '#ff9900' : '#fff', 
-                textDecoration: 'none', 
-                cursor: 'pointer',
-                display: 'inline-block',
-                padding: link.isButton ? '10px 18px' : '4px 8px',
-                backgroundColor: link.isButton ? '#ff9900' : 'transparent',
-                borderRadius: link.isButton ? '8px' : '0',
-                fontSize: '16px',
-                border: 'none',
-                font: 'inherit',
-                textAlign: 'center',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              {link.isButton ? <strong>{link.label}</strong> : link.label}
-            </button>
+            <NavLink link={link} />
           </li>
         ))}
       </ul>
