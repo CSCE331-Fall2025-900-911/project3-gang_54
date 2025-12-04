@@ -6,77 +6,71 @@ import { usePathname } from "next/navigation";
 export default function Navigation() {
   const pathname = usePathname();
 
+  const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/order', label: 'Order' },
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/login', label: 'Login', isButton: true },
+  ];
+
   return (
     <nav 
-      className="fixed top-0 left-0 w-full bg-black text-white shadow-md flex justify-between items-center px-6 py-4 z-50"
-      style={{ zIndex: 50, pointerEvents: 'auto', position: 'fixed' }}
+      className="fixed top-0 left-0 w-full bg-black text-white shadow-md flex justify-between items-center px-6 py-4"
+      style={{ 
+        zIndex: 50, 
+        pointerEvents: 'auto', 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        backgroundColor: '#000',
+        color: '#fff',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '16px 24px'
+      }}
     >
-      <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <h1 className="text-2xl font-bold tracking-wide">ShareTea</h1>
+      <Link 
+        href="/" 
+        style={{ 
+          textDecoration: 'none', 
+          color: 'inherit',
+          cursor: 'pointer'
+        }}
+      >
+        <h1 className="text-2xl font-bold tracking-wide" style={{ margin: 0 }}>ShareTea</h1>
       </Link>
-      <ul className="flex gap-6" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', alignItems: 'center' }}>
-        <li>
-          <Link 
-            href="/" 
-            className="hover:text-orange-400 transition-colors"
-            style={{ 
-              color: pathname === '/' ? '#ff9900' : '#fff', 
-              textDecoration: 'none', 
-              cursor: 'pointer',
-              display: 'block',
-              padding: '4px 8px'
-            }}
-          >
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link 
-            href="/order" 
-            className="hover:text-orange-400 transition-colors"
-            style={{ 
-              color: pathname === '/order' ? '#ff9900' : '#fff', 
-              textDecoration: 'none', 
-              cursor: 'pointer',
-              display: 'block',
-              padding: '4px 8px'
-            }}
-          >
-            Order
-          </Link>
-        </li>
-        <li>
-          <Link 
-            href="/dashboard" 
-            className="hover:text-orange-400 transition-colors"
-            style={{ 
-              color: pathname === '/dashboard' ? '#ff9900' : '#fff', 
-              textDecoration: 'none', 
-              cursor: 'pointer',
-              display: 'block',
-              padding: '4px 8px'
-            }}
-          >
-            Dashboard
-          </Link>
-        </li>
-        <li>
-          <Link 
-            href="/login" 
-            className="hover:text-orange-400 transition-colors login_box"
-            style={{ 
-              color: '#fff', 
-              textDecoration: 'none', 
-              cursor: 'pointer',
-              display: 'block',
-              padding: '10px 18px',
-              backgroundColor: '#ff9900',
-              borderRadius: '8px'
-            }}
-          >
-            <strong>Login</strong>
-          </Link>
-        </li>
+      <ul 
+        style={{ 
+          listStyle: 'none', 
+          margin: 0, 
+          padding: 0, 
+          display: 'flex', 
+          alignItems: 'center',
+          gap: '24px'
+        }}
+      >
+        {navLinks.map((link) => (
+          <li key={link.href}>
+            <Link 
+              href={link.href}
+              className={link.isButton ? "login_box" : "hover:text-orange-400 transition-colors"}
+              style={{ 
+                color: pathname === link.href ? '#ff9900' : '#fff', 
+                textDecoration: 'none', 
+                cursor: 'pointer',
+                display: 'block',
+                padding: link.isButton ? '10px 18px' : '4px 8px',
+                backgroundColor: link.isButton ? '#ff9900' : 'transparent',
+                borderRadius: link.isButton ? '8px' : '0',
+                fontSize: '16px'
+              }}
+            >
+              {link.isButton ? <strong>{link.label}</strong> : link.label}
+            </Link>
+          </li>
+        ))}
       </ul>
     </nav>
   );
