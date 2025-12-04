@@ -51,10 +51,19 @@ export function useTranslation(texts: string[]) {
           signal: abortController.signal,
         });
 
-        if (!response.ok) throw new Error("Translation request failed.");
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+          console.error("Translation API error:", errorData);
+          throw new Error(errorData.error || errorData.details || "Translation request failed.");
+        }
 
-        const data = (await response.json()) as { translations?: Record<string, string> };
-        if (!data.translations) throw new Error("Translation data missing.");
+        const data = (await response.json()) as { translations?: Record<string, string>; error?: string };
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        if (!data.translations) {
+          throw new Error("Translation data missing.");
+        }
 
         if (!cancelled) {
           translationsCache.current[language] = data.translations;

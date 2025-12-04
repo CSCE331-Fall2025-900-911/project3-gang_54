@@ -56,41 +56,46 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No valid text strings provided for translation." }, { status: 400 });
     }
 
-    // Use JSON format for Google Translate API
-    const requestBody = {
-      q: validTexts,
-      target: targetLanguage,
-      source: "en",
-      format: "text",
-    };
+    // Google Translate API v2 requires form-urlencoded format
+    const params = new URLSearchParams();
+    validTexts.forEach((text) => {
+      params.append("q", text);
+    });
+    params.append("target", targetLanguage);
+    params.append("source", "en");
+    params.append("format", "text");
 
     const response = await fetch(`${GOOGLE_TRANSLATE_ENDPOINT}?key=${apiKey}`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: JSON.stringify(requestBody),
+      body: params.toString(),
       cache: "no-store",
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
       let errorMessage = "Translation service error.";
+      let errorDetails = "";
       
       try {
         const errorJson = JSON.parse(errorBody);
-        errorMessage = errorJson.error?.message || errorJson.error || errorMessage;
+        errorMessage = errorJson.error?.message || errorJson.error?.errors?.[0]?.message || errorJson.error || errorMessage;
+        errorDetails = JSON.stringify(errorJson, null, 2);
         console.error("Google Translate API error", response.status, errorJson);
       } catch {
         console.error("Google Translate API error", response.status, errorBody);
+        errorDetails = errorBody;
       }
       
       return NextResponse.json(
         { 
           error: errorMessage,
-          details: "Check that GOOGLE_TRANSLATE_API_KEY is set correctly and has Translate API enabled."
+          details: errorDetails || "Check that GOOGLE_TRANSLATE_API_KEY is set correctly and has Translate API enabled.",
+          status: response.status
         }, 
-        { status: 502 }
+        { status: response.status >= 400 && response.status < 500 ? response.status : 502 }
       );
     }
 
