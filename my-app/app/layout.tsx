@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
-import Navigation from "./components/Navigation";
-import AccessibilityToggle from "./AccessibilityToggle";
-import { TranslationProvider } from "./contexts/TranslationContext"; 
+import ClientProviders from "./components/ClientProviders"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,24 +37,18 @@ export default function RootLayout({
       </head>
 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}>
-        <TranslationProvider>
-          {/* Google OAuth script */}
-          <Script
-            src="https://accounts.google.com/gsi/client"
-            strategy="afterInteractive"
-            async
-            defer
-          />
+        {/* Google OAuth script */}
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+          async
+          defer
+        />
 
-          {/* NAVBAR */}
-          <Navigation />
-
-          {/* ACCESSIBILITY MENU */}
-          <AccessibilityToggle />
-
+        <ClientProviders>
           {/* MAIN CONTENT (pushed down so nav doesn't overlap) */}
           <main className="pt-24">{children}</main>
-        </TranslationProvider>
+        </ClientProviders>
       </body>
     </html>
   );
