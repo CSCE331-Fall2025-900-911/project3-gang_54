@@ -11,10 +11,10 @@
   "dependencies": {
     "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
-    "next": "16.0.1",
+    "next": "^16.0.7",
     "pg": "^8.16.3",
-    "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
