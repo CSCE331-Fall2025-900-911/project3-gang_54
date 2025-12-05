@@ -1024,12 +1024,92 @@ function KitchenView() {
 /* ====================================================================== */
 
 function XReportsView() {
+  const [date, setDate] = useState("");
+  const [rows, setRows] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadXReport = async () => {
+    setError(null);
+    setRows([]);
+
+    if (!date) {
+      setError("Please enter a date.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/xreports", {
+        method: "POST",
+        body: JSON.stringify({ date }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to generate X-Report");
+      }
+
+      const data = await res.json();
+      setRows(data);
+
+      if (data.length === 0) setError("No sales recorded for that date.");
+    } catch (err: any) {
+      setError(err.message ?? "Unexpected error");
+    }
+  };
+
   return (
-    <div>
-      <p className={styles.helperText}>implement backend</p>
-      <div className={styles.tablePlaceholder}>
-        <p>X-Report table will go here.</p>
+    <div className={styles.container}>
+      <h1 className={styles.title}>X-Report</h1>
+      <p className={styles.subtitle}>Hourly breakdown of sales for a selected day.</p>
+
+      <div className={styles.filterRow}>
+        <label>Date (YYYY-MM-DD):</label>
+        <input
+          type="text"
+          className={styles.inputField}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+        <button className={styles.actionButton} onClick={loadXReport}>
+          Generate X-Report
+        </button>
       </div>
+
+      {error && <p className={styles.errorText}>{error}</p>}
+
+      {rows.length > 0 && (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Hour</th>
+              <th>Orders</th>
+              <th>Total Sales ($)</th>
+              <th>Returns</th>
+              <th>Voids</th>
+              <th>Cash ($)</th>
+              <th>Credit ($)</th>
+              <th>Debit ($)</th>
+              <th>Gift Card ($)</th>
+              <th>Mobile Pay ($)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, idx) => (
+              <tr key={idx}>
+                <td>{r.hour}</td>
+                <td>{r.orders}</td>
+                <td>{r.total_sales}</td>
+                <td>{r.returns}</td>
+                <td>{r.voids}</td>
+                <td>{r.cash_total}</td>
+                <td>{r.credit_total}</td>
+                <td>{r.debit_total}</td>
+                <td>{r.gift_card_total}</td>
+                <td>{r.mobile_pay_total}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
