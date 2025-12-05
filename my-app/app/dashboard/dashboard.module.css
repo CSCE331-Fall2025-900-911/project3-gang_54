@@ -158,3 +158,13 @@
   margin: 10px 0;
   font-weight: 500;
 }
+
+/* Z-Report */
+.tableWrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.tableWrapper table {
+  min-width: 1200px;
+}

@@ -1119,12 +1119,100 @@ function XReportsView() {
 /* ====================================================================== */
 
 function ZReportsView() {
+  const [date, setDate] = useState("");
+  const [rows, setRows] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const runZReport = async () => {
+    setError(null);
+    setRows([]);
+
+    if (!date) {
+      setError("Please enter a date.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/zreports", {
+        method: "POST",
+        body: JSON.stringify({ date }),
+      });
+
+      if (!res.ok) throw new Error("Failed to generate Z-Report");
+
+      const data = await res.json();
+      setRows(data);
+
+      if (data.length === 0) setError("No sales on that date.");
+    } catch (err: any) {
+      setError(err.message ?? "Unexpected error");
+    }
+  };
+
   return (
-    <div>
-      <p className={styles.helperText}>implement backend</p>
-      <div className={styles.tablePlaceholder}>
-        <p>Z-Report table and run form will go here.</p>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Z-Report</h1>
+      <p className={styles.subtitle}>Daily summary with totals and cashier signatures.</p>
+
+      <div className={styles.filterRow}>
+        <label>Date (YYYY-MM-DD):</label>
+        <input
+          type="text"
+          className={styles.inputField}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
+        <button className={styles.actionButton} onClick={runZReport}>
+          Run Z-Report
+        </button>
       </div>
+
+      {error && <p className={styles.errorText}>{error}</p>}
+
+      {rows.length > 0 && (
+        <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Report ID</th>
+              <th>Report Date</th>
+              <th>Total Gross</th>
+              <th>Total Discount</th>
+              <th>Total Tax</th>
+              <th>Total Net</th>
+              <th>Void Count</th>
+              <th>Return Count</th>
+              <th>Cash Total</th>
+              <th>Credit Total</th>
+              <th>Debit Total</th>
+              <th>Gift Card Total</th>
+              <th>Mobile Pay Total</th>
+              <th>Cashier Signatures</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, idx) => (
+              <tr key={idx}>
+                <td>{r.report_id}</td>
+                <td>{r.report_date}</td>
+                <td>{r.total_gross}</td>
+                <td>{r.total_discount}</td>
+                <td>{r.total_tax}</td>
+                <td>{r.total_net}</td>
+                <td>{r.void_count}</td>
+                <td>{r.return_count}</td>
+                <td>{r.cash_total}</td>
+                <td>{r.credit_total}</td>
+                <td>{r.debit_total}</td>
+                <td>{r.gift_card_total}</td>
+                <td>{r.mobile_pay_total}</td>
+                <td>{r.cashier_signatures}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        </div>
+      )}
     </div>
   );
 }
