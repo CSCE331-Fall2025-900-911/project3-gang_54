@@ -681,15 +681,36 @@ function ManageEmployeesView() {
   type Employee = {
     employee_id: number;
     name: string;
+    phone_number: string;
+    email: string;
     role: string;
+    hire_date: string;
+    salary: number;
+    status: string;
+    address: string;
+    date_of_birth: string;
   };
 
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [newName, setNewName] = useState("");
-  const [newRole, setNewRole] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    phone_number: "",
+    email: "",
+    role: "",
+    hire_date: "",
+    salary: "",
+    status: "",
+    address: "",
+    date_of_birth: "",
+  });
+
+  const updateForm = (field: string, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -700,7 +721,14 @@ function ManageEmployeesView() {
         const res = await fetch("/api/employees");
         if (!res.ok) throw new Error("Failed to load employees");
         const data = await res.json();
-        setEmployees(data);
+
+        const cleaned = data.map((emp: any) => ({
+          ...emp,
+          hire_date: emp.hire_date?.split("T")[0] ?? "",
+          date_of_birth: emp.date_of_birth?.split("T")[0] ?? "",
+        }));
+
+        setEmployees(cleaned);
       } catch (err: any) {
         setError(err.message ?? "Error loading employees");
       } finally {
@@ -712,7 +740,7 @@ function ManageEmployeesView() {
 
   const handleCellChange = (
     id: number,
-    field: "name" | "role",
+    field: keyof Employee,
     value: string
   ) => {
     setEmployees((prev) =>
@@ -723,11 +751,11 @@ function ManageEmployeesView() {
   };
 
   const handleAdd = async () => {
-    const name = newName.trim();
-    const role = newRole.trim();
+    const body = { ...form };
 
-    if (!name || !role) {
-      alert("Enter valid name and role");
+    // simple validation
+    if (!body.name || !body.phone_number || !body.email || !body.role) {
+      alert("Missing required fields");
       return;
     }
 
@@ -735,7 +763,7 @@ function ManageEmployeesView() {
       const res = await fetch("/api/employees", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, role }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) throw new Error("Failed to add employee");
@@ -743,8 +771,17 @@ function ManageEmployeesView() {
       const created: Employee = await res.json();
       setEmployees((prev) => [...prev, created]);
 
-      setNewName("");
-      setNewRole("");
+      setForm({
+        name: "",
+        phone_number: "",
+        email: "",
+        role: "",
+        hire_date: "",
+        salary: "",
+        status: "",
+        address: "",
+        date_of_birth: "",
+      });
     } catch (err: any) {
       alert(err.message ?? "Error adding employee");
     }
@@ -759,25 +796,31 @@ function ManageEmployeesView() {
     const emp = employees.find((e) => e.employee_id === selectedId);
     if (!emp) return;
 
-    const name = emp.name.trim();
-    const role = emp.role.trim();
-
-    if (!name || !role) {
-      alert("Invalid values on selected row");
-      return;
-    }
+    const payload = {
+      ...emp,
+      employee_id: selectedId,
+      hire_date: emp.hire_date?.split("T")[0] ?? emp.hire_date,
+      date_of_birth: emp.date_of_birth?.split("T")[0] ?? emp.date_of_birth,
+    };
 
     try {
       const res = await fetch("/api/employees", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: selectedId, name, role }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error("Failed to update employee");
 
-      const data = await res.json();
-      setEmployees(data);
+      let updated = await res.json();
+
+      updated = updated.map((emp: any) => ({
+        ...emp,
+        hire_date: emp.hire_date?.split("T")[0] ?? "",
+        date_of_birth: emp.date_of_birth?.split("T")[0] ?? "",
+      }));
+
+      setEmployees(updated);
     } catch (err: any) {
       alert(err.message ?? "Error updating employee");
     }
@@ -810,13 +853,20 @@ function ManageEmployeesView() {
       {loading && <p className={styles.helperText}>Loading employees...</p>}
       {error && <p className={styles.helperText}>Error: {error}</p>}
 
-      <div className={styles.tablePlaceholder}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className={`${styles.tablePlaceholder} ${styles.tableWrapper}`}>
+        <table>
           <thead>
             <tr>
               <th style={{ padding: "8px" }}>ID</th>
               <th style={{ padding: "8px" }}>Name</th>
+              <th style={{ padding: "8px" }}>Phone</th>
+              <th style={{ padding: "8px" }}>Email</th>
               <th style={{ padding: "8px" }}>Role</th>
+              <th style={{ padding: "8px" }}>Hire Date (YYYY-MM-DD)</th>
+              <th style={{ padding: "8px" }}>Salary</th>
+              <th style={{ padding: "8px" }}>Status</th>
+              <th style={{ padding: "8px" }}>Address</th>
+              <th style={{ padding: "8px" }}>DOB (YYYY-MM-DD)</th>
               <th style={{ padding: "8px" }}>Actions</th>
             </tr>
           </thead>
@@ -834,6 +884,7 @@ function ManageEmployeesView() {
               >
                 <td style={{ padding: "8px" }}>{emp.employee_id}</td>
 
+                {/* NAME */}
                 <td style={{ padding: "8px" }}>
                   <input
                     type="text"
@@ -845,6 +896,35 @@ function ManageEmployeesView() {
                   />
                 </td>
 
+                {/* PHONE */}
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={emp.phone_number}
+                    onChange={(e) =>
+                      handleCellChange(
+                        emp.employee_id,
+                        "phone_number",
+                        e.target.value
+                      )
+                    }
+                    className={styles.inputField}
+                  />
+                </td>
+
+                {/* EMAIL */}
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={emp.email}
+                    onChange={(e) =>
+                      handleCellChange(emp.employee_id, "email", e.target.value)
+                    }
+                    className={styles.inputField}
+                  />
+                </td>
+
+                {/* ROLE */}
                 <td style={{ padding: "8px" }}>
                   <input
                     type="text"
@@ -856,6 +936,89 @@ function ManageEmployeesView() {
                   />
                 </td>
 
+                {/* HIRE DATE */}
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    placeholder="YYYY-MM-DD"
+                    value={emp.hire_date ?? ""}
+                    onChange={(e) =>
+                      handleCellChange(
+                        emp.employee_id,
+                        "hire_date",
+                        e.target.value
+                      )
+                    }
+                    className={styles.inputField}
+                  />
+                </td>
+
+                {/* SALARY */}
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="number"
+                    value={emp.salary}
+                    onChange={(e) =>
+                      handleCellChange(
+                        emp.employee_id,
+                        "salary",
+                        e.target.value
+                      )
+                    }
+                    className={styles.inputField}
+                  />
+                </td>
+
+                {/* STATUS */}
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={emp.status}
+                    onChange={(e) =>
+                      handleCellChange(
+                        emp.employee_id,
+                        "status",
+                        e.target.value
+                      )
+                    }
+                    className={styles.inputField}
+                  />
+                </td>
+
+                {/* ADDRESS */}
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={emp.address}
+                    onChange={(e) =>
+                      handleCellChange(
+                        emp.employee_id,
+                        "address",
+                        e.target.value
+                      )
+                    }
+                    className={styles.inputField}
+                  />
+                </td>
+
+                {/* DOB */}
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    placeholder="YYYY-MM-DD"
+                    value={emp.date_of_birth ?? ""}
+                    onChange={(e) =>
+                      handleCellChange(
+                        emp.employee_id,
+                        "date_of_birth",
+                        e.target.value
+                      )
+                    }
+                    className={styles.inputField}
+                  />
+                </td>
+
+                {/* DELETE */}
                 <td style={{ padding: "8px" }}>
                   <button
                     className={styles.deleteButton}
@@ -873,34 +1036,92 @@ function ManageEmployeesView() {
         </table>
       </div>
 
+      {/* UPDATE BUTTON */}
       <div style={{ marginTop: "20px" }}>
         <button className={styles.updateButton} onClick={handleUpdate}>
           Update Selected
         </button>
       </div>
 
+      {/* ADD EMPLOYEE FORM */}
       <div
         style={{
           marginTop: "20px",
           display: "flex",
-          alignItems: "center",
+          flexWrap: "wrap",
           gap: "12px",
         }}
       >
         <input
           type="text"
           placeholder="Name"
-          value={newName}
+          value={form.name}
           className={styles.inputField}
-          onChange={(e) => setNewName(e.target.value)}
+          onChange={(e) => updateForm("name", e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Phone Number"
+          value={form.phone_number}
+          className={styles.inputField}
+          onChange={(e) => updateForm("phone_number", e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Email"
+          value={form.email}
+          className={styles.inputField}
+          onChange={(e) => updateForm("email", e.target.value)}
         />
 
         <input
           type="text"
           placeholder="Role"
-          value={newRole}
+          value={form.role}
           className={styles.inputField}
-          onChange={(e) => setNewRole(e.target.value)}
+          onChange={(e) => updateForm("role", e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Hire Date (YYYY-MM-DD)"
+          value={form.hire_date}
+          className={styles.inputField}
+          onChange={(e) => updateForm("hire_date", e.target.value)}
+        />
+
+        <input
+          type="number"
+          placeholder="Salary"
+          value={form.salary}
+          className={styles.inputField}
+          onChange={(e) => updateForm("salary", e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Status"
+          value={form.status}
+          className={styles.inputField}
+          onChange={(e) => updateForm("status", e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Address"
+          value={form.address}
+          className={styles.inputField}
+          onChange={(e) => updateForm("address", e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="DOB (YYYY-MM-DD)"
+          value={form.date_of_birth}
+          className={styles.inputField}
+          onChange={(e) => updateForm("date_of_birth", e.target.value)}
         />
 
         <button className={styles.addButton} onClick={handleAdd}>
@@ -1059,7 +1280,9 @@ function XReportsView() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>X-Report</h1>
-      <p className={styles.subtitle}>Hourly breakdown of sales for a selected day.</p>
+      <p className={styles.subtitle}>
+        Hourly breakdown of sales for a selected day.
+      </p>
 
       <div className={styles.filterRow}>
         <label>Date (YYYY-MM-DD):</label>
@@ -1152,7 +1375,9 @@ function ZReportsView() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Z-Report</h1>
-      <p className={styles.subtitle}>Daily summary with totals and cashier signatures.</p>
+      <p className={styles.subtitle}>
+        Daily summary with totals and cashier signatures.
+      </p>
 
       <div className={styles.filterRow}>
         <label>Date (YYYY-MM-DD):</label>
@@ -1171,46 +1396,46 @@ function ZReportsView() {
 
       {rows.length > 0 && (
         <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Report ID</th>
-              <th>Report Date</th>
-              <th>Total Gross</th>
-              <th>Total Discount</th>
-              <th>Total Tax</th>
-              <th>Total Net</th>
-              <th>Void Count</th>
-              <th>Return Count</th>
-              <th>Cash Total</th>
-              <th>Credit Total</th>
-              <th>Debit Total</th>
-              <th>Gift Card Total</th>
-              <th>Mobile Pay Total</th>
-              <th>Cashier Signatures</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r, idx) => (
-              <tr key={idx}>
-                <td>{r.report_id}</td>
-                <td>{r.report_date}</td>
-                <td>{r.total_gross}</td>
-                <td>{r.total_discount}</td>
-                <td>{r.total_tax}</td>
-                <td>{r.total_net}</td>
-                <td>{r.void_count}</td>
-                <td>{r.return_count}</td>
-                <td>{r.cash_total}</td>
-                <td>{r.credit_total}</td>
-                <td>{r.debit_total}</td>
-                <td>{r.gift_card_total}</td>
-                <td>{r.mobile_pay_total}</td>
-                <td>{r.cashier_signatures}</td>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Report ID</th>
+                <th>Report Date</th>
+                <th>Total Gross</th>
+                <th>Total Discount</th>
+                <th>Total Tax</th>
+                <th>Total Net</th>
+                <th>Void Count</th>
+                <th>Return Count</th>
+                <th>Cash Total</th>
+                <th>Credit Total</th>
+                <th>Debit Total</th>
+                <th>Gift Card Total</th>
+                <th>Mobile Pay Total</th>
+                <th>Cashier Signatures</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((r, idx) => (
+                <tr key={idx}>
+                  <td>{r.report_id}</td>
+                  <td>{r.report_date}</td>
+                  <td>{r.total_gross}</td>
+                  <td>{r.total_discount}</td>
+                  <td>{r.total_tax}</td>
+                  <td>{r.total_net}</td>
+                  <td>{r.void_count}</td>
+                  <td>{r.return_count}</td>
+                  <td>{r.cash_total}</td>
+                  <td>{r.credit_total}</td>
+                  <td>{r.debit_total}</td>
+                  <td>{r.gift_card_total}</td>
+                  <td>{r.mobile_pay_total}</td>
+                  <td>{r.cashier_signatures}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
