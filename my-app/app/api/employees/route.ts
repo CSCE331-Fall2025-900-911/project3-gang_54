@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
 
+const connectionString = `postgres://${process.env.DB_user}:${process.env.DB_password}` + `@${process.env.DB_host}:5432/${process.env.DB_name}`;
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
   ssl: { rejectUnauthorized: false },
 });
 
