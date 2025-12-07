@@ -92,7 +92,7 @@ export function useTranslation(texts: string[]) {
       cancelled = true;
       abortController.abort();
     };
-  }, [language, TRANSLATABLE_STRINGS]);
+  }, [language]);
 
   const display = useCallback(
     (text: string | undefined | null) => {
