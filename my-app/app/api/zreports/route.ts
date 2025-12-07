@@ -1,5 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Client } from "pg";
+import { Client, types } from "pg";
+
+types.setTypeParser(1082, (val) => val);
+
+export async function GET() {
+  const client = new Client({
+    user: process.env.DB_user,
+    host: process.env.DB_host,
+    database: process.env.DB_name,
+    password: process.env.DB_password,
+    port: 5432,
+  });
+
+  try {
+    await client.connect();
+
+    const result = await client.query(`
+      SELECT 
+        report_id,
+        report_date,
+        total_gross,
+        total_discount,
+        total_tax,
+        total_net,
+        void_count,
+        return_count,
+        cash_total,
+        credit_total,
+        debit_total,
+        gift_card_total,
+        mobile_pay_total,
+        cashier_signatures
+      FROM z_report
+      ORDER BY report_date DESC, report_id DESC;
+    `);
+
+    return NextResponse.json(result.rows);
+  } catch (error) {
+    console.error("GET /zreports error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  } finally {
+    await client.end();
+  }
+}
 
 export async function POST(request: NextRequest) {
   const { date } = await request.json();

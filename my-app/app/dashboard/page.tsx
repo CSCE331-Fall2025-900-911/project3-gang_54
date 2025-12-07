@@ -1344,7 +1344,22 @@ function XReportsView() {
 function ZReportsView() {
   const [date, setDate] = useState("");
   const [rows, setRows] = useState<any[]>([]);
+  const [allReports, setAllReports] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadAllReports = async () => {
+      try {
+        const res = await fetch("/api/zreports");
+        if (!res.ok) throw new Error("Failed to load Z-Reports");
+        const data = await res.json();
+        setAllReports(data);
+      } catch (err: any) {
+        setError(err.message ?? "Error loading Z-Reports");
+      }
+    };
+    loadAllReports();
+  }, []);
 
   const runZReport = async () => {
     setError(null);
@@ -1358,6 +1373,7 @@ function ZReportsView() {
     try {
       const res = await fetch("/api/zreports", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date }),
       });
 
@@ -1375,9 +1391,7 @@ function ZReportsView() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Z-Report</h1>
-      <p className={styles.subtitle}>
-        Daily summary with totals and cashier signatures.
-      </p>
+      <p className={styles.subtitle}>Daily summary with totals and cashier signatures.</p>
 
       <div className={styles.filterRow}>
         <label>Date (YYYY-MM-DD):</label>
@@ -1395,49 +1409,100 @@ function ZReportsView() {
       {error && <p className={styles.errorText}>{error}</p>}
 
       {rows.length > 0 && (
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Report ID</th>
-                <th>Report Date</th>
-                <th>Total Gross</th>
-                <th>Total Discount</th>
-                <th>Total Tax</th>
-                <th>Total Net</th>
-                <th>Void Count</th>
-                <th>Return Count</th>
-                <th>Cash Total</th>
-                <th>Credit Total</th>
-                <th>Debit Total</th>
-                <th>Gift Card Total</th>
-                <th>Mobile Pay Total</th>
-                <th>Cashier Signatures</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, idx) => (
-                <tr key={idx}>
-                  <td>{r.report_id}</td>
-                  <td>{r.report_date}</td>
-                  <td>{r.total_gross}</td>
-                  <td>{r.total_discount}</td>
-                  <td>{r.total_tax}</td>
-                  <td>{r.total_net}</td>
-                  <td>{r.void_count}</td>
-                  <td>{r.return_count}</td>
-                  <td>{r.cash_total}</td>
-                  <td>{r.credit_total}</td>
-                  <td>{r.debit_total}</td>
-                  <td>{r.gift_card_total}</td>
-                  <td>{r.mobile_pay_total}</td>
-                  <td>{r.cashier_signatures}</td>
+        <>
+          <h2 className={styles.subtitle}>Z-Report for {date}</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Report ID</th>
+                  <th>Report Date</th>
+                  <th>Total Gross</th>
+                  <th>Total Discount</th>
+                  <th>Total Tax</th>
+                  <th>Total Net</th>
+                  <th>Void Count</th>
+                  <th>Return Count</th>
+                  <th>Cash Total</th>
+                  <th>Credit Total</th>
+                  <th>Debit Total</th>
+                  <th>Gift Card Total</th>
+                  <th>Mobile Pay Total</th>
+                  <th>Cashier Signatures</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {rows.map((r, idx) => (
+                  <tr key={idx}>
+                    <td>{r.report_id}</td>
+                    <td>{r.report_date}</td>
+                    <td>{r.total_gross}</td>
+                    <td>{r.total_discount}</td>
+                    <td>{r.total_tax}</td>
+                    <td>{r.total_net}</td>
+                    <td>{r.void_count}</td>
+                    <td>{r.return_count}</td>
+                    <td>{r.cash_total}</td>
+                    <td>{r.credit_total}</td>
+                    <td>{r.debit_total}</td>
+                    <td>{r.gift_card_total}</td>
+                    <td>{r.mobile_pay_total}</td>
+                    <td>{r.cashier_signatures}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
+
+      <h2 className={styles.subtitle} style={{ marginTop: "40px" }}>
+        All Z-Reports
+      </h2>
+
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Report ID</th>
+              <th>Report Date</th>
+              <th>Total Gross</th>
+              <th>Total Discount</th>
+              <th>Total Tax</th>
+              <th>Total Net</th>
+              <th>Void Count</th>
+              <th>Return Count</th>
+              <th>Cash Total</th>
+              <th>Credit Total</th>
+              <th>Debit Total</th>
+              <th>Gift Card Total</th>
+              <th>Mobile Pay Total</th>
+              <th>Cashier Signatures</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {allReports.map((r, idx) => (
+              <tr key={idx}>
+                <td>{r.report_id}</td>
+                <td>{r.report_date}</td>
+                <td>{r.total_gross}</td>
+                <td>{r.total_discount}</td>
+                <td>{r.total_tax}</td>
+                <td>{r.total_net}</td>
+                <td>{r.void_count}</td>
+                <td>{r.return_count}</td>
+                <td>{r.cash_total}</td>
+                <td>{r.credit_total}</td>
+                <td>{r.debit_total}</td>
+                <td>{r.gift_card_total}</td>
+                <td>{r.mobile_pay_total}</td>
+                <td>{r.cashier_signatures}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
