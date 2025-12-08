@@ -137,5 +137,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unable to process translation request." }, { status: 500 });
   }
 }
-
-
