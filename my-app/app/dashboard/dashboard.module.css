@@ -187,6 +187,11 @@
   opacity: 1;
 }
 
+.container input,
+.container textarea {
+  color: rgb(237, 237, 237) !important;
+}
+
 .table,
 .table th,
 .table td {
