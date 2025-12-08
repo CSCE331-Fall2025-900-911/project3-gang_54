@@ -331,7 +331,7 @@ function ManageMenuView() {
                 onClick={() => setSelectedId(item.item_id)}
                 style={{
                   backgroundColor:
-                    selectedId === item.item_id ? "#ffe0b3" : "transparent",
+                    selectedId === item.item_id ? "rgba(52, 52, 52, 1)" : "transparent",
                   cursor: "pointer",
                 }}
               >
@@ -589,7 +589,7 @@ function ManageInventoryView() {
                 style={{
                   backgroundColor:
                     selectedId === ingredient.ingredient_id
-                      ? "#ffe0b3"
+                      ? "rgba(52, 52, 52, 1)"
                       : "transparent",
                   cursor: "pointer",
                 }}
@@ -883,7 +883,7 @@ function ManageEmployeesView() {
                 onClick={() => setSelectedId(emp.employee_id)}
                 style={{
                   backgroundColor:
-                    selectedId === emp.employee_id ? "#ffe0b3" : "transparent",
+                    selectedId === emp.employee_id ? "rgba(52, 52, 52, 1)" : "transparent",
                   cursor: "pointer",
                 }}
               >
