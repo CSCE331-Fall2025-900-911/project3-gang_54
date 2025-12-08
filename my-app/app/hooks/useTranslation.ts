@@ -80,7 +80,9 @@ export function useTranslation(texts: string[]) {
       } catch (error) {
         if (cancelled || abortController.signal.aborted) return;
         console.error("Translation error", error);
-        setTranslationError("We couldn't translate right now. Showing original text.");
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        console.error("Translation failed:", errorMessage);
+        setTranslationError(`Translation unavailable: ${errorMessage}. Showing original text.`);
         setIsTranslating(false);
         setTranslations({});
       }

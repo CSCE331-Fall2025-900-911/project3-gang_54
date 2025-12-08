@@ -70,7 +70,11 @@ export async function POST(req: NextRequest) {
     params.append("source", "en");
     params.append("format", "text");
 
-    const response = await fetch(`${GOOGLE_TRANSLATE_ENDPOINT}?key=${apiKey}`, {
+    const apiUrl = `${GOOGLE_TRANSLATE_ENDPOINT}?key=${encodeURIComponent(apiKey)}`;
+    
+    console.log(`Calling Google Translate API with ${validTexts.length} texts to translate to ${targetLanguage}`);
+    
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",

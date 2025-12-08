@@ -35,15 +35,24 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const city = searchParams.get("city") || DEFAULT_CITY;
     const state = searchParams.get("state") || DEFAULT_STATE;
+    // Try different location formats for better compatibility
     const location = `${city},${state},US`;
 
-    // Call OpenWeather API
-    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&appid=${OPENWEATHER_API_KEY}&units=imperial`;
+    // Call OpenWeather API - try with state abbreviation first
+    let weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&appid=${OPENWEATHER_API_KEY}&units=imperial`;
 
-    const response = await fetch(weatherUrl, {
-      cache: "no-store",
+    let response = await fetch(weatherUrl, {
       next: { revalidate: 300 }, // Cache for 5 minutes
     });
+
+    // If that fails, try with just city name
+    if (!response.ok && response.status === 404) {
+      console.log(`Trying alternative location format: ${city}`);
+      weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${OPENWEATHER_API_KEY}&units=imperial`;
+      response = await fetch(weatherUrl, {
+        next: { revalidate: 300 },
+      });
+    }
 
     if (!response.ok) {
       const errorText = await response.text();

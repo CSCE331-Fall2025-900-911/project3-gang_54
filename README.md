@@ -55,3 +55,20 @@ You can pull the production values directly from Vercel:
 ```
 vercel env pull my-app/.env.local --environment=production
 ```
+
+### Debugging API Issues
+
+If the APIs are not working, you can test them using the debug endpoint:
+
+1. Visit: `https://your-vercel-app.vercel.app/api/test-apis`
+2. This will show you:
+   - Whether environment variables are set
+   - Whether the API keys are valid
+   - Specific error messages from the APIs
+
+**Common Issues:**
+
+1. **API Keys Not Set in Vercel**: Environment variables must be set in Vercel project settings, not just in `.env.local`
+2. **Google Translate API Not Enabled**: Make sure Cloud Translation API is enabled in Google Cloud Console
+3. **Invalid API Keys**: Check that the keys are copied correctly (no extra spaces, correct format)
+4. **API Quota Exceeded**: Free tier APIs have usage limits
