@@ -133,6 +133,10 @@
   flex-wrap: wrap;
 }
 
+.filterRow label {
+  color: white;
+}
+
 .table {
   width: 100%;
   border-collapse: separate;
