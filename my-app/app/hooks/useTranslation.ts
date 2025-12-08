@@ -21,6 +21,10 @@ export function useTranslation(texts: string[]) {
   const TRANSLATABLE_STRINGS = useMemo(() => Array.from(new Set(texts)), [texts]);
 
   useEffect(() => {
+    translationsCache.current = {};
+  }, [TRANSLATABLE_STRINGS.join("|")]);
+
+  useEffect(() => {
     let cancelled = false;
     const abortController = new AbortController();
 
@@ -53,24 +57,12 @@ export function useTranslation(texts: string[]) {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-          console.error("Translation API error:", errorData);
-          
-          // Log helpful message if API key is missing
-          if (errorData.error && errorData.error.includes("Missing Google Translate API key")) {
-            console.warn("Translation API:", errorData.error);
-            console.warn("Set GOOGLE_TRANSLATE_API_KEY in Vercel environment variables");
-          }
-          
           throw new Error(errorData.error || errorData.details || "Translation request failed.");
         }
 
         const data = (await response.json()) as { translations?: Record<string, string>; error?: string };
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        if (!data.translations) {
-          throw new Error("Translation data missing.");
-        }
+        if (data.error) throw new Error(data.error);
+        if (!data.translations) throw new Error("Translation data missing.");
 
         if (!cancelled) {
           translationsCache.current[language] = data.translations;
@@ -79,22 +71,19 @@ export function useTranslation(texts: string[]) {
         }
       } catch (error) {
         if (cancelled || abortController.signal.aborted) return;
-        console.error("Translation error", error);
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        console.error("Translation failed:", errorMessage);
-        setTranslationError(`Translation unavailable: ${errorMessage}. Showing original text.`);
+        const err = error instanceof Error ? error.message : "Unknown error";
+        setTranslationError(`Translation unavailable: ${err}. Showing original text.`);
         setIsTranslating(false);
         setTranslations({});
       }
     }
 
-    void translate();
-
+    translate();
     return () => {
       cancelled = true;
       abortController.abort();
     };
-  }, [language]);
+  }, [language, TRANSLATABLE_STRINGS]);
 
   const display = useCallback(
     (text: string | undefined | null) => {
@@ -112,5 +101,3 @@ export function useTranslation(texts: string[]) {
     translationError,
   };
 }
-
-

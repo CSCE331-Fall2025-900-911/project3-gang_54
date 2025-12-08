@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation, LANGUAGE_OPTIONS } from "./hooks/useTranslation";
 export const SYSTEM_MESSAGE = {
   role: "system",
@@ -54,7 +54,7 @@ export default function Home() {
   const [chatInput, setChatInput] = useState("");
 
   // Translation strings
-  const TRANSLATABLE_STRINGS = [
+  const TRANSLATABLE_STRINGS = useMemo(() => [
     "Welcome to ShareTea",
     "Current Weather:",
     "Your favorite bubble tea, just a click away!",
@@ -66,7 +66,7 @@ export default function Home() {
     "Mango Fruit Tea",
     "Language",
     "Translating…",
-  ];
+  ], []);
 
   const { language, setLanguage, display, isTranslating } = useTranslation(TRANSLATABLE_STRINGS);
 
