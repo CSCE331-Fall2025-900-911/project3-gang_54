@@ -38,133 +38,138 @@ export default function ManagerDashboard() {
   const goBack = () => setView("dashboard");
 
   return (
-    <div className={styles.container}>
-      <section
-        className="dashboard-language"
-        aria-label="Language selection"
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          justifyContent: "flex-end",
-          paddingRight: "20px",
-        }}
-      >
-        <label htmlFor="dashboard-language-select">{display("Language")}</label>
-        <select
-          id="dashboard-language-select"
-          value={language}
-          onChange={(event) =>
-            setLanguage(event.target.value as "en" | "es" | "zh")
-          }
+    // <div className={styles.dashboardPage}>
+      <div className={styles.container}>
+        <section
+          className="dashboard-language"
+          aria-label="Language selection"
           style={{
-            padding: "8px 16px",
-            borderRadius: "999px",
-            border: "1px solid rgba(255,255,255,0.3)",
-            background: "rgba(0,0,0,0.2)",
-            color: "#fff",
+            marginBottom: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            justifyContent: "flex-end",
+            paddingRight: "20px",
           }}
         >
-          {LANGUAGE_OPTIONS.map((option) => (
-            <option key={option.code} value={option.code}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        {isTranslating && <span>{display("Translating…")}</span>}
-      </section>
+          <label htmlFor="dashboard-language-select">
+            {display("Language")}
+          </label>
+          <select
+            id="dashboard-language-select"
+            value={language}
+            onChange={(event) =>
+              setLanguage(event.target.value as "en" | "es" | "zh")
+            }
+            style={{
+              padding: "8px 16px",
+              borderRadius: "999px",
+              border: "1px solid rgba(255,255,255,0.3)",
+              background: "rgba(0,0,0,0.2)",
+              color: "#fff",
+            }}
+          >
+            {LANGUAGE_OPTIONS.map((option) => (
+              <option key={option.code} value={option.code}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          {isTranslating && <span>{display("Translating…")}</span>}
+        </section>
 
-      {view === "dashboard" ? (
-        <>
-          <h1 className={styles.title}>{display("Manager Dashboard")}</h1>
-          <p className={styles.subtitle}>
-            {display("Select a function to manage:")}
-          </p>
+        {view === "dashboard" ? (
+          <>
+            <h1 className={styles.title}>{display("Manager Dashboard")}</h1>
+            <p className={styles.subtitle}>
+              {display("Select a function to manage:")}
+            </p>
 
-          <div className={styles.buttonGrid}>
-            <button
-              className={styles.actionButton}
-              onClick={() => setView("menu")}
-            >
-              {display("Manage Menu Items")}
-            </button>
+            <div className={styles.buttonGrid}>
+              <button
+                className={styles.actionButton}
+                onClick={() => setView("menu")}
+              >
+                {display("Manage Menu Items")}
+              </button>
 
-            <button
-              className={styles.actionButton}
-              onClick={() => setView("inventory")}
-            >
-              {display("Manage Inventory")}
-            </button>
+              <button
+                className={styles.actionButton}
+                onClick={() => setView("inventory")}
+              >
+                {display("Manage Inventory")}
+              </button>
 
-            <button
-              className={styles.actionButton}
-              onClick={() => setView("employees")}
-            >
-              {display("Manage Employees")}
-            </button>
+              <button
+                className={styles.actionButton}
+                onClick={() => setView("employees")}
+              >
+                {display("Manage Employees")}
+              </button>
 
-            <button
-              className={styles.actionButton}
-              onClick={() => setView("productUsage")}
-            >
-              {display("Product Usage")}
-            </button>
+              <button
+                className={styles.actionButton}
+                onClick={() => setView("productUsage")}
+              >
+                {display("Product Usage")}
+              </button>
 
-            <button
-              className={styles.actionButton}
-              onClick={() => setView("xReports")}
-            >
-              {display("X Reports")}
-            </button>
+              <button
+                className={styles.actionButton}
+                onClick={() => setView("xReports")}
+              >
+                {display("X Reports")}
+              </button>
 
-            <button
-              className={styles.actionButton}
-              onClick={() => setView("zReports")}
-            >
-              {display("Z Reports")}
-            </button>
+              <button
+                className={styles.actionButton}
+                onClick={() => setView("zReports")}
+              >
+                {display("Z Reports")}
+              </button>
 
-            {/* ★ KITCHEN BUTTON */}
-            <button
-              className={styles.actionButton}
-              onClick={() => setView("kitchen")}
-            >
-              {display("Kitchen Display")}
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className={styles.topBar}>
-            <button className={styles.backButton} onClick={goBack}>
-              {display("← Back to Dashboard")}
-            </button>
+              {/* ★ KITCHEN BUTTON */}
+              <button
+                className={styles.actionButton}
+                onClick={() => setView("kitchen")}
+              >
+                {display("Kitchen Display")}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.topBar}>
+              <button className={styles.backButton} onClick={goBack}>
+                {display("← Back to Dashboard")}
+              </button>
 
-            <h1 className={styles.title}>
-              {view === "menu" && display("Manage Menu Items")}
-              {view === "inventory" && display("Manage Inventory")}
-              {view === "employees" && display("Manage Employees")}
-              {view === "productUsage" && display("Product Usage")}
-              {view === "xReports" && display("X Reports")}
-              {view === "zReports" && display("Z Reports")}
-              {view === "kitchen" && display("Kitchen Display")} {/* ★ TITLE */}
-            </h1>
-          </div>
+              <h1 className={styles.title}>
+                {view === "menu" && display("Manage Menu Items")}
+                {view === "inventory" && display("Manage Inventory")}
+                {view === "employees" && display("Manage Employees")}
+                {view === "productUsage" && display("Product Usage")}
+                {view === "xReports" && display("X Reports")}
+                {view === "zReports" && display("Z Reports")}
+                {view === "kitchen" && display("Kitchen Display")}{" "}
+                {/* ★ TITLE */}
+              </h1>
+            </div>
 
-          {/* ★ WHERE DIFFERENT VIEWS RENDER */}
-          <div className={styles.contentArea}>
-            {view === "menu" && <ManageMenuView />}
-            {view === "inventory" && <ManageInventoryView />}
-            {view === "employees" && <ManageEmployeesView />}
-            {view === "productUsage" && <ProductUsageView />}
-            {view === "xReports" && <XReportsView />}
-            {view === "zReports" && <ZReportsView />}
-            {view === "kitchen" && <KitchenView />} {/* ★ FULL FIX */}
-          </div>
-        </>
-      )}
-    </div>
+            {/* ★ WHERE DIFFERENT VIEWS RENDER */}
+            <div className={styles.contentArea}>
+              {view === "menu" && <ManageMenuView />}
+              {view === "inventory" && <ManageInventoryView />}
+              {view === "employees" && <ManageEmployeesView />}
+              {view === "productUsage" && <ProductUsageView />}
+              {view === "xReports" && <XReportsView />}
+              {view === "zReports" && <ZReportsView />}
+              {view === "kitchen" && <KitchenView />} {/* ★ FULL FIX */}
+            </div>
+          </>
+        )}
+      </div>
+    // </div>
   );
 }
 
@@ -1391,7 +1396,9 @@ function ZReportsView() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Z-Report</h1>
-      <p className={styles.subtitle}>Daily summary with totals and cashier signatures.</p>
+      <p className={styles.subtitle}>
+        Daily summary with totals and cashier signatures.
+      </p>
 
       <div className={styles.filterRow}>
         <label>Date (YYYY-MM-DD):</label>

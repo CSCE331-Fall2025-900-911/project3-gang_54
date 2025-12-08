@@ -1,3 +1,11 @@
+/* .dashboardPage {
+  background: black;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  border-radius: 0;
+} */
+
 .container {
   max-width: 1000px;
   margin: 40px auto;
@@ -171,4 +179,16 @@
 
 .tableWrapper table {
   min-width: 1200px;
+}
+
+.container input::placeholder,
+.container textarea::placeholder {
+  color: rgb(237, 237, 237) !important;
+  opacity: 1;
+}
+
+.table,
+.table th,
+.table td {
+  color: white !important;
 }
