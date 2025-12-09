@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
         feels_like: 70,
         city: DEFAULT_CITY,
         error: "Weather API key not configured. Set OPENWEATHER_API_KEY in Vercel.",
+        isRealData: false, // Flag to indicate this is fallback data
       });
     }
 
@@ -71,12 +72,14 @@ export async function GET(req: NextRequest) {
       }
       
       // Return fallback on API error
+      console.warn(`Weather API error (${response.status}): ${errorMessage}`);
       return NextResponse.json({
         temp: 72,
         condition: "Sunny",
         feels_like: 70,
         city: city,
         error: errorMessage,
+        isRealData: false, // Flag to indicate this is fallback data
       });
     }
 
@@ -91,12 +94,15 @@ export async function GET(req: NextRequest) {
     const condition = data.weather?.[0]?.main ?? "Clear";
     const description = data.weather?.[0]?.description ?? "clear sky";
 
+    console.log(`Weather API success: ${temp}°F in ${data.name || city}, condition: ${condition}`);
+
     return NextResponse.json({
       temp,
       feels_like: feelsLike,
       condition,
       description,
       city: data.name || city,
+      isRealData: true, // Flag to indicate this is real API data
     });
   } catch (error) {
     console.error("Weather API error", error);
@@ -107,6 +113,7 @@ export async function GET(req: NextRequest) {
       feels_like: 70,
       city: DEFAULT_CITY,
       error: "Unable to fetch weather data",
+      isRealData: false, // Flag to indicate this is fallback data
     });
   }
 }

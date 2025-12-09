@@ -77,8 +77,18 @@ export default function Home() {
         setWeatherLoading(true);
         const res = await fetch("/api/weather");
         const data = await res.json();
-        if (!res.ok) console.error("Weather API error:", data.error || "Unknown error");
-        setWeather(data.temp ?? "N/A");
+        
+        if (data.isRealData) {
+          console.log("✅ Weather API: Using real weather data");
+          setWeather(data.temp ?? "N/A");
+        } else {
+          console.warn("⚠️ Weather API: Using fallback data", data.error || "API key not configured");
+          setWeather(data.temp ?? "N/A");
+        }
+        
+        if (!res.ok && data.error) {
+          console.error("Weather API error:", data.error);
+        }
       } catch (error) {
         console.error("Weather fetch error", error);
         setWeather("N/A");
