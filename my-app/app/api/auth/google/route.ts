@@ -23,20 +23,9 @@ const pool = new Pool({
 
 // Build role directory from database employees and hardcoded emails
 async function buildRoleDirectory(): Promise<Record<string, "manager" | "cashier" | "customer">> {
-  const roleDirectory: Record<string, "manager" | "cashier" | "customer"> = {
-    // Hardcoded manager emails
-    "reveille.bubbletea@gmail.com": "manager",
-    // Hardcoded cashier emails
-    "akul.ranjan.1@tamu.edu": "cashier",
-  };
+  const roleDirectory: Record<string, "manager" | "cashier" | "customer"> = {};
 
-  // Add environment variable emails as managers (if they exist)
-  if (EMAIL1) roleDirectory[EMAIL1] = "manager";
-  if (EMAIL2) roleDirectory[EMAIL2] = "manager";
-  if (EMAIL3) roleDirectory[EMAIL3] = "manager";
-  if (EMAIL4) roleDirectory[EMAIL4] = "manager";
-
-  // Fetch employees from database and add them to role directory
+  // First, fetch employees from database and add them to role directory
   try {
     const result = await pool.query(
       "SELECT email, role FROM employees WHERE email IS NOT NULL AND email != '' AND role IN ('manager', 'cashier')"
@@ -51,6 +40,18 @@ async function buildRoleDirectory(): Promise<Record<string, "manager" | "cashier
     console.error("Error fetching employees for role directory:", error);
     // Continue with hardcoded emails if database query fails
   }
+
+  // Then, add hardcoded emails (these take precedence over database)
+  // Hardcoded manager emails
+  roleDirectory["reveille.bubbletea@gmail.com"] = "manager";
+  // Hardcoded cashier emails
+  roleDirectory["akul.ranjan.1@tamu.edu"] = "cashier";
+
+  // Add environment variable emails as managers (if they exist) - these also take precedence
+  if (EMAIL1) roleDirectory[EMAIL1.toLowerCase()] = "manager";
+  if (EMAIL2) roleDirectory[EMAIL2.toLowerCase()] = "manager";
+  if (EMAIL3) roleDirectory[EMAIL3.toLowerCase()] = "manager";
+  if (EMAIL4) roleDirectory[EMAIL4.toLowerCase()] = "manager";
 
   return roleDirectory;
 }
