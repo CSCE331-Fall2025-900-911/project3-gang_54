@@ -11,8 +11,7 @@ type View =
   | "employees"
   | "productUsage"
   | "xReports"
-  | "zReports"
-  | "kitchen"; // ← ADD THIS
+  | "zReports";
 
 export default function ManagerDashboard() {
   const [view, setView] = useState<View>("dashboard");
@@ -127,14 +126,6 @@ export default function ManagerDashboard() {
               >
                 {display("Z Reports")}
               </button>
-
-              {/* ★ KITCHEN BUTTON */}
-              <button
-                className={styles.actionButton}
-                onClick={() => setView("kitchen")}
-              >
-                {display("Kitchen Display")}
-              </button>
             </div>
           </>
         ) : (
@@ -151,12 +142,9 @@ export default function ManagerDashboard() {
                 {view === "productUsage" && display("Product Usage")}
                 {view === "xReports" && display("X Reports")}
                 {view === "zReports" && display("Z Reports")}
-                {view === "kitchen" && display("Kitchen Display")}{" "}
-                {/* ★ TITLE */}
               </h1>
             </div>
 
-            {/* ★ WHERE DIFFERENT VIEWS RENDER */}
             <div className={styles.contentArea}>
               {view === "menu" && <ManageMenuView />}
               {view === "inventory" && <ManageInventoryView />}
@@ -164,7 +152,6 @@ export default function ManagerDashboard() {
               {view === "productUsage" && <ProductUsageView />}
               {view === "xReports" && <XReportsView />}
               {view === "zReports" && <ZReportsView />}
-              {view === "kitchen" && <KitchenView />} {/* ★ FULL FIX */}
             </div>
           </>
         )}
@@ -1225,22 +1212,6 @@ function ProductUsageView() {
           </tbody>
         </table>
       )}
-    </div>
-  );
-}
-
-/* ====================================================================== */
-/*                           ★ KITCHEN VIEW ★                              */
-/* ====================================================================== */
-
-function KitchenView() {
-  return (
-    <div>
-      <h2 className={styles.subtitle}>Kitchen Display</h2>
-      <div className={styles.tablePlaceholder}>
-        <p>Incoming orders will appear here automatically.</p>
-        <p style={{ marginTop: "8px" }}>(Read-only kitchen interface)</p>
-      </div>
     </div>
   );
 }
