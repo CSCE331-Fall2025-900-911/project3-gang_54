@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
+import { Pool } from "pg";
 
 const SESSION_COOKIE = "sharetea-session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -10,16 +11,47 @@ const EMAIL2 = process.env.EMAIL2;
 const EMAIL3 = process.env.EMAIL3;
 const EMAIL4 = process.env.EMAIL4;
 
-const ROLE_DIRECTORY: Record<string, "manager" | "cashier" | "customer"> = {
-  "reveille.bubbletea@gmail.com": "manager",
-  [EMAIL1!]: "manager",
-  [EMAIL2!]: "manager",
-  [EMAIL3!]: "manager",
-  [EMAIL4!]: "manager",
-  // Add cashier emails here - example:
-  // "cashier@example.com": "cashier",
-  // To test the cashier interface, add your email here with "cashier" role
-};
+// Database connection for fetching employees
+const connectionString =
+  `postgres://${process.env.DB_user}:${process.env.DB_password}` +
+  `@${process.env.DB_host}:5432/${process.env.DB_name}`;
+
+const pool = new Pool({
+  connectionString,
+  ssl: { rejectUnauthorized: false },
+});
+
+// Build role directory from database employees and hardcoded emails
+async function buildRoleDirectory(): Promise<Record<string, "manager" | "cashier" | "customer">> {
+  const roleDirectory: Record<string, "manager" | "cashier" | "customer"> = {
+    // Hardcoded manager emails
+    "reveille.bubbletea@gmail.com": "manager",
+  };
+
+  // Add environment variable emails as managers (if they exist)
+  if (EMAIL1) roleDirectory[EMAIL1] = "manager";
+  if (EMAIL2) roleDirectory[EMAIL2] = "manager";
+  if (EMAIL3) roleDirectory[EMAIL3] = "manager";
+  if (EMAIL4) roleDirectory[EMAIL4] = "manager";
+
+  // Fetch employees from database and add them to role directory
+  try {
+    const result = await pool.query(
+      "SELECT email, role FROM employees WHERE email IS NOT NULL AND email != '' AND role IN ('manager', 'cashier')"
+    );
+    
+    result.rows.forEach((row: { email: string; role: string }) => {
+      if (row.email && (row.role === "manager" || row.role === "cashier")) {
+        roleDirectory[row.email.toLowerCase()] = row.role as "manager" | "cashier";
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching employees for role directory:", error);
+    // Continue with hardcoded emails if database query fails
+  }
+
+  return roleDirectory;
+}
 
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
@@ -57,7 +89,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Google account email is not verified." }, { status: 401 });
     }
 
-    const role = ROLE_DIRECTORY[payload.email] ?? "customer";
+    // Build role directory dynamically from database
+    const roleDirectory = await buildRoleDirectory();
+    const role = roleDirectory[payload.email.toLowerCase()] ?? "customer";
     const user = {
       sub: payload.sub,
       name: payload.name ?? "",
