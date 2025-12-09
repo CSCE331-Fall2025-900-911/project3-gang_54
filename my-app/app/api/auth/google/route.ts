@@ -10,6 +10,11 @@ const EMAIL2 = process.env.EMAIL2;
 const EMAIL3 = process.env.EMAIL3;
 const EMAIL4 = process.env.EMAIL4;
 
+console.log("EMAIL2 =", JSON.stringify(EMAIL2));
+console.log("EMAIL1 =", JSON.stringify(EMAIL1));
+console.log("EMAIL3 =", JSON.stringify(EMAIL3));
+console.log("EMAIL4 =", JSON.stringify(EMAIL4));
+
 const ROLE_DIRECTORY: Record<string, "manager" | "cashier" | "customer"> = {
   "reveille.bubbletea@gmail.com": "manager",
   [EMAIL1!]: "manager",
