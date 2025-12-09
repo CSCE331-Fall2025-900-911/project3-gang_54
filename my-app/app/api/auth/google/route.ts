@@ -22,8 +22,9 @@ const pool = new Pool({
 });
 
 // Build role directory from database employees and hardcoded emails
-// Returns an array of roles for each email to support multiple roles
-async function buildRoleDirectory(): Promise<Record<string, ("manager" | "cashier" | "customer")[]>> {
+async function buildRoleDirectory(): Promise<
+  Record<string, ("manager" | "cashier" | "customer")[]>
+> {
   const roleDirectory: Record<string, ("manager" | "cashier" | "customer")[]> = {};
 
   // ✅ Step 1: Pull managers & cashiers from DB
@@ -47,19 +48,21 @@ async function buildRoleDirectory(): Promise<Record<string, ("manager" | "cashie
     console.error("Error fetching employees for role directory:", error);
   }
 
-  // ✅ Step 2: Force hardcoded admin emails
+  // ✅ Step 2: Force hardcoded admin emails (ALL get manager + cashier)
+
+  // Reveille (manager + cashier)
   const reveilleEmail = "reveille.bubbletea@gmail.com";
-  if (!roleDirectory[reveilleEmail]) {
-    roleDirectory[reveilleEmail] = [];
-  }
+  if (!roleDirectory[reveilleEmail]) roleDirectory[reveilleEmail] = [];
   if (!roleDirectory[reveilleEmail].includes("manager")) {
     roleDirectory[reveilleEmail].push("manager");
   }
-
-  const akulEmail = "akul.ranjan.1@tamu.edu";
-  if (!roleDirectory[akulEmail]) {
-    roleDirectory[akulEmail] = [];
+  if (!roleDirectory[reveilleEmail].includes("cashier")) {
+    roleDirectory[reveilleEmail].push("cashier");
   }
+
+  // Akul (manager + cashier)
+  const akulEmail = "akul.ranjan.1@tamu.edu";
+  if (!roleDirectory[akulEmail]) roleDirectory[akulEmail] = [];
   if (!roleDirectory[akulEmail].includes("manager")) {
     roleDirectory[akulEmail].push("manager");
   }
@@ -67,7 +70,17 @@ async function buildRoleDirectory(): Promise<Record<string, ("manager" | "cashie
     roleDirectory[akulEmail].push("cashier");
   }
 
-  // ✅ ✅ ✅ Step 3: EMAIL1–EMAIL4 now get BOTH manager + cashier
+  // Arnav (manager + cashier)
+  const arnavEmail = "arnavs@tamu.edu";
+  if (!roleDirectory[arnavEmail]) roleDirectory[arnavEmail] = [];
+  if (!roleDirectory[arnavEmail].includes("manager")) {
+    roleDirectory[arnavEmail].push("manager");
+  }
+  if (!roleDirectory[arnavEmail].includes("cashier")) {
+    roleDirectory[arnavEmail].push("cashier");
+  }
+
+  // ✅ EMAIL1–EMAIL4 (manager + cashier)
   [EMAIL1, EMAIL2, EMAIL3, EMAIL4].forEach((email) => {
     if (email) {
       const emailLower = email.toLowerCase();
