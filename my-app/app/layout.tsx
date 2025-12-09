@@ -29,10 +29,10 @@ export default function RootLayout({
       <head>
         {/* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" /> */}
         {/* <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.2/dist/css/bootstrap.min.css" /> */}
-        {/* Dyslexia-friendly font */}
+        {/* Dyslexia-friendly font - using alternative CDN */}
         <link
           rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/antijingoist/open-dyslexic@v1.0.0/open-dyslexic.css"
+          href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.0/open-dyslexic.css"
         />
       </head>
 

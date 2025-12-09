@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
         sh.boba,
         i.item_name,
         sh.timestamp
-      FROM salesHistory sh
+      FROM sales_history sh
       JOIN items i ON sh.drinkid = i.item_id
     `;
 
@@ -104,14 +104,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Get the next orderId
-    const res = await client.query(`SELECT COALESCE(MAX(orderid), 2) + 1 AS nextOrderId FROM salesHistory`);
-    const orderId = res.rows[0].nextorderid; // will start from 3 if table has 2 orders
+    const res = await client.query(`SELECT COALESCE(MAX(orderid), 0) + 1 AS nextOrderId FROM sales_history`);
+    const orderId = res.rows[0].nextorderid;
 
     for (const item of items) {
       const { item_id, quantity, price, size, sugar, ice, temperature, boba } = item;
 
       await client.query(
-        `INSERT INTO salesHistory
+        `INSERT INTO sales_history
          (orderid, drinkid, quantity, price, size, sugar, ice, temperature, boba)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
         [orderId, item_id, quantity, price, size, sugar, ice, temperature, boba]
