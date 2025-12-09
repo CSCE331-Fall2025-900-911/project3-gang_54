@@ -24,19 +24,15 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=<your-client-id>.apps.googleusercontent.com
 GOOGLE_CLIENT_ID=<your-client-id>.apps.googleusercontent.com
 JWT_SECRET=<random-long-secret>
 GOOGLE_TRANSLATE_API_KEY=<your-google-translate-api-key>
-OPENWEATHER_API_KEY=<your-openweather-api-key>
 ```
 
 ### API Sources
 
-- **Weather API**: Uses OpenWeatherMap Current Weather Data API
-  - Source: https://api.openweathermap.org/data/2.5/weather
-  - Get free API key at: https://openweathermap.org/api
-  - Default location: College Station, TX
-  - **To set up in Vercel:**
-    1. Go to Vercel project settings → Environment Variables
-    2. Add `OPENWEATHER_API_KEY` with your API key
-    3. Redeploy the application
+- **Weather API**: Uses Open-Meteo Weather Forecast API
+  - Source: https://api.open-meteo.com/v1/forecast
+  - No API key required - completely free and open source
+  - Default location: College Station, TX (30.6279°N, 96.3344°W)
+  - Documentation: https://open-meteo.com/en/docs
 
 - **Google Translate API**: Uses Google Cloud Translation API v2
   - Endpoint: https://translation.googleapis.com/language/translate/v2

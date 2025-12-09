@@ -12,34 +12,29 @@ export async function GET(req: NextRequest) {
     environment: {
       nodeEnv: process.env.NODE_ENV,
       hasGoogleTranslateKey: !!process.env.GOOGLE_TRANSLATE_API_KEY,
-      hasOpenWeatherKey: !!process.env.OPENWEATHER_API_KEY,
       googleTranslateKeyLength: process.env.GOOGLE_TRANSLATE_API_KEY?.length || 0,
-      openWeatherKeyLength: process.env.OPENWEATHER_API_KEY?.length || 0,
+      note: "Open-Meteo API does not require an API key",
     },
     tests: {},
   };
 
-  // Test Weather API
-  if (process.env.OPENWEATHER_API_KEY) {
-    try {
-      const testUrl = `https://api.openweathermap.org/data/2.5/weather?q=College%20Station,TX,US&appid=${process.env.OPENWEATHER_API_KEY}&units=imperial`;
-      const weatherRes = await fetch(testUrl, { cache: "no-store" });
-      const weatherData = await weatherRes.json();
-      
-      results.tests.weather = {
-        status: weatherRes.status,
-        ok: weatherRes.ok,
-        hasData: !!weatherData.main,
-        error: weatherData.message || (weatherRes.ok ? null : "API call failed"),
-      };
-    } catch (error) {
-      results.tests.weather = {
-        error: error instanceof Error ? error.message : "Unknown error",
-      };
-    }
-  } else {
+  // Test Weather API (Open-Meteo - no API key required)
+  try {
+    const testUrl = `https://api.open-meteo.com/v1/forecast?latitude=30.6279&longitude=-96.3344&current=temperature_2m,weather_code&temperature_unit=fahrenheit`;
+    const weatherRes = await fetch(testUrl, { cache: "no-store" });
+    const weatherData = await weatherRes.json();
+    
     results.tests.weather = {
-      error: "OPENWEATHER_API_KEY not set",
+      status: weatherRes.status,
+      ok: weatherRes.ok,
+      hasData: !!weatherData.current?.temperature_2m,
+      temperature: weatherData.current?.temperature_2m,
+      weatherCode: weatherData.current?.weather_code,
+      error: weatherRes.ok ? null : "API call failed",
+    };
+  } catch (error) {
+    results.tests.weather = {
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 

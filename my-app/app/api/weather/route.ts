@@ -3,105 +3,85 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * Weather API Route
  * 
- * Fetches weather data from OpenWeatherMap API (https://openweathermap.org/api)
+ * Fetches weather data from Open-Meteo API (https://open-meteo.com)
  * 
- * Source: OpenWeatherMap Current Weather Data API
- * Endpoint: https://api.openweathermap.org/data/2.5/weather
+ * Source: Open-Meteo Weather Forecast API
+ * Endpoint: https://api.open-meteo.com/v1/forecast
  * 
- * Requires OPENWEATHER_API_KEY environment variable
- * Get your free API key at: https://openweathermap.org/api
+ * No API key required - completely free and open source
  */
 
-const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 const DEFAULT_CITY = "College Station";
 const DEFAULT_STATE = "TX";
 
+// Coordinates for College Station, TX (default location)
+const DEFAULT_LATITUDE = 30.6279;
+const DEFAULT_LONGITUDE = -96.3344;
+
+// Map Open-Meteo weather codes to readable conditions
+function getWeatherCondition(weatherCode: number): string {
+  // WMO Weather interpretation codes (WW)
+  if (weatherCode === 0) return "Clear";
+  if (weatherCode <= 3) return "Partly Cloudy";
+  if (weatherCode <= 48) return "Foggy";
+  if (weatherCode <= 67) return "Rainy";
+  if (weatherCode <= 77) return "Snowy";
+  if (weatherCode <= 82) return "Rainy";
+  if (weatherCode <= 86) return "Snowy";
+  if (weatherCode <= 99) return "Thunderstorm";
+  return "Clear";
+}
+
 export async function GET(req: NextRequest) {
   try {
-    // If no API key, return a fallback response
-    if (!OPENWEATHER_API_KEY) {
-      console.warn("OPENWEATHER_API_KEY not set, returning fallback weather data");
-      console.warn("To enable weather API: Set OPENWEATHER_API_KEY in Vercel environment variables");
-      return NextResponse.json({
-        temp: 72,
-        condition: "Sunny",
-        feels_like: 70,
-        city: DEFAULT_CITY,
-        error: "Weather API key not configured. Set OPENWEATHER_API_KEY in Vercel.",
-        isRealData: false, // Flag to indicate this is fallback data
-      });
-    }
-
-    // Get city from query params or use default
+    // Get location from query params or use default
     const { searchParams } = new URL(req.url);
     const city = searchParams.get("city") || DEFAULT_CITY;
-    const state = searchParams.get("state") || DEFAULT_STATE;
-    // Try different location formats for better compatibility
-    const location = `${city},${state},US`;
+    const latitude = parseFloat(searchParams.get("latitude") || String(DEFAULT_LATITUDE));
+    const longitude = parseFloat(searchParams.get("longitude") || String(DEFAULT_LONGITUDE));
 
-    // Call OpenWeather API - try with state abbreviation first
-    let weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&appid=${OPENWEATHER_API_KEY}&units=imperial`;
+    // Call Open-Meteo API - no API key required!
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`;
 
-    let response = await fetch(weatherUrl, {
+    const response = await fetch(weatherUrl, {
       next: { revalidate: 300 }, // Cache for 5 minutes
     });
 
-    // If that fails, try with just city name
-    if (!response.ok && response.status === 404) {
-      console.log(`Trying alternative location format: ${city}`);
-      weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${OPENWEATHER_API_KEY}&units=imperial`;
-      response = await fetch(weatherUrl, {
-        next: { revalidate: 300 },
-      });
-    }
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("OpenWeather API error", response.status, errorText);
-      
-      let errorMessage = "Weather service temporarily unavailable";
-      try {
-        const errorJson = JSON.parse(errorText);
-        if (errorJson.message) {
-          errorMessage = errorJson.message;
-        } else if (response.status === 401) {
-          errorMessage = "Invalid API key. Check OPENWEATHER_API_KEY in Vercel.";
-        }
-      } catch {
-        // Use default error message
-      }
+      console.error("Open-Meteo API error", response.status, errorText);
       
       // Return fallback on API error
-      console.warn(`Weather API error (${response.status}): ${errorMessage}`);
+      console.warn(`Weather API error (${response.status}): Weather service temporarily unavailable`);
       return NextResponse.json({
         temp: 72,
         condition: "Sunny",
-        feels_like: 70,
+        feels_like: 72,
         city: city,
-        error: errorMessage,
-        isRealData: false, // Flag to indicate this is fallback data
+        error: "Weather service temporarily unavailable",
+        isRealData: false,
       });
     }
 
     const data = await response.json() as {
-      main?: { temp?: number; feels_like?: number };
-      weather?: Array<{ main?: string; description?: string }>;
-      name?: string;
+      current?: {
+        temperature_2m?: number;
+        weather_code?: number;
+      };
     };
 
-    const temp = Math.round(data.main?.temp ?? 72);
-    const feelsLike = Math.round(data.main?.feels_like ?? temp);
-    const condition = data.weather?.[0]?.main ?? "Clear";
-    const description = data.weather?.[0]?.description ?? "clear sky";
+    const temp = Math.round(data.current?.temperature_2m ?? 72);
+    const weatherCode = data.current?.weather_code ?? 0;
+    const condition = getWeatherCondition(weatherCode);
 
-    console.log(`Weather API success: ${temp}°F in ${data.name || city}, condition: ${condition}`);
+    console.log(`Weather API success: ${temp}°F in ${city}, condition: ${condition}`);
 
     return NextResponse.json({
       temp,
-      feels_like: feelsLike,
+      feels_like: temp, // Open-Meteo doesn't provide feels_like, use temp
       condition,
-      description,
-      city: data.name || city,
+      description: condition.toLowerCase(),
+      city: city,
       isRealData: true, // Flag to indicate this is real API data
     });
   } catch (error) {
@@ -110,10 +90,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       temp: 72,
       condition: "Sunny",
-      feels_like: 70,
+      feels_like: 72,
       city: DEFAULT_CITY,
       error: "Unable to fetch weather data",
-      isRealData: false, // Flag to indicate this is fallback data
+      isRealData: false,
     });
   }
 }
