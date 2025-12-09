@@ -113,6 +113,17 @@ export default function LoginPage() {
         setUser(data.user);
         setStatus("success");
         setMessage("Signed in. Redirecting you shortly...");
+        
+        // Auto-redirect based on role
+        setTimeout(() => {
+          if (data.user.role === "manager") {
+            window.location.href = "/dashboard";
+          } else if (data.user.role === "cashier") {
+            window.location.href = "/cashier";
+          } else {
+            window.location.href = "/";
+          }
+        }, 1500);
       } catch (error) {
         console.error(error);
         setStatus("error");
@@ -265,7 +276,10 @@ export default function LoginPage() {
                   <p className="login-session__email">{user.email}</p>
                 </div>
                 <div className="login-session__actions">
-                  <a className="secondary-btn" href="/dashboard">
+                  <a 
+                    className="secondary-btn" 
+                    href={user.role === "manager" ? "/dashboard" : user.role === "cashier" ? "/cashier" : "/"}
+                  >
                     {display("Go to dashboard")}
                   </a>
                   <button className="ghost-btn" type="button" onClick={() => void handleSignOut()}>
