@@ -37,33 +37,40 @@ export default function CashierPage() {
       try {
         const res = await fetch("/api/auth/session", { cache: "no-store" });
         if (!res.ok) {
+          console.error("Session fetch failed:", res.status);
           setLoading(false);
-          router.push("/login");
+          setTimeout(() => router.push("/login"), 100);
           return;
         }
 
         const data = await res.json();
+        console.log("Session data:", data); // Debug log
+        
         if (data?.user) {
+          console.log("User role:", data.user.role); // Debug log
           if (data.user.role !== "cashier") {
             setLoading(false);
+            console.log("User is not cashier, redirecting..."); // Debug log
             // Redirect managers to manager dashboard, customers to home
             if (data.user.role === "manager") {
-              router.push("/dashboard");
+              setTimeout(() => router.push("/dashboard"), 100);
             } else {
-              router.push("/");
+              setTimeout(() => router.push("/"), 100);
             }
             return;
           }
+          console.log("Setting user as cashier"); // Debug log
           setUser(data.user);
           setLoading(false);
         } else {
+          console.log("No user in session data"); // Debug log
           setLoading(false);
-          router.push("/login");
+          setTimeout(() => router.push("/login"), 100);
         }
       } catch (error) {
         console.error("Unable to restore session", error);
         setLoading(false);
-        router.push("/login");
+        setTimeout(() => router.push("/login"), 100);
       }
     }
     fetchSession();
@@ -93,7 +100,14 @@ export default function CashierPage() {
   }
 
   if (!user) {
-    return null; // Will redirect
+    return (
+      <main style={{ padding: "40px", textAlign: "center" }}>
+        <p>Redirecting...</p>
+        <p style={{ fontSize: "0.9rem", opacity: 0.7, marginTop: "10px" }}>
+          If you're not redirected, <a href="/login" style={{ color: "#ff9900" }}>click here to login</a>
+        </p>
+      </main>
+    );
   }
 
   return (

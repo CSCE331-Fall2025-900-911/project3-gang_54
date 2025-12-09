@@ -93,7 +93,11 @@ export async function POST(req: NextRequest) {
 
     // Build role directory dynamically from database
     const roleDirectory = await buildRoleDirectory();
-    const role = roleDirectory[payload.email.toLowerCase()] ?? "customer";
+    const emailLower = payload.email.toLowerCase();
+    const role = roleDirectory[emailLower] ?? "customer";
+    
+    console.log(`[Auth] Email: ${payload.email}, Lowercase: ${emailLower}, Role: ${role}`);
+    console.log(`[Auth] Role directory keys:`, Object.keys(roleDirectory));
     const user = {
       sub: payload.sub,
       name: payload.name ?? "",
