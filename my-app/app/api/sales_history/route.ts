@@ -77,8 +77,12 @@ export async function GET(req: NextRequest) {
     const orders = Array.from(ordersMap.values());
     return NextResponse.json(orders);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("Error in GET /api/sales_history:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ 
+      error: "Internal Server Error",
+      details: errorMessage 
+    }, { status: 500 });
   } finally {
     await client.end();
   }
@@ -120,8 +124,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: "Order items added successfully", orderId });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("Error in POST /api/sales_history:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ 
+      error: "Internal Server Error",
+      details: errorMessage 
+    }, { status: 500 });
   } finally {
     await client.end();
   }
