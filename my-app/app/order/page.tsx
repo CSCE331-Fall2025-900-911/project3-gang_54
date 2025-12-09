@@ -19,6 +19,7 @@ interface Category {
 }
 
 interface Drink {
+  item_id: number;
   name: string;
   subtitle?: string;
   description: string;
@@ -84,9 +85,7 @@ export default function OrderPage() {
         setMenuLoading(true);
         setMenuError(null);
         const res = await fetch("/api/ordermenu");
-        if (!res.ok) {
-          throw new Error(`Failed to fetch menu: ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`Failed to fetch menu: ${res.status}`);
         const data: Drink[] = await res.json();
         setDrinkMenu(data || []);
       } catch (err) {
@@ -173,6 +172,40 @@ export default function OrderPage() {
 
   const removeFromCart = useCallback((index: number) => setCart((prev) => prev.filter((_, i) => i !== index)), []);
   const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + Number(item.drink.price), 0), [cart]);
+
+  // --- NEW: Submit Order ---
+  const submitOrder = useCallback(async () => {
+    if (cart.length === 0) return;
+
+    try {
+      const payload = {
+        items: cart.map((item) => ({
+          item_id: item.drink.item_id,
+          quantity: 1,
+          price: item.drink.price,
+          size: item.size,
+          sugar: item.sugar,
+          ice: item.ice,
+          temperature: item.temp,
+          boba: item.boba,
+        })),
+      };
+
+      const res = await fetch("/api/sales_history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error(`Failed to submit order: ${res.status}`);
+      setCart([]);
+      setCartOpen(false);
+      alert("Order submitted successfully!");
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "Failed to submit order");
+    }
+  }, [cart]);
 
   return (
     <main className="order-page">
@@ -328,7 +361,7 @@ export default function OrderPage() {
         {cart.length > 0 && (
           <div className="cart-footer">
             <p className="cart-total">{display("Total:")} <span>${Number(cartTotal).toFixed(2)}</span></p>
-            <button className="cart-checkout">{display("Checkout")}</button>
+            <button className="cart-checkout" onClick={submitOrder}>{display("Checkout")}</button>
           </div>
         )}
       </div>
