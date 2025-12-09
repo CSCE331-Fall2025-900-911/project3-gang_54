@@ -168,6 +168,7 @@ export default function CashierPage() {
             Process customer payments at the counter
           </p>
           <button
+            onClick={() => router.push("/cashier/process-payment")}
             style={{
               padding: "12px 24px",
               background: "#ff9900",
@@ -196,6 +197,7 @@ export default function CashierPage() {
             View past orders and sales history
           </p>
           <button
+            onClick={() => router.push("/cashier/order-history")}
             style={{
               padding: "12px 24px",
               background: "#ff9900",

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 interface SessionUser {
   email: string;
   name: string;
+  role?: string;
 }
 
 export default function Navigation() {
@@ -32,11 +33,14 @@ export default function Navigation() {
   }, []);
 
   const isEmployee = role && role !== "customer";
+  const isManager = role === "manager";
+  const isCashier = role === "cashier";
 
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/order', label: 'Order' },
-    ...(isEmployee ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
+    ...(isManager ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
+    ...(isCashier ? [{ href: '/cashier', label: 'Cashier' }] : []),
     ...(!user
       ? [{ href: '/login', label: 'Login', isButton: true }]
       : [{ href: '/login', label: 'Logout', isButton: true }]),
