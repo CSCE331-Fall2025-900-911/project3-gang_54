@@ -5,8 +5,17 @@ import jwt from "jsonwebtoken";
 const SESSION_COOKIE = "sharetea-session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
+const EMAIL1 = process.env.EMAIL1;
+const EMAIL2 = process.env.EMAIL2;
+const EMAIL3 = process.env.EMAIL3;
+const EMAIL4 = process.env.EMAIL4;
+
 const ROLE_DIRECTORY: Record<string, "manager" | "cashier" | "customer"> = {
   "reveille.bubbletea@gmail.com": "manager",
+  [EMAIL1!]: "manager",
+  [EMAIL2!]: "manager",
+  [EMAIL3!]: "manager",
+  [EMAIL4!]: "manager",
 };
 
 function getJwtSecret(): string {
