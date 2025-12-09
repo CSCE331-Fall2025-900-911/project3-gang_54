@@ -232,7 +232,7 @@ export default function Home() {
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             placeholder="Type a message..."
-            style={{ flexGrow: 1, padding: '6px', borderRadius: '6px', border: '1px solid #ccc' }}
+            style={{ flexGrow: 1, padding: '6px', borderRadius: '6px', border: '1px solid #ccc', color: '#fff' }}
           />
           <button onClick={sendChatMessage} style={{ background: '#ff9900', color: '#fff', padding: '6px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>Send</button>
         </div>
