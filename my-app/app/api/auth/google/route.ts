@@ -26,12 +26,12 @@ const pool = new Pool({
 async function buildRoleDirectory(): Promise<Record<string, ("manager" | "cashier" | "customer")[]>> {
   const roleDirectory: Record<string, ("manager" | "cashier" | "customer")[]> = {};
 
-  // First, fetch employees from database and add them to role directory
+  // ✅ Step 1: Pull managers & cashiers from DB
   try {
     const result = await pool.query(
       "SELECT email, role FROM employees WHERE email IS NOT NULL AND email != '' AND role IN ('manager', 'cashier')"
     );
-    
+
     result.rows.forEach((row: { email: string; role: string }) => {
       if (row.email && (row.role === "manager" || row.role === "cashier")) {
         const emailLower = row.email.toLowerCase();
@@ -45,11 +45,9 @@ async function buildRoleDirectory(): Promise<Record<string, ("manager" | "cashie
     });
   } catch (error) {
     console.error("Error fetching employees for role directory:", error);
-    // Continue with hardcoded emails if database query fails
   }
 
-  // Then, add hardcoded emails (these take precedence over database)
-  // Hardcoded manager emails
+  // ✅ Step 2: Force hardcoded admin emails
   const reveilleEmail = "reveille.bubbletea@gmail.com";
   if (!roleDirectory[reveilleEmail]) {
     roleDirectory[reveilleEmail] = [];
@@ -58,12 +56,10 @@ async function buildRoleDirectory(): Promise<Record<string, ("manager" | "cashie
     roleDirectory[reveilleEmail].push("manager");
   }
 
-  // Hardcoded emails with multiple roles
   const akulEmail = "akul.ranjan.1@tamu.edu";
   if (!roleDirectory[akulEmail]) {
     roleDirectory[akulEmail] = [];
   }
-  // Add both manager and cashier roles
   if (!roleDirectory[akulEmail].includes("manager")) {
     roleDirectory[akulEmail].push("manager");
   }
@@ -71,15 +67,20 @@ async function buildRoleDirectory(): Promise<Record<string, ("manager" | "cashie
     roleDirectory[akulEmail].push("cashier");
   }
 
-  // Add environment variable emails as managers (if they exist) - these also take precedence
+  // ✅ ✅ ✅ Step 3: EMAIL1–EMAIL4 now get BOTH manager + cashier
   [EMAIL1, EMAIL2, EMAIL3, EMAIL4].forEach((email) => {
     if (email) {
       const emailLower = email.toLowerCase();
       if (!roleDirectory[emailLower]) {
         roleDirectory[emailLower] = [];
       }
+
       if (!roleDirectory[emailLower].includes("manager")) {
         roleDirectory[emailLower].push("manager");
+      }
+
+      if (!roleDirectory[emailLower].includes("cashier")) {
+        roleDirectory[emailLower].push("cashier");
       }
     }
   });
@@ -123,19 +124,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Google account email is not verified." }, { status: 401 });
     }
 
-    // Build role directory dynamically from database
+    // ✅ Build role directory dynamically
     const roleDirectory = await buildRoleDirectory();
     const emailLower = payload.email.toLowerCase();
     const roles = roleDirectory[emailLower] ?? ["customer"];
-    
-    console.log(`[Auth] Email: ${payload.email}, Lowercase: ${emailLower}, Roles:`, roles);
-    console.log(`[Auth] Role directory keys:`, Object.keys(roleDirectory));
+
+    console.log(`[Auth] Email: ${payload.email}, Roles:`, roles);
+
     const user = {
       sub: payload.sub,
       name: payload.name ?? "",
       email: payload.email,
       picture: payload.picture ?? "",
-      roles, // Store as array
+      roles,
     };
 
     const token = jwt.sign(
@@ -144,7 +145,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         name: user.name,
         picture: user.picture,
-        roles: user.roles, // Store as array in JWT
+        roles: user.roles,
       },
       getJwtSecret(),
       { expiresIn: SESSION_MAX_AGE }
