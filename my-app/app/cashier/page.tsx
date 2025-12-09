@@ -159,9 +159,10 @@ export default function CashierPage() {
           <p style={{ opacity: 0.7, marginBottom: "20px" }}>
             View and manage incoming orders from customers
           </p>
-          <button
-            onClick={() => router.push("/order")}
+          <a
+            href="/order"
             style={{
+              display: "block",
               padding: "12px 24px",
               background: "#ff9900",
               color: "white",
@@ -170,10 +171,12 @@ export default function CashierPage() {
               cursor: "pointer",
               fontWeight: "600",
               width: "100%",
+              textAlign: "center",
+              textDecoration: "none",
             }}
           >
             {display("View Orders")}
-          </button>
+          </a>
         </div>
 
         <div
@@ -188,9 +191,10 @@ export default function CashierPage() {
           <p style={{ opacity: 0.7, marginBottom: "20px" }}>
             Process customer payments at the counter
           </p>
-          <button
-            onClick={() => router.push("/cashier/process-payment")}
+          <a
+            href="/cashier/process-payment"
             style={{
+              display: "block",
               padding: "12px 24px",
               background: "#ff9900",
               color: "white",
@@ -199,10 +203,12 @@ export default function CashierPage() {
               cursor: "pointer",
               fontWeight: "600",
               width: "100%",
+              textAlign: "center",
+              textDecoration: "none",
             }}
           >
             {display("Process Payment")}
-          </button>
+          </a>
         </div>
 
         <div
@@ -217,9 +223,10 @@ export default function CashierPage() {
           <p style={{ opacity: 0.7, marginBottom: "20px" }}>
             View past orders and sales history
           </p>
-          <button
-            onClick={() => router.push("/cashier/order-history")}
+          <a
+            href="/cashier/order-history"
             style={{
+              display: "block",
               padding: "12px 24px",
               background: "#ff9900",
               color: "white",
@@ -228,10 +235,12 @@ export default function CashierPage() {
               cursor: "pointer",
               fontWeight: "600",
               width: "100%",
+              textAlign: "center",
+              textDecoration: "none",
             }}
           >
             {display("Order History")}
-          </button>
+          </a>
         </div>
       </div>
     </main>

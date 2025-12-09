@@ -21,9 +21,19 @@ interface Order {
   total: number;
 }
 
+interface AuthenticatedUser {
+  email: string;
+  name: string;
+  role: string; // Legacy: single role
+  roles?: string[]; // New: array of roles
+  picture?: string | null;
+}
+
 export default function OrderHistoryPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const router = useRouter();
 
@@ -49,23 +59,84 @@ export default function OrderHistoryPage() {
   const { language, setLanguage, display, isTranslating } = useTranslation(TRANSLATABLE_STRINGS);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    async function checkAuth() {
+      try {
+        const res = await fetch("/api/auth/session", { cache: "no-store" });
+        if (!res.ok) {
+          setAuthLoading(false);
+          router.push("/login");
+          return;
+        }
+
+        const data = await res.json();
+        if (data?.user) {
+          const userRoles = data.user.roles || (data.user.role ? [data.user.role] : []);
+          if (!userRoles.includes("cashier")) {
+            setAuthLoading(false);
+            if (userRoles.includes("manager")) {
+              router.push("/dashboard");
+            } else {
+              router.push("/");
+            }
+            return;
+          }
+          setUser(data.user);
+          setAuthLoading(false);
+        } else {
+          setAuthLoading(false);
+          router.push("/login");
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        setAuthLoading(false);
+        router.push("/login");
+      }
+    }
+    checkAuth();
+  }, [router]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchOrders();
+    }
+  }, [authLoading, user]);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       const res = await fetch("/api/sales_history?limit=100");
-      if (!res.ok) throw new Error("Failed to fetch orders");
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Failed to fetch orders:", res.status, errorText);
+        throw new Error(`Failed to fetch orders: ${res.status}`);
+      }
       const data = await res.json();
-      setOrders(data);
+      console.log("Fetched orders:", data);
+      setOrders(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching orders:", error);
-      alert("Failed to load orders");
+      alert(`Failed to load orders: ${error instanceof Error ? error.message : "Unknown error"}`);
+      setOrders([]);
     } finally {
       setLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <main style={{ padding: "40px", textAlign: "center" }}>
+        <p>Loading...</p>
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main style={{ padding: "40px", textAlign: "center" }}>
+        <p>Redirecting...</p>
+      </main>
+    );
+  }
 
   if (loading) {
     return (
@@ -79,9 +150,10 @@ export default function OrderHistoryPage() {
     <main style={{ padding: "40px", maxWidth: "1400px", margin: "0 auto" }}>
       <div style={{ marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1 style={{ fontSize: "2rem", margin: 0 }}>{display("Order History")}</h1>
-        <button
-          onClick={() => router.push("/cashier")}
+        <a
+          href="/cashier"
           style={{
+            display: "inline-block",
             padding: "10px 20px",
             background: "#666",
             color: "white",
@@ -89,10 +161,11 @@ export default function OrderHistoryPage() {
             borderRadius: "8px",
             cursor: "pointer",
             fontWeight: "600",
+            textDecoration: "none",
           }}
         >
           {display("Back to Cashier Dashboard")}
-        </button>
+        </a>
       </div>
 
       {orders.length === 0 ? (
