@@ -107,6 +107,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
+    // Validate all items before processing
+    for (const item of items) {
+      if (!item.item_id || !item.price) {
+        return NextResponse.json({ 
+          error: "Invalid item data",
+          details: `Missing required fields: item_id=${item.item_id}, price=${item.price}` 
+        }, { status: 400 });
+      }
+    }
+
     // Get the next orderId
     const res = await client.query(`SELECT COALESCE(MAX(orderid), 0) + 1 AS nextOrderId FROM sales_history`);
     const orderId = res.rows[0].nextorderid;
@@ -114,11 +124,24 @@ export async function POST(req: NextRequest) {
     for (const item of items) {
       const { item_id, quantity, price, size, sugar, ice, temperature, boba } = item;
 
+      // Ensure all values are properly formatted
+      const values = [
+        orderId,
+        parseInt(item_id),
+        parseInt(quantity) || 1,
+        parseFloat(price),
+        size || 'Regular',
+        sugar || 'Regular',
+        ice || 'Regular',
+        temperature || 'Regular',
+        boba || 'None'
+      ];
+
       await client.query(
         `INSERT INTO sales_history
          (orderid, drinkid, quantity, price, size, sugar, ice, temperature, boba)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
-        [orderId, item_id, quantity, price, size, sugar, ice, temperature, boba]
+        values
       );
     }
 

@@ -214,14 +214,16 @@ export default function OrderPage() {
         items: cart.map((item) => ({
           item_id: item.drink.item_id,
           quantity: 1,
-          price: item.drink.price,
-          size: item.size,
-          sugar: item.sugar,
-          ice: item.ice,
-          temperature: item.temp,
-          boba: item.boba,
+          price: Number(item.drink.price),
+          size: item.size || 'Regular',
+          sugar: item.sugar || 'Regular',
+          ice: item.ice || 'Regular',
+          temperature: item.temp || 'Regular',
+          boba: item.boba || 'None',
         })),
       };
+      
+      console.log("Submitting order payload:", payload);
 
       const res = await fetch("/api/sales_history", {
         method: "POST",
@@ -229,12 +231,17 @@ export default function OrderPage() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error(`Failed to submit order: ${res.status}`);
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: "Unknown error" }));
+        throw new Error(errorData.details || errorData.error || `Failed to submit order: ${res.status}`);
+      }
+      
+      const result = await res.json();
       setCart([]);
       setCartOpen(false);
-      alert("Order submitted successfully!");
+      alert(`Order submitted successfully! Order #${result.orderId}`);
     } catch (err) {
-      console.error(err);
+      console.error("Order submission error:", err);
       alert(err instanceof Error ? err.message : "Failed to submit order");
     }
   }, [cart]);
