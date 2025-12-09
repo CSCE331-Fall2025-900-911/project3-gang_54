@@ -38,6 +38,7 @@ type Status = "idle" | "loading" | "success" | "error";
 interface AuthenticatedUser {
   name?: string | null;
   email: string;
+  role?: string;
   picture?: string | null;
 }
 
