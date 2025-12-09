@@ -39,7 +39,7 @@ export default function Navigation() {
     ...(isEmployee ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
     ...(!user
       ? [{ href: '/login', label: 'Login', isButton: true }]
-      : [{ href: '/api/auth/google/logout/route.ts', label: 'Logout', isButton: true }]),
+      : [{ href: '/login', label: 'Logout', isButton: true }]),
   ];
 
   if (loading) return null;
