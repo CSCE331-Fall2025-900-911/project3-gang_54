@@ -125,33 +125,76 @@ export async function POST(req: NextRequest) {
       const { item_id, quantity, price, size, sugar, ice, temperature, boba } = item;
 
       // Ensure all values are properly formatted
+      const itemIdInt = parseInt(item_id);
+      const quantityInt = parseInt(quantity) || 1;
+      const priceFloat = parseFloat(price);
+      
+      if (isNaN(itemIdInt) || isNaN(priceFloat)) {
+        throw new Error(`Invalid item data: item_id=${item_id} (parsed: ${itemIdInt}), price=${price} (parsed: ${priceFloat})`);
+      }
+
       const values = [
         orderId,
-        parseInt(item_id),
-        parseInt(quantity) || 1,
-        parseFloat(price),
-        size || 'Regular',
-        sugar || 'Regular',
-        ice || 'Regular',
-        temperature || 'Regular',
-        boba || 'None'
+        itemIdInt,
+        quantityInt,
+        priceFloat,
+        String(size || 'Regular'),
+        String(sugar || 'Regular'),
+        String(ice || 'Regular'),
+        String(temperature || 'Regular'),
+        String(boba || 'None')
       ];
 
-      await client.query(
-        `INSERT INTO sales_history
-         (orderid, drinkid, quantity, price, size, sugar, ice, temperature, boba)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
-        values
-      );
+      console.log(`Inserting order item:`, { orderId, values });
+
+      try {
+        await client.query(
+          `INSERT INTO sales_history
+           (orderid, drinkid, quantity, price, size, sugar, ice, temperature, boba)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+          values
+        );
+      } catch (insertError) {
+        console.error(`Failed to insert item:`, { item, values, error: insertError });
+        throw insertError;
+      }
     }
 
     return NextResponse.json({ message: "Order items added successfully", orderId });
   } catch (error) {
     console.error("Error in POST /api/sales_history:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    // Get more detailed error information
+    let errorMessage = "Unknown error";
+    let errorCode = null;
+    let errorDetail = null;
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      // Check if it's a PostgreSQL error
+      if ('code' in error) {
+        errorCode = (error as any).code;
+      }
+      if ('detail' in error) {
+        errorDetail = (error as any).detail;
+      }
+      if ('constraint' in error) {
+        errorDetail = `Constraint violation: ${(error as any).constraint}`;
+      }
+    }
+    
+    console.error("Full error details:", {
+      message: errorMessage,
+      code: errorCode,
+      detail: errorDetail,
+      error: error
+    });
+    
     return NextResponse.json({ 
       error: "Internal Server Error",
-      details: errorMessage 
+      details: errorMessage,
+      code: errorCode,
+      constraint: errorDetail
     }, { status: 500 });
   } finally {
     await client.end();

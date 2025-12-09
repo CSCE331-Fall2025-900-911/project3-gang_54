@@ -233,7 +233,9 @@ export default function OrderPage() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.details || errorData.error || `Failed to submit order: ${res.status}`);
+        console.error("Order submission error response:", errorData);
+        const errorMsg = errorData.details || errorData.constraint || errorData.error || `Failed to submit order: ${res.status}`;
+        throw new Error(errorMsg);
       }
       
       const result = await res.json();
