@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "../hooks/useTranslation";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface AuthenticatedUser {
   email: string;
@@ -159,7 +160,7 @@ export default function CashierPage() {
           <p style={{ opacity: 0.7, marginBottom: "20px" }}>
             View and manage incoming orders from customers
           </p>
-          <a
+          <Link
             href="/order"
             style={{
               display: "block",
@@ -176,7 +177,7 @@ export default function CashierPage() {
             }}
           >
             {display("View Orders")}
-          </a>
+          </Link>
         </div>
 
         <div
@@ -191,7 +192,7 @@ export default function CashierPage() {
           <p style={{ opacity: 0.7, marginBottom: "20px" }}>
             Process customer payments at the counter
           </p>
-          <a
+          <Link
             href="/cashier/process-payment"
             style={{
               display: "block",
@@ -208,7 +209,7 @@ export default function CashierPage() {
             }}
           >
             {display("Process Payment")}
-          </a>
+          </Link>
         </div>
 
         <div
@@ -223,7 +224,7 @@ export default function CashierPage() {
           <p style={{ opacity: 0.7, marginBottom: "20px" }}>
             View past orders and sales history
           </p>
-          <a
+          <Link
             href="/cashier/order-history"
             style={{
               display: "block",
@@ -240,7 +241,7 @@ export default function CashierPage() {
             }}
           >
             {display("Order History")}
-          </a>
+          </Link>
         </div>
       </div>
     </main>

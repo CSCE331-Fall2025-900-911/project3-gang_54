@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Order {
   orderId: number;
@@ -150,7 +151,7 @@ export default function OrderHistoryPage() {
     <main style={{ padding: "40px", maxWidth: "1400px", margin: "0 auto" }}>
       <div style={{ marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1 style={{ fontSize: "2rem", margin: 0 }}>{display("Order History")}</h1>
-        <a
+        <Link
           href="/cashier"
           style={{
             display: "inline-block",
@@ -165,7 +166,7 @@ export default function OrderHistoryPage() {
           }}
         >
           {display("Back to Cashier Dashboard")}
-        </a>
+        </Link>
       </div>
 
       {orders.length === 0 ? (
