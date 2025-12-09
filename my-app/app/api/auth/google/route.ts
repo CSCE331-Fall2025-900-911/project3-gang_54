@@ -16,6 +16,9 @@ const ROLE_DIRECTORY: Record<string, "manager" | "cashier" | "customer"> = {
   [EMAIL2!]: "manager",
   [EMAIL3!]: "manager",
   [EMAIL4!]: "manager",
+  // Add cashier emails here - example:
+  // "cashier@example.com": "cashier",
+  // To test the cashier interface, add your email here with "cashier" role
 };
 
 function getJwtSecret(): string {
