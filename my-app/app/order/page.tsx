@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "../hooks/useTranslation";
@@ -41,12 +41,24 @@ interface CartItem {
 
 const categories: Category[] = [
   { id: "all", label: "All Drinks" },
-  { id: "seasonal", label: "Seasonal Limited", helper: "Cozy & limited-time pours" },
-  { id: "classics", label: "Classic Tea", helper: "Original recipes everyone loves" },
+  {
+    id: "seasonal",
+    label: "Seasonal Limited",
+    helper: "Cozy & limited-time pours",
+  },
+  {
+    id: "classics",
+    label: "Classic Tea",
+    helper: "Original recipes everyone loves",
+  },
   { id: "milk-tea", label: "Milk Tea", helper: "Silky, slow-steeped blends" },
   { id: "fruit-tea", label: "Fruit Tea", helper: "Bright, juicy infusions" },
   { id: "sparkling", label: "Sparkling", helper: "Fizz-forward refreshers" },
-  { id: "dessert", label: "Dessert Bar", helper: "Sweet treats & creamy finishes" },
+  {
+    id: "dessert",
+    label: "Dessert Bar",
+    helper: "Sweet treats & creamy finishes",
+  },
 ];
 
 const BASE_TRANSLATABLE_STRINGS = [
@@ -90,7 +102,9 @@ export default function OrderPage() {
         setDrinkMenu(data || []);
       } catch (err) {
         console.error("Menu fetch error:", err);
-        setMenuError(err instanceof Error ? err.message : "Failed to load menu");
+        setMenuError(
+          err instanceof Error ? err.message : "Failed to load menu"
+        );
         setDrinkMenu([]);
       } finally {
         setMenuLoading(false);
@@ -109,10 +123,14 @@ export default function OrderPage() {
   }, [activeCategory, drinkMenu]);
 
   const categoryHelper = useMemo(() => {
-    return categories.find((category) => category.id === activeCategory)?.helper;
+    return categories.find((category) => category.id === activeCategory)
+      ?.helper;
   }, [activeCategory]);
 
-  const recommendedDrinks = useMemo(() => filteredDrinks.slice(0, 3), [filteredDrinks]);
+  const recommendedDrinks = useMemo(
+    () => filteredDrinks.slice(0, 3),
+    [filteredDrinks]
+  );
 
   const TRANSLATABLE_STRINGS = useMemo(() => {
     const categoryStrings = categories.flatMap((category) =>
@@ -138,10 +156,18 @@ export default function OrderPage() {
       "Barista highlights",
     ];
 
-    return Array.from(new Set([...BASE_TRANSLATABLE_STRINGS, ...categoryStrings, ...drinkStrings, ...orderStrings]));
+    return Array.from(
+      new Set([
+        ...BASE_TRANSLATABLE_STRINGS,
+        ...categoryStrings,
+        ...drinkStrings,
+        ...orderStrings,
+      ])
+    );
   }, [drinkMenu]);
 
-  const { language, setLanguage, display, isTranslating, translationError } = useTranslation(TRANSLATABLE_STRINGS);
+  const { language, setLanguage, display, isTranslating, translationError } =
+    useTranslation(TRANSLATABLE_STRINGS);
 
   // --- Popup State ---
   const [customizeOpen, setCustomizeOpen] = useState(false);
@@ -170,8 +196,14 @@ export default function OrderPage() {
     [customSize, customSugar, customIce, customTemp, customBoba]
   );
 
-  const removeFromCart = useCallback((index: number) => setCart((prev) => prev.filter((_, i) => i !== index)), []);
-  const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + Number(item.drink.price), 0), [cart]);
+  const removeFromCart = useCallback(
+    (index: number) => setCart((prev) => prev.filter((_, i) => i !== index)),
+    []
+  );
+  const cartTotal = useMemo(
+    () => cart.reduce((sum, item) => sum + Number(item.drink.price), 0),
+    [cart]
+  );
 
   // --- NEW: Submit Order ---
   const submitOrder = useCallback(async () => {
@@ -224,7 +256,9 @@ export default function OrderPage() {
           <button
             key={category.id}
             type="button"
-            className={`filter-chip ${activeCategory === category.id ? "active" : ""}`}
+            className={`filter-chip ${
+              activeCategory === category.id ? "active" : ""
+            }`}
             aria-pressed={activeCategory === category.id}
             onClick={() => setActiveCategory(category.id)}
           >
@@ -233,71 +267,112 @@ export default function OrderPage() {
         ))}
       </section>
 
-      {categoryHelper && <p className="order-category-note" role="status">{display(categoryHelper)}</p>}
+      {categoryHelper && (
+        <p className="order-category-note" role="status">
+          {display(categoryHelper)}
+        </p>
+      )}
 
       <section className="order-layout">
         <div className="order-menu" aria-label="Menu items">
           {menuLoading && (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "40px",
+              }}
+            >
               <p>Loading menu...</p>
             </div>
           )}
           {menuError && !menuLoading && (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: '#ff6b6b' }}>
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "40px",
+                color: "#ff6b6b",
+              }}
+            >
               <p>Error loading menu: {menuError}</p>
-              <p style={{ fontSize: '14px', marginTop: '10px', opacity: 0.8 }}>
-                Please refresh the page or contact support if the problem persists.
+              <p style={{ fontSize: "14px", marginTop: "10px", opacity: 0.8 }}>
+                Please refresh the page or contact support if the problem
+                persists.
               </p>
             </div>
           )}
           {!menuLoading && !menuError && filteredDrinks.length === 0 && (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "40px",
+              }}
+            >
               <p>No drinks available at this time.</p>
             </div>
           )}
-          {!menuLoading && filteredDrinks.map((drink) => (
-            <article key={drink.name} className="order-card">
-              <header className="order-card-header">
-                <div className="order-card-title">
-                  <span className="order-icon" aria-hidden>{drink.icon}</span>
-                  <div>
-                    <h2>{display(drink.name)}</h2>
-                    {drink.subtitle && <p className="order-card-subtitle">{display(drink.subtitle)}</p>}
+          {!menuLoading &&
+            filteredDrinks.map((drink) => (
+              <article key={drink.name} className="order-card">
+                <header className="order-card-header">
+                  <div className="order-card-title">
+                    <span className="order-icon" aria-hidden>
+                      {drink.icon}
+                    </span>
+                    <div>
+                      <h2>{display(drink.name)}</h2>
+                      {drink.subtitle && (
+                        <p className="order-card-subtitle">
+                          {display(drink.subtitle)}
+                        </p>
+                      )}
+                    </div>
                   </div>
+                  {drink.badge && (
+                    <span className="order-card-badge">
+                      {display(drink.badge)}
+                    </span>
+                  )}
+                  <span className="order-price">
+                    ${Number(drink.price).toFixed(2)}
+                  </span>
+                </header>
+                <p className="order-description">
+                  {display(drink.description)}
+                </p>
+                <ul className="order-tags">
+                  {drink.tags.map((tag) => (
+                    <li key={tag}>{display(tag)}</li>
+                  ))}
+                </ul>
+                <div className="order-card-actions">
+                  <button
+                    type="button"
+                    className="order-button"
+                    onClick={() => {
+                      setSelectedDrink(drink);
+                      setCustomizeOpen(true);
+                      setCustomSize("Medium");
+                      setCustomSugar("Normal");
+                      setCustomIce("Medium");
+                      setCustomTemp("Cold");
+                      setCustomBoba("Pearls");
+                    }}
+                  >
+                    {display("Customize drink")}
+                  </button>
+                  <button
+                    type="button"
+                    className="order-button order-button--ghost"
+                    onClick={() => addToCart(drink)}
+                  >
+                    {display("Quick add")}
+                  </button>
                 </div>
-                {drink.badge && <span className="order-card-badge">{display(drink.badge)}</span>}
-                <span className="order-price">${Number(drink.price).toFixed(2)}</span>
-              </header>
-              <p className="order-description">{display(drink.description)}</p>
-              <ul className="order-tags">
-                {drink.tags.map((tag) => (<li key={tag}>{display(tag)}</li>))}
-              </ul>
-              <div className="order-card-actions">
-                <button
-                  type="button"
-                  className="order-button"
-                  onClick={() => {
-                    setSelectedDrink(drink);
-                    setCustomizeOpen(true);
-                    setCustomSize("Medium");
-                    setCustomSugar("Normal");
-                    setCustomIce("Medium");
-                    setCustomTemp("Cold");
-                    setCustomBoba("Pearls");
-                  }}
-                >
-                  {display("Customize drink")}
-                </button>
-                <button
-                  type="button"
-                  className="order-button order-button--ghost"
-                  onClick={() => addToCart(drink)}
-                >
-                  {display("Quick add")}
-                </button>
-              </div>
-            </article>
-          ))}
+              </article>
+            ))}
         </div>
 
         <aside className="order-summary" aria-label="Order summary">
@@ -310,18 +385,28 @@ export default function OrderPage() {
           </ol>
           <div className="order-tip">
             <h3>{display("Need a recommendation?")}</h3>
-            <p>{display("Ask a team member or switch the kiosk to accessibility mode at the bottom of the screen.")}</p>
+            <p>
+              {display(
+                "Ask a team member or switch the kiosk to accessibility mode at the bottom of the screen."
+              )}
+            </p>
           </div>
           <div className="order-recommendations">
             <h3>{display("Barista highlights")}</h3>
             <ul>
               {recommendedDrinks.map((drink) => (
                 <li key={drink.name}>
-                  <span className="order-recommendations__icon" aria-hidden>{drink.icon}</span>
+                  <span className="order-recommendations__icon" aria-hidden>
+                    {drink.icon}
+                  </span>
                   <div>
-                    <p className="order-recommendations__name">{display(drink.name)}</p>
+                    <p className="order-recommendations__name">
+                      {display(drink.name)}
+                    </p>
                     <p className="order-recommendations__note">
-                      {drink.subtitle ? display(drink.subtitle) : drink.tags.map((tag) => display(tag)).join(" • ")}
+                      {drink.subtitle
+                        ? display(drink.subtitle)
+                        : drink.tags.map((tag) => display(tag)).join(" • ")}
                     </p>
                   </div>
                 </li>
@@ -334,17 +419,29 @@ export default function OrderPage() {
       <div className={"cart-sidebar" + (cartOpen ? " open" : "")}>
         <div className="cart-header">
           <h2>{display("Your Order")}</h2>
-          <button className="cart-close" onClick={() => setCartOpen(false)} aria-label="Close cart">✕</button>
+          <button
+            className="cart-close"
+            onClick={() => setCartOpen(false)}
+            aria-label="Close cart"
+          >
+            ✕
+          </button>
         </div>
 
-        {cart.length === 0 && <p className="cart-empty">{display("Your cart is empty.")}</p>}
+        {cart.length === 0 && (
+          <p className="cart-empty">{display("Your cart is empty.")}</p>
+        )}
 
         <ul className="cart-items">
           {cart.map((item, index) => (
             <li key={index} className="cart-item">
               <div className="cart-item-info">
-                <span className="cart-item-name">{item.drink.icon} {display(item.drink.name)}</span>
-                <span className="cart-item-price">${Number(item.drink.price).toFixed(2)}</span>
+                <span className="cart-item-name">
+                  {item.drink.icon} {display(item.drink.name)}
+                </span>
+                <span className="cart-item-price">
+                  ${Number(item.drink.price).toFixed(2)}
+                </span>
                 <ul className="cart-item-customizations">
                   <li>Size: {item.size}</li>
                   <li>Sugar: {item.sugar}</li>
@@ -353,39 +450,59 @@ export default function OrderPage() {
                   <li>Boba: {item.boba}</li>
                 </ul>
               </div>
-              <button className="cart-remove" onClick={() => removeFromCart(index)}>{display("Remove")}</button>
+              <button
+                className="cart-remove"
+                onClick={() => removeFromCart(index)}
+              >
+                {display("Remove")}
+              </button>
             </li>
           ))}
         </ul>
 
         {cart.length > 0 && (
           <div className="cart-footer">
-            <p className="cart-total">{display("Total:")} <span>${Number(cartTotal).toFixed(2)}</span></p>
-            <button className="cart-checkout" onClick={submitOrder}>{display("Checkout")}</button>
+            <p className="cart-total">
+              {display("Total:")} <span>${Number(cartTotal).toFixed(2)}</span>
+            </p>
+            <button className="cart-checkout" onClick={submitOrder}>
+              {display("Checkout")}
+            </button>
           </div>
         )}
       </div>
-      <button type="button" className="cart-toggle-button" onClick={() => setCartOpen(true)}>
+      <button
+        type="button"
+        className="cart-toggle-button"
+        onClick={() => setCartOpen(true)}
+      >
         {display("View Cart")} ({cart.length})
       </button>
 
       {/* --- Customize Popup --- */}
       {customizeOpen && selectedDrink && (
-        <div className="customize-popup-overlay" onClick={() => setCustomizeOpen(false)}>
+        <div
+          className="customize-popup-overlay"
+          onClick={() => setCustomizeOpen(false)}
+        >
           <div className="customize-popup" onClick={(e) => e.stopPropagation()}>
             <div className="customize-popup-header">
-              <button 
-                className="customize-popup-close" 
+              <button
+                className="customize-popup-close"
                 onClick={() => setCustomizeOpen(false)}
                 aria-label="Close customization"
               >
                 ✕
               </button>
               <div className="customize-popup-drink-info">
-                <span className="customize-popup-icon" aria-hidden>{selectedDrink.icon}</span>
+                <span className="customize-popup-icon" aria-hidden>
+                  {selectedDrink.icon}
+                </span>
                 <div>
                   <h3>{display(selectedDrink.name)}</h3>
-                  <p className="customize-popup-price">${Number(selectedDrink.price).toFixed(2)}</p>
+                  <p className="customize-popup-price">
+                    ${Number(selectedDrink.price).toFixed(2)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -401,7 +518,9 @@ export default function OrderPage() {
                     <button
                       key={size}
                       type="button"
-                      className={`customize-option-button ${customSize === size ? "active" : ""}`}
+                      className={`customize-option-button ${
+                        customSize === size ? "active" : ""
+                      }`}
                       onClick={() => setCustomSize(size)}
                     >
                       {size}
@@ -420,7 +539,9 @@ export default function OrderPage() {
                     <button
                       key={sugar}
                       type="button"
-                      className={`customize-option-button ${customSugar === sugar ? "active" : ""}`}
+                      className={`customize-option-button ${
+                        customSugar === sugar ? "active" : ""
+                      }`}
                       onClick={() => setCustomSugar(sugar)}
                     >
                       {sugar}
@@ -439,7 +560,9 @@ export default function OrderPage() {
                     <button
                       key={ice}
                       type="button"
-                      className={`customize-option-button ${customIce === ice ? "active" : ""}`}
+                      className={`customize-option-button ${
+                        customIce === ice ? "active" : ""
+                      }`}
                       onClick={() => setCustomIce(ice)}
                     >
                       {ice}
@@ -458,7 +581,9 @@ export default function OrderPage() {
                     <button
                       key={temp}
                       type="button"
-                      className={`customize-option-button ${customTemp === temp ? "active" : ""}`}
+                      className={`customize-option-button ${
+                        customTemp === temp ? "active" : ""
+                      }`}
                       onClick={() => setCustomTemp(temp)}
                     >
                       {temp}
@@ -477,7 +602,9 @@ export default function OrderPage() {
                     <button
                       key={boba}
                       type="button"
-                      className={`customize-option-button ${customBoba === boba ? "active" : ""}`}
+                      className={`customize-option-button ${
+                        customBoba === boba ? "active" : ""
+                      }`}
                       onClick={() => setCustomBoba(boba)}
                     >
                       {boba}

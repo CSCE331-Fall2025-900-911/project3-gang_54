@@ -1061,6 +1061,7 @@ body.a11y-mode a {
 }
 
 .cart-sidebar {
+  z-index: 10000 !important;
   position: fixed;
   right: -420px;
   top: 0;
@@ -1081,6 +1082,8 @@ body.a11y-mode a {
 }
 
 .cart-header {
+  position: relative;
+  z-index: 10001;
   display: flex;
   justify-content: space-between;
   align-items: center;
