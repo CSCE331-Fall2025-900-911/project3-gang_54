@@ -8,7 +8,8 @@ interface SessionPayload {
   email: string;
   name?: string;
   picture?: string;
-  role?: string;
+  role?: string; // Legacy: single role (for backward compatibility)
+  roles?: string[]; // New: array of roles
   iat?: number;
   exp?: number;
 }
@@ -30,12 +31,18 @@ export async function GET(req: NextRequest) {
 
     const payload = jwt.verify(token, getJwtSecret()) as SessionPayload;
 
+    // Support both old (single role) and new (array of roles) formats
+    const roles = payload.roles || (payload.role ? [payload.role] : ["customer"]);
+    // For backward compatibility, also include a single role (use first role or "customer")
+    const role = roles.length > 0 && roles[0] !== "customer" ? roles[0] : (roles.includes("customer") ? "customer" : roles[0] || "customer");
+
     return NextResponse.json({
       user: {
         email: payload.email,
         name: payload.name,
         picture: payload.picture,
-        role: payload.role,
+        role, // Single role for backward compatibility
+        roles, // Array of roles
       },
       expiresAt: payload.exp ? payload.exp * 1000 : null,
     });

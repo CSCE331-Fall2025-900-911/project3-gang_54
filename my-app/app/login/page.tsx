@@ -38,7 +38,8 @@ type Status = "idle" | "loading" | "success" | "error";
 interface AuthenticatedUser {
   name?: string | null;
   email: string;
-  role?: string;
+  role?: string; // Legacy: single role
+  roles?: string[]; // New: array of roles
   picture?: string | null;
 }
 
@@ -115,11 +116,12 @@ export default function LoginPage() {
         setStatus("success");
         setMessage("Signed in. Redirecting you shortly...");
         
-        // Auto-redirect based on role
+        // Auto-redirect based on role (check roles array if available)
         setTimeout(() => {
-          if (data.user.role === "manager") {
+          const userRoles = data.user?.roles || (data.user?.role ? [data.user.role] : []);
+          if (userRoles.includes("manager")) {
             window.location.href = "/dashboard";
-          } else if (data.user.role === "cashier") {
+          } else if (userRoles.includes("cashier")) {
             window.location.href = "/cashier";
           } else {
             window.location.href = "/";
@@ -279,7 +281,12 @@ export default function LoginPage() {
                 <div className="login-session__actions">
                   <a 
                     className="secondary-btn" 
-                    href={user.role === "manager" ? "/dashboard" : user.role === "cashier" ? "/cashier" : "/"}
+                    href={(() => {
+                      const userRoles = user.roles || (user.role ? [user.role] : []);
+                      if (userRoles.includes("manager")) return "/dashboard";
+                      if (userRoles.includes("cashier")) return "/cashier";
+                      return "/";
+                    })()}
                   >
                     {display("Go to dashboard")}
                   </a>

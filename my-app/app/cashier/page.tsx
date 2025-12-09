@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 interface AuthenticatedUser {
   email: string;
   name: string;
-  role: string;
+  role: string; // Legacy: single role
+  roles?: string[]; // New: array of roles
   picture?: string | null;
 }
 
@@ -47,12 +48,15 @@ export default function CashierPage() {
         console.log("Session data:", data); // Debug log
         
         if (data?.user) {
-          console.log("User role:", data.user.role); // Debug log
-          if (data.user.role !== "cashier") {
+          // Check roles using the roles array if available, otherwise use single role
+          const userRoles = data.user.roles || (data.user.role ? [data.user.role] : []);
+          console.log("User roles:", userRoles); // Debug log
+          
+          if (!userRoles.includes("cashier")) {
             setLoading(false);
             console.log("User is not cashier, redirecting..."); // Debug log
             // Redirect managers to manager dashboard, customers to home
-            if (data.user.role === "manager") {
+            if (userRoles.includes("manager")) {
               setTimeout(() => router.push("/dashboard"), 100);
             } else {
               setTimeout(() => router.push("/"), 100);

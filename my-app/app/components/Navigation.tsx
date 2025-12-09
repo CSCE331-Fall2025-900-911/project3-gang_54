@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 interface SessionUser {
   email: string;
   name: string;
-  role?: string;
+  role?: string; // Legacy: single role
+  roles?: string[]; // New: array of roles
 }
 
 export default function Navigation() {
@@ -21,7 +22,9 @@ export default function Navigation() {
         const res = await fetch("/api/auth/session", { cache: "no-store" });
         const data = await res.json();
         setUser(data.user);
-        setRole(data.user?.role ?? null);
+        // Use roles array if available, otherwise fall back to single role
+        const userRoles = data.user?.roles || (data.user?.role ? [data.user.role] : []);
+        setRole(userRoles.length > 0 ? userRoles[0] : null);
       } catch {
         setUser(null);
         setRole(null);
@@ -32,9 +35,11 @@ export default function Navigation() {
     fetchSession();
   }, []);
 
-  const isEmployee = role && role !== "customer";
-  const isManager = role === "manager";
-  const isCashier = role === "cashier";
+  // Check roles using the roles array if available, otherwise use single role
+  const userRoles = user?.roles || (user?.role ? [user.role] : []);
+  const isEmployee = userRoles.length > 0 && !userRoles.includes("customer");
+  const isManager = userRoles.includes("manager");
+  const isCashier = userRoles.includes("cashier");
 
   const navLinks = [
     { href: '/', label: 'Home' },
