@@ -29,6 +29,15 @@ interface Drink {
   badge?: string;
 }
 
+interface CartItem {
+  drink: Drink;
+  size: string;
+  sugar: string;
+  ice: string;
+  temp: string;
+  boba: string;
+}
+
 const categories: Category[] = [
   { id: "all", label: "All Drinks" },
   { id: "seasonal", label: "Seasonal Limited", helper: "Cozy & limited-time pours" },
@@ -83,7 +92,6 @@ export default function OrderPage() {
       } catch (err) {
         console.error("Menu fetch error:", err);
         setMenuError(err instanceof Error ? err.message : "Failed to load menu");
-        // Set empty array so page can still render
         setDrinkMenu([]);
       } finally {
         setMenuLoading(false);
@@ -93,7 +101,8 @@ export default function OrderPage() {
   }, []);
 
   const [activeCategory, setActiveCategory] = useState<CategoryId>("seasonal");
-  const [cart, setCart] = useState<Drink[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cartOpen, setCartOpen] = useState(false);
 
   const filteredDrinks = useMemo(() => {
     if (activeCategory === "all") return drinkMenu;
@@ -106,7 +115,6 @@ export default function OrderPage() {
 
   const recommendedDrinks = useMemo(() => filteredDrinks.slice(0, 3), [filteredDrinks]);
 
-  // Memoize translatable strings to prevent infinite loops
   const TRANSLATABLE_STRINGS = useMemo(() => {
     const categoryStrings = categories.flatMap((category) =>
       category.helper ? [category.label, category.helper] : [category.label]
@@ -136,14 +144,38 @@ export default function OrderPage() {
 
   const { language, setLanguage, display, isTranslating, translationError } = useTranslation(TRANSLATABLE_STRINGS);
 
-  const addToCart = useCallback((drink: Drink) => setCart((prev) => [...prev, drink]), []);
+  // --- Popup State ---
+  const [customizeOpen, setCustomizeOpen] = useState(false);
+  const [selectedDrink, setSelectedDrink] = useState<Drink | null>(null);
+  const [customSize, setCustomSize] = useState("Medium");
+  const [customSugar, setCustomSugar] = useState("Normal");
+  const [customIce, setCustomIce] = useState("Medium");
+  const [customTemp, setCustomTemp] = useState("Cold");
+  const [customBoba, setCustomBoba] = useState("Pearls");
+
+  const addToCart = useCallback(
+    (drink: Drink) => {
+      setCart((prev) => [
+        ...prev,
+        {
+          drink,
+          size: customSize,
+          sugar: customSugar,
+          ice: customIce,
+          temp: customTemp,
+          boba: customBoba,
+        },
+      ]);
+      setCartOpen(true);
+    },
+    [customSize, customSugar, customIce, customTemp, customBoba]
+  );
+
   const removeFromCart = useCallback((index: number) => setCart((prev) => prev.filter((_, i) => i !== index)), []);
-  const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + Number(item.price), 0), [cart]);
-  const [cartOpen, setCartOpen] = useState(false);
+  const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + Number(item.drink.price), 0), [cart]);
 
   return (
     <main className="order-page">
-      {/* ... your JSX unchanged ... */}
       <section className="order-hero" aria-labelledby="order-heading">
         <p className="order-kicker">{display("In-store kiosk")}</p>
         <h1 id="order-heading">{display("Craft your ShareTea drink")}</h1>
@@ -208,11 +240,25 @@ export default function OrderPage() {
                 {drink.tags.map((tag) => (<li key={tag}>{display(tag)}</li>))}
               </ul>
               <div className="order-card-actions">
-                <button type="button" className="order-button">{display("Customize drink")}</button>
+                <button
+                  type="button"
+                  className="order-button"
+                  onClick={() => {
+                    setSelectedDrink(drink);
+                    setCustomizeOpen(true);
+                    setCustomSize("Medium");
+                    setCustomSugar("Normal");
+                    setCustomIce("Medium");
+                    setCustomTemp("Cold");
+                    setCustomBoba("Pearls");
+                  }}
+                >
+                  {display("Customize drink")}
+                </button>
                 <button
                   type="button"
                   className="order-button order-button--ghost"
-                  onClick={() => { addToCart(drink); setCartOpen(true); }}
+                  onClick={() => addToCart(drink)}
                 >
                   {display("Quick add")}
                 </button>
@@ -264,8 +310,15 @@ export default function OrderPage() {
           {cart.map((item, index) => (
             <li key={index} className="cart-item">
               <div className="cart-item-info">
-                <span className="cart-item-name">{item.icon} {display(item.name)}</span>
-                <span className="cart-item-price">${Number(item.price).toFixed(2)}</span>
+                <span className="cart-item-name">{item.drink.icon} {display(item.drink.name)}</span>
+                <span className="cart-item-price">${Number(item.drink.price).toFixed(2)}</span>
+                <ul className="cart-item-customizations">
+                  <li>Size: {item.size}</li>
+                  <li>Sugar: {item.sugar}</li>
+                  <li>Ice: {item.ice}</li>
+                  <li>Temp: {item.temp}</li>
+                  <li>Boba: {item.boba}</li>
+                </ul>
               </div>
               <button className="cart-remove" onClick={() => removeFromCart(index)}>{display("Remove")}</button>
             </li>
@@ -282,6 +335,62 @@ export default function OrderPage() {
       <button type="button" className="cart-toggle-button" onClick={() => setCartOpen(true)}>
         {display("View Cart")} ({cart.length})
       </button>
+
+      {/* --- Customize Popup --- */}
+      {customizeOpen && selectedDrink && (
+        <div className="customize-popup-overlay">
+          <div className="customize-popup">
+            <h3>Customize Your Drink</h3>
+
+            <label>Size:</label>
+            <select value={customSize} onChange={(e) => setCustomSize(e.target.value)}>
+              <option>Small</option>
+              <option>Medium</option>
+              <option>Large</option>
+            </select>
+
+            <label>Sugar:</label>
+            <select value={customSugar} onChange={(e) => setCustomSugar(e.target.value)}>
+              <option>None</option>
+              <option>Less</option>
+              <option>Normal</option>
+              <option>Extra</option>
+            </select>
+
+            <label>Ice:</label>
+            <select value={customIce} onChange={(e) => setCustomIce(e.target.value)}>
+              <option>None</option>
+              <option>Less</option>
+              <option>Medium</option>
+              <option>Extra</option>
+            </select>
+
+            <label>Temperature:</label>
+            <select value={customTemp} onChange={(e) => setCustomTemp(e.target.value)}>
+              <option>Hot</option>
+              <option>Cold</option>
+            </select>
+
+            <label>Boba:</label>
+            <select value={customBoba} onChange={(e) => setCustomBoba(e.target.value)}>
+              <option>None</option>
+              <option>Pearls</option>
+            </select>
+
+            <div className="customize-popup-actions">
+              <button
+                onClick={() => {
+                  addToCart(selectedDrink);
+                  setCustomizeOpen(false);
+                }}
+              >
+                Add to Order
+              </button>
+              <button className="customize-popup-cancel" onClick={() => setCustomizeOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
