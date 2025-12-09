@@ -1292,96 +1292,265 @@ body.a11y-mode a {
 }
 
 /* --- Customize Popup Overlay --- */
+/* --- Customize Popup Overlay --- */
 .customize-popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
+  animation: overlayFadeIn 0.2s ease-out;
 }
 
 /* --- Popup Container --- */
 .customize-popup {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 20px 25px;
-  width: 320px;
-  max-width: 90%;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  animation: popupFadeIn 0.2s ease-out;
+  overflow: hidden;
+  animation: popupSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* --- Popup Header --- */
-.customize-popup h3 {
+.customize-popup-header {
+  background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
+  color: white;
+  padding: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.customize-popup-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.customize-popup-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.customize-popup-drink-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.customize-popup-icon {
+  font-size: 48px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.customize-popup-header h3 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.customize-popup-price {
+  margin: 4px 0 0 0;
+  font-size: 1.1rem;
   font-weight: 600;
-  text-align: center;
+  color: rgba(255, 255, 255, 0.95);
+  opacity: 0.95;
 }
 
-/* --- Labels --- */
-.customize-popup label {
-  font-weight: 500;
-  margin-top: 6px;
+/* --- Popup Content --- */
+.customize-popup-content {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  flex: 1;
 }
 
-/* --- Select Dropdowns --- */
-.customize-popup select {
-  width: 100%;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+/* --- Option Groups --- */
+.customize-option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.customize-option-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.customize-option-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.customize-option-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.customize-option-button {
+  flex: 1;
+  min-width: 80px;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  color: #333;
   font-size: 0.95rem;
-  margin-top: 2px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.customize-option-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 0;
+}
+
+.customize-option-button span,
+.customize-option-button {
+  position: relative;
+  z-index: 1;
+}
+
+.customize-option-button:hover {
+  border-color: #ff9900;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 153, 0, 0.2);
+}
+
+.customize-option-button.active {
+  background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
+  border-color: #ff9900;
+  color: white;
+  box-shadow: 0 4px 16px rgba(255, 153, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.customize-option-button.active::before {
+  opacity: 1;
 }
 
 /* --- Action Buttons --- */
 .customize-popup-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
+  padding: 20px 24px;
+  background: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
 }
 
-.customize-popup-actions button {
-  padding: 8px 14px;
-  font-size: 0.95rem;
-  font-weight: 500;
+.customize-popup-add {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
+  color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(255, 153, 0, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.customize-popup-actions button:hover {
-  opacity: 0.9;
+.customize-popup-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 153, 0, 0.4);
 }
 
-.customize-popup-actions button:first-child {
-  background-color: #0070f3;
-  color: white;
+.customize-popup-add:active {
+  transform: translateY(0);
 }
 
-.customize-popup-cancel {
-  background-color: #ccc;
-}
-
-/* --- Animation --- */
-@keyframes popupFadeIn {
+/* --- Animations --- */
+@keyframes overlayFadeIn {
   from {
-    transform: scale(0.95);
     opacity: 0;
   }
   to {
-    transform: scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes popupSlideIn {
+  from {
+    transform: translateY(30px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+  .customize-popup {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 85vh;
+  }
+
+  .customize-popup-header {
+    padding: 20px;
+  }
+
+  .customize-popup-content {
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .customize-option-button {
+    min-width: 70px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
   }
 }
 

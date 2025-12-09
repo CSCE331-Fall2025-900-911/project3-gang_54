@@ -371,55 +371,132 @@ export default function OrderPage() {
 
       {/* --- Customize Popup --- */}
       {customizeOpen && selectedDrink && (
-        <div className="customize-popup-overlay">
-          <div className="customize-popup">
-            <h3>Customize Your Drink</h3>
+        <div className="customize-popup-overlay" onClick={() => setCustomizeOpen(false)}>
+          <div className="customize-popup" onClick={(e) => e.stopPropagation()}>
+            <div className="customize-popup-header">
+              <button 
+                className="customize-popup-close" 
+                onClick={() => setCustomizeOpen(false)}
+                aria-label="Close customization"
+              >
+                ✕
+              </button>
+              <div className="customize-popup-drink-info">
+                <span className="customize-popup-icon" aria-hidden>{selectedDrink.icon}</span>
+                <div>
+                  <h3>{display(selectedDrink.name)}</h3>
+                  <p className="customize-popup-price">${Number(selectedDrink.price).toFixed(2)}</p>
+                </div>
+              </div>
+            </div>
 
-            <label>Size:</label>
-            <select value={customSize} onChange={(e) => setCustomSize(e.target.value)}>
-              <option>Small</option>
-              <option>Medium</option>
-              <option>Large</option>
-            </select>
+            <div className="customize-popup-content">
+              <div className="customize-option-group">
+                <label className="customize-option-label">
+                  <span className="customize-option-icon">📏</span>
+                  Size
+                </label>
+                <div className="customize-option-buttons">
+                  {["Small", "Medium", "Large"].map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      className={`customize-option-button ${customSize === size ? "active" : ""}`}
+                      onClick={() => setCustomSize(size)}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            <label>Sugar:</label>
-            <select value={customSugar} onChange={(e) => setCustomSugar(e.target.value)}>
-              <option>None</option>
-              <option>Less</option>
-              <option>Normal</option>
-              <option>Extra</option>
-            </select>
+              <div className="customize-option-group">
+                <label className="customize-option-label">
+                  <span className="customize-option-icon">🍬</span>
+                  Sweetness
+                </label>
+                <div className="customize-option-buttons">
+                  {["None", "Less", "Normal", "Extra"].map((sugar) => (
+                    <button
+                      key={sugar}
+                      type="button"
+                      className={`customize-option-button ${customSugar === sugar ? "active" : ""}`}
+                      onClick={() => setCustomSugar(sugar)}
+                    >
+                      {sugar}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            <label>Ice:</label>
-            <select value={customIce} onChange={(e) => setCustomIce(e.target.value)}>
-              <option>None</option>
-              <option>Less</option>
-              <option>Medium</option>
-              <option>Extra</option>
-            </select>
+              <div className="customize-option-group">
+                <label className="customize-option-label">
+                  <span className="customize-option-icon">🧊</span>
+                  Ice Level
+                </label>
+                <div className="customize-option-buttons">
+                  {["None", "Less", "Medium", "Extra"].map((ice) => (
+                    <button
+                      key={ice}
+                      type="button"
+                      className={`customize-option-button ${customIce === ice ? "active" : ""}`}
+                      onClick={() => setCustomIce(ice)}
+                    >
+                      {ice}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            <label>Temperature:</label>
-            <select value={customTemp} onChange={(e) => setCustomTemp(e.target.value)}>
-              <option>Hot</option>
-              <option>Cold</option>
-            </select>
+              <div className="customize-option-group">
+                <label className="customize-option-label">
+                  <span className="customize-option-icon">🌡️</span>
+                  Temperature
+                </label>
+                <div className="customize-option-buttons">
+                  {["Hot", "Cold"].map((temp) => (
+                    <button
+                      key={temp}
+                      type="button"
+                      className={`customize-option-button ${customTemp === temp ? "active" : ""}`}
+                      onClick={() => setCustomTemp(temp)}
+                    >
+                      {temp}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            <label>Boba:</label>
-            <select value={customBoba} onChange={(e) => setCustomBoba(e.target.value)}>
-              <option>None</option>
-              <option>Pearls</option>
-            </select>
+              <div className="customize-option-group">
+                <label className="customize-option-label">
+                  <span className="customize-option-icon">🧋</span>
+                  Toppings
+                </label>
+                <div className="customize-option-buttons">
+                  {["None", "Pearls"].map((boba) => (
+                    <button
+                      key={boba}
+                      type="button"
+                      className={`customize-option-button ${customBoba === boba ? "active" : ""}`}
+                      onClick={() => setCustomBoba(boba)}
+                    >
+                      {boba}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             <div className="customize-popup-actions">
               <button
+                className="customize-popup-add"
                 onClick={() => {
                   addToCart(selectedDrink);
                   setCustomizeOpen(false);
                 }}
               >
-                Add to Order
+                Add to Order • ${Number(selectedDrink.price).toFixed(2)}
               </button>
-              <button className="customize-popup-cancel" onClick={() => setCustomizeOpen(false)}>Cancel</button>
             </div>
           </div>
         </div>
