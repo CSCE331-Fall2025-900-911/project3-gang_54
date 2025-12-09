@@ -26,6 +26,8 @@ async function buildRoleDirectory(): Promise<Record<string, "manager" | "cashier
   const roleDirectory: Record<string, "manager" | "cashier" | "customer"> = {
     // Hardcoded manager emails
     "reveille.bubbletea@gmail.com": "manager",
+    // Hardcoded cashier emails
+    "akul.ranjan.1@tamu.edu": "cashier",
   };
 
   // Add environment variable emails as managers (if they exist)

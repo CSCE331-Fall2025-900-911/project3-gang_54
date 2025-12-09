@@ -37,6 +37,7 @@ export default function CashierPage() {
       try {
         const res = await fetch("/api/auth/session", { cache: "no-store" });
         if (!res.ok) {
+          setLoading(false);
           router.push("/login");
           return;
         }
@@ -44,6 +45,7 @@ export default function CashierPage() {
         const data = await res.json();
         if (data?.user) {
           if (data.user.role !== "cashier") {
+            setLoading(false);
             // Redirect managers to manager dashboard, customers to home
             if (data.user.role === "manager") {
               router.push("/dashboard");
@@ -53,14 +55,15 @@ export default function CashierPage() {
             return;
           }
           setUser(data.user);
+          setLoading(false);
         } else {
+          setLoading(false);
           router.push("/login");
         }
       } catch (error) {
         console.error("Unable to restore session", error);
-        router.push("/login");
-      } finally {
         setLoading(false);
+        router.push("/login");
       }
     }
     fetchSession();
