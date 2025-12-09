@@ -1437,26 +1437,6 @@ body.a11y-mode a {
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
-  overflow: hidden;
-}
-
-.customize-option-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  z-index: 0;
-}
-
-.customize-option-button span,
-.customize-option-button {
-  position: relative;
-  z-index: 1;
 }
 
 .customize-option-button:hover {
@@ -1468,13 +1448,9 @@ body.a11y-mode a {
 .customize-option-button.active {
   background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
   border-color: #ff9900;
-  color: white;
+  color: white !important;
   box-shadow: 0 4px 16px rgba(255, 153, 0, 0.4);
   transform: translateY(-2px);
-}
-
-.customize-option-button.active::before {
-  opacity: 1;
 }
 
 /* --- Action Buttons --- */
