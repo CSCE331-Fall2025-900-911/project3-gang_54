@@ -80,6 +80,24 @@ async function buildRoleDirectory(): Promise<
     roleDirectory[arnavEmail].push("cashier");
   }
 
+  const rayEmail = "rchu7x7@tamu.edu";
+  if (!roleDirectory[rayEmail]) roleDirectory[rayEmail] = [];
+  if (!roleDirectory[rayEmail].includes("manager")) {
+    roleDirectory[rayEmail].push("manager");
+  }
+  if (!roleDirectory[rayEmail].includes("cashier")) {
+    roleDirectory[rayEmail].push("cashier");
+  }
+
+  const vedEmail = "vedbuls@tamu.edu";
+  if (!roleDirectory[vedEmail]) roleDirectory[vedEmail] = [];
+  if (!roleDirectory[vedEmail].includes("manager")) {
+    roleDirectory[vedEmail].push("manager");
+  }
+  if (!roleDirectory[vedEmail].includes("cashier")) {
+    roleDirectory[vedEmail].push("cashier");
+  }
+
   // ✅ EMAIL1–EMAIL4 (manager + cashier)
   [EMAIL1, EMAIL2, EMAIL3, EMAIL4].forEach((email) => {
     if (email) {
