@@ -44,8 +44,13 @@ export default function Navigation() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/order', label: 'Order' },
-    ...(isManager ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
-    { href: '/cashier/pos', label: 'Cashier' }, // Always show cashier link - page will handle access control
+    ...((isManager || process.env.NODE_ENV === "development")
+  ? [{ href: '/dashboard', label: 'Dashboard' }]
+  : []),
+
+    ...(isCashier || isManager || process.env.NODE_ENV === "development"
+  ? [{ href: '/cashier/pos', label: 'Cashier' }]
+  : []),
     ...(!user
       ? [{ href: '/login', label: 'Login', isButton: true }]
       : [{ href: '/login', label: 'Logout', isButton: true }]),

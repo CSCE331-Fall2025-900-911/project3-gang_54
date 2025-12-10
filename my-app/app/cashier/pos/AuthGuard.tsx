@@ -8,16 +8,23 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // ✅ DEV BYPASS — ONLY ON LOCALHOST
+    if (process.env.NODE_ENV === "development") {
+      setLoading(false);
+      return;
+    }
+
+    // ✅ REAL AUTH FOR VERCEL
     fetch("/api/session")
       .then((res) => res.json())
       .then((data) => {
         if (!data?.user) {
-          router.push("/"); // not logged in
+          router.push("/");
           return;
         }
 
         if (!data.user.roles?.includes("cashier")) {
-          router.push("/"); // logged in but not cashier
+          router.push("/");
           return;
         }
 
