@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 
 interface Item {
   item_id: number;
-  item_name: string;
+  name: string;
   price: number;
+  category: string;
 }
+
 
 interface CartItem {
   item_id: number;
@@ -21,19 +23,25 @@ interface CartItem {
 }
 
 const CATEGORIES = [
-  "Milk Tea",
-  "Fruit Tea",
-  "Milk Drinks",
-  "Smoothies",
-  "Lattes",
-  "Coffee",
-  "Seasonal",
+  { label: "Milk Tea", value: "milk-tea" },
+  { label: "Fruit Tea", value: "fruit-tea" },
+  { label: "Sparkling", value: "sparkling" },
+  { label: "Classics", value: "classics" },
+  { label: "Dessert", value: "dessert" },
+  { label: "Seasonal", value: "seasonal" },
 ];
+
 
 export default function CashierPOS() {
   const [items, setItems] = useState<Item[]>([]);
-  const [category, setCategory] = useState(CATEGORIES[0]);
+  const [category, setCategory] = useState(CATEGORIES[0].value);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentType, setPaymentType] = useState<"cash" | "card" | null>(null);
+  const cartTotal = cart.reduce(
+  (sum, item) => sum + item.price * item.quantity,
+  0
+);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const [size, setSize] = useState("Medium");
@@ -44,7 +52,7 @@ export default function CashierPOS() {
   const [qty, setQty] = useState(1);
 
   useEffect(() => {
-    fetch("/api/menu_items")
+    fetch("/api/ordermenu")
       .then((res) => res.json())
       .then(setItems);
   }, []);
@@ -56,7 +64,7 @@ export default function CashierPOS() {
       ...prev,
       {
         item_id: selectedItem.item_id,
-        name: selectedItem.item_name,
+        name: selectedItem.name,
         price: selectedItem.price,
         size,
         sugar,
@@ -71,29 +79,38 @@ export default function CashierPOS() {
     setQty(1);
   }
 
-  function checkout() {
-    const payload = {
-      items: cart.map((c) => ({
-        item_id: c.item_id,
-        quantity: c.quantity,
-        price: c.price,
-        size: c.size,
-        sugar: c.sugar,
-        ice: c.ice,
-        temperature: c.temperature,
-        boba: c.boba,
-      })),
-    };
+    function checkout() {
+        setShowPayment(true);
+        }
+    function confirmPayment() {
+  const payload = {
+    items: cart.map((c) => ({
+      item_id: c.item_id,
+      quantity: c.quantity,
+      price: c.price,
+      size: c.size,
+      sugar: c.sugar,
+      ice: c.ice,
+      temperature: c.temperature,
+      boba: c.boba,
+    })),
+    paymentType,
+    total: cartTotal,
+  };
 
-    fetch("/api/sales_history", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    }).then(() => {
-      alert("Order Sent!");
-      setCart([]);
-    });
-  }
+  fetch("/api/sales_history", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  }).then(() => {
+    alert(`Payment Successful (${paymentType?.toUpperCase()})`);
+    setCart([]);
+    setShowPayment(false);
+    setPaymentType(null);
+  });
+}
+
+
 
   return (
     <div className="flex h-screen text-black">
@@ -101,26 +118,29 @@ export default function CashierPOS() {
       <div className="w-2/3 p-4">
         <div className="grid grid-cols-4 gap-3 mb-4">
           {CATEGORIES.map((c) => (
-            <button
-              key={c}
-              onClick={() => setCategory(c)}
-              className={`p-4 text-lg rounded ${
-                category === c ? "bg-blue-600 text-white" : "bg-gray-200"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
+  <button
+    key={c.value}
+    onClick={() => setCategory(c.value)}
+    className={`p-4 text-lg rounded ${
+      category === c.value ? "bg-blue-600 text-white" : "bg-gray-200"
+    }`}
+  >
+    {c.label}
+  </button>
+))}
+
         </div>
 
         <div className="grid grid-cols-4 gap-3">
-          {items.map((item) => (
+          {items
+  .filter((item) => item.category === category.toLowerCase().replace(" ", "-"))
+  .map((item) => (
             <button
               key={item.item_id}
               onClick={() => setSelectedItem(item)}
               className="p-6 bg-green-300 text-lg rounded shadow"
             >
-              {item.item_name}
+              {item.name}
               <div>${item.price}</div>
             </button>
           ))}
@@ -133,21 +153,61 @@ export default function CashierPOS() {
 
         <div className="flex-1 overflow-y-auto">
           {cart.map((c, i) => (
-            <div key={i} className="mb-3 p-2 bg-white rounded">
-              {c.name} x{c.quantity}
-              <div className="text-sm">
-                {c.size}, {c.sugar}, {c.ice}, {c.temperature}, {c.boba}
-              </div>
-            </div>
-          ))}
+  <div key={i} className="mb-3 p-2 bg-white rounded flex justify-between items-center">
+    <div>
+      {c.name} x{c.quantity}
+      <div className="text-sm">
+        {c.size}, {c.sugar}, {c.ice}, {c.temperature}, {c.boba}
+      </div>
+    </div>
+
+    <div className="flex gap-2">
+      <button
+        onClick={() => {
+          setSelectedItem({
+            item_id: c.item_id,
+            name: c.name,
+            price: c.price,
+            category: "",
+          });
+          setSize(c.size);
+          setSugar(c.sugar);
+          setIce(c.ice);
+          setTemp(c.temperature);
+          setBoba(c.boba);
+          setQty(c.quantity);
+          setCart(cart.filter((_, idx) => idx !== i));
+        }}
+        className="bg-blue-500 text-white px-2 rounded"
+      >
+        EDIT
+      </button>
+
+      <button
+        onClick={() =>
+          setCart(cart.filter((_, idx) => idx !== i))
+        }
+        className="bg-red-500 text-white px-2 rounded"
+      >
+        X
+      </button>
+    </div>
+  </div>
+))}
+
         </div>
 
-        <button
-          onClick={checkout}
-          className="bg-green-600 text-white text-xl p-4 rounded"
-        >
-          CHECKOUT
-        </button>
+        <div className="mb-3 text-xl font-bold">
+  Total: ${cartTotal.toFixed(2)}
+</div>
+
+<button
+  onClick={checkout}
+  className="bg-green-600 text-white text-xl p-4 rounded"
+>
+  CHECKOUT
+</button>
+
       </div>
 
       {/* MODAL */}
@@ -155,7 +215,7 @@ export default function CashierPOS() {
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
           <div className="bg-white p-6 rounded w-96">
             <h2 className="text-xl font-bold mb-4">
-              {selectedItem.item_name}
+              {selectedItem.name}
             </h2>
 
             <div className="grid grid-cols-2 gap-2 mb-3">
@@ -167,7 +227,7 @@ export default function CashierPOS() {
             </div>
 
             <div className="flex items-center justify-between mb-4">
-              <button onClick={() => setQty(qty - 1)}>-</button>
+              <button onClick={() => setQty(Math.max(1, qty - 1))}>-</button>
               <span>{qty}</span>
               <button onClick={() => setQty(qty + 1)}>+</button>
             </div>
@@ -189,6 +249,62 @@ export default function CashierPOS() {
           </div>
         </div>
       )}
+
+
+      {showPayment && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="bg-white p-6 rounded w-80 text-center">
+      <h2 className="text-2xl font-bold mb-4">Select Payment</h2>
+
+      <div className="text-lg mb-4">
+        Total: ${cartTotal.toFixed(2)}
+      </div>
+
+      <div className="flex flex-col gap-3 mb-4">
+        <button
+          onClick={() => setPaymentType("card")}
+          className={`p-3 rounded ${
+            paymentType === "card" ? "bg-blue-600 text-white" : "bg-gray-200"
+          }`}
+        >
+          💳 Card
+        </button>
+
+        <button
+          onClick={() => setPaymentType("cash")}
+          className={`p-3 rounded ${
+            paymentType === "cash" ? "bg-green-600 text-white" : "bg-gray-200"
+          }`}
+        >
+          💵 Cash
+        </button>
+      </div>
+
+      <div className="flex gap-3">
+        <button
+          disabled={!paymentType}
+          onClick={confirmPayment}
+          className="bg-black text-white p-3 rounded w-full disabled:opacity-50"
+        >
+          CONFIRM
+        </button>
+
+        <button
+          onClick={() => {
+            setShowPayment(false);
+            setPaymentType(null);
+          }}
+          className="bg-gray-400 p-3 rounded w-full"
+        >
+          CANCEL
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
+  
 }
+
