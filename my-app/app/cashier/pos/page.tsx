@@ -1,5 +1,5 @@
 "use client";
-
+import AuthGuard from "./AuthGuard";
 import { useEffect, useState } from "react";
 
 interface Item {
@@ -113,7 +113,9 @@ export default function CashierPOS() {
 
 
   return (
+  <AuthGuard>
     <div className="flex h-screen text-black">
+
       {/* LEFT: MENU */}
       <div className="w-2/3 p-4">
         <div className="grid grid-cols-4 gap-3 mb-4">
@@ -303,8 +305,11 @@ export default function CashierPOS() {
   </div>
 )}
 
-    </div>
-  );
+      </div>
+</AuthGuard>
+);
+
+  
   
 }
 

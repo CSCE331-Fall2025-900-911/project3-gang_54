@@ -45,7 +45,7 @@ export default function Navigation() {
     { href: '/', label: 'Home' },
     { href: '/order', label: 'Order' },
     ...(isManager ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
-    { href: '/cashier', label: 'Cashier' }, // Always show cashier link - page will handle access control
+    { href: '/cashier/pos', label: 'Cashier' }, // Always show cashier link - page will handle access control
     ...(!user
       ? [{ href: '/login', label: 'Login', isButton: true }]
       : [{ href: '/login', label: 'Logout', isButton: true }]),
