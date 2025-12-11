@@ -25,9 +25,10 @@ const CATEGORIES = [
   { label: "Milk Tea", value: "milk-tea" },
   { label: "Fruit Tea", value: "fruit-tea" },
   { label: "Sparkling", value: "sparkling" },
-  { label: "Classics", value: "classics" },
   { label: "Dessert", value: "dessert" },
   { label: "Seasonal", value: "seasonal" },
+  { label: "Coffee", value: "coffee" }
+
 ];
 
 export default function CashierPOS() {
@@ -50,7 +51,7 @@ export default function CashierPOS() {
   const [qty, setQty] = useState(1);
 
   useEffect(() => {
-    fetch("/api/ordermenu")
+    fetch("/api/ordermenu", { cache: "no-store" })
       .then((res) => res.json())
       .then(setItems);
   }, []);
@@ -219,83 +220,152 @@ export default function CashierPOS() {
 
         {/* MODALS (unchanged) */}
         {selectedItem && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
-            <div className="bg-white p-6 rounded w-96">
-              <h2 className="text-xl font-bold mb-4">
-                {selectedItem.name}
-              </h2>
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+    <div className="bg-white p-6 rounded w-[900px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
+      <h2 className="text-2xl font-bold mb-6 text-center">{selectedItem.name}</h2>
 
-              <div className="grid grid-cols-2 gap-4 mb-4 text-lg">
+      {/* Wide 3-column grid */}
+      <div className="grid grid-cols-3 gap-6 text-lg">
 
-                <div className="flex flex-col">
-                  <label className="font-semibold">Size</label>
-                  <select onChange={(e) => setSize(e.target.value)} className="border p-2 rounded">
-                    <option>Small</option>
-                    <option>Medium</option>
-                    <option>Large</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="font-semibold">Sugar</label>
-                  <select onChange={(e) => setSugar(e.target.value)} className="border p-2 rounded">
-                    <option>Extra</option>
-                    <option>Normal</option>
-                    <option>Less</option>
-                    <option>None</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="font-semibold">Ice</label>
-                  <select onChange={(e) => setIce(e.target.value)} className="border p-2 rounded">
-                    <option>Extra</option>
-                    <option>Medium</option>
-                    <option>Less</option>
-                    <option>None</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="font-semibold">Temp</label>
-                  <select onChange={(e) => setTemp(e.target.value)} className="border p-2 rounded">
-                    <option>Cold</option>
-                    <option>Hot</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col col-span-2">
-                  <label className="font-semibold">Boba</label>
-                  <select onChange={(e) => setBoba(e.target.value)} className="border p-2 rounded">
-                    <option>Pearls</option>
-                    <option>None</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between mb-4">
-                <button onClick={() => setQty(Math.max(1, qty - 1))}>-</button>
-                <span>{qty}</span>
-                <button onClick={() => setQty(qty + 1)}>+</button>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={addToCart}
-                  className="bg-blue-600 text-white p-3 rounded w-full"
-                >
-                  ADD
-                </button>
-                <button
-                  onClick={() => setSelectedItem(null)}
-                  className="bg-gray-400 p-3 rounded w-full"
-                >
-                  CANCEL
-                </button>
-              </div>
-            </div>
+        {/* SIZE */}
+        <div>
+          <label className="font-semibold mb-2 block">Size</label>
+          <div className="flex flex-wrap gap-2">
+            {["Small", "Medium", "Large"].map((s) => (
+              <button
+                key={s}
+                onClick={() => setSize(s)}
+                className={`px-3 py-2 rounded ${
+                  size === s ? "bg-blue-600 text-white" : "bg-gray-200"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
           </div>
-        )}
+        </div>
+
+        {/* SUGAR */}
+        <div>
+          <label className="font-semibold mb-2 block">Sugar</label>
+          <div className="flex flex-wrap gap-2">
+            {["Extra", "Normal", "Less", "None"].map((s) => (
+              <button
+                key={s}
+                onClick={() => setSugar(s)}
+                className={`px-3 py-2 rounded ${
+                  sugar === s ? "bg-blue-600 text-white" : "bg-gray-200"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ICE */}
+        <div>
+          <label className="font-semibold mb-2 block">Ice</label>
+          <div className="flex flex-wrap gap-2">
+            {["Extra", "Medium", "Less", "None"].map((i) => (
+              <button
+                key={i}
+                onClick={() => setIce(i)}
+                className={`px-3 py-2 rounded ${
+                  ice === i ? "bg-blue-600 text-white" : "bg-gray-200"
+                }`}
+              >
+                {i}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* TEMP */}
+        <div>
+          <label className="font-semibold mb-2 block">Temp</label>
+          <div className="flex flex-wrap gap-2">
+            {["Cold", "Hot"].map((t) => (
+              <button
+                key={t}
+                onClick={() => setTemp(t)}
+                className={`px-3 py-2 rounded ${
+                  temp === t ? "bg-blue-600 text-white" : "bg-gray-200"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* TOPPINGS */}
+        <div className="col-span-2">
+          <label className="font-semibold mb-2 block">Toppings</label>
+          <div className="flex flex-wrap gap-2">
+            {[
+              "Pearls",
+              "Mini Boba",
+              "Crystal Boba",
+              "Lychee Jelly",
+              "Mango Jelly",
+              "Pudding",
+              "Grass Jelly",
+              "None",
+            ].map((b) => (
+              <button
+                key={b}
+                onClick={() => setBoba(b)}
+                className={`px-3 py-2 rounded ${
+                  boba === b ? "bg-blue-600 text-white" : "bg-gray-200"
+                }`}
+              >
+                {b}
+              </button>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* Quantity */}
+      <div className="flex items-center justify-center gap-6 my-6 text-2xl">
+        <button
+          onClick={() => setQty(Math.max(1, qty - 1))}
+          className="px-4 py-2 bg-gray-300 rounded"
+        >
+          -
+        </button>
+        <span>{qty}</span>
+        <button
+          onClick={() => setQty(qty + 1)}
+          className="px-4 py-2 bg-gray-300 rounded"
+        >
+          +
+        </button>
+      </div>
+
+      {/* Bottom Buttons */}
+      <div className="flex gap-4 mt-4">
+        <button
+          onClick={addToCart}
+          className="bg-blue-600 text-white p-3 rounded w-full text-xl"
+        >
+          ADD
+        </button>
+
+        <button
+          onClick={() => setSelectedItem(null)}
+          className="bg-gray-400 p-3 rounded w-full text-xl"
+        >
+          CANCEL
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
 
         {showPayment && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
