@@ -1077,6 +1077,7 @@ body.a11y-mode a {
 }
 
 .cart-sidebar.open {
+  z-index: 10003 !important;
   right: 0;
 }
 
