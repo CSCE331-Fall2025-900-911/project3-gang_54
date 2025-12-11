@@ -15,7 +15,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     // ✅ REAL AUTH FOR VERCEL
-    fetch("/api/session")
+    fetch("/api/auth/session")
       .then((res) => res.json())
       .then((data) => {
         if (!data?.user) {
