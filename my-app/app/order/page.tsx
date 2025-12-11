@@ -37,6 +37,7 @@ interface CartItem {
   ice: string;
   temp: string;
   boba: string;
+  quantity: number;
 }
 
 const categories: Category[] = [
@@ -152,9 +153,26 @@ export default function OrderPage() {
   const [customTemp, setCustomTemp] = useState("Cold");
   const [customBoba, setCustomBoba] = useState("Pearls");
 
-  const addToCart = useCallback(
-    (drink: Drink) => {
-      setCart((prev) => [
+const addToCart = useCallback(
+  (drink: Drink) => {
+    setCart((prev) => {
+      const index = prev.findIndex(
+        (item) =>
+          item.drink.item_id === drink.item_id &&
+          item.size === customSize &&
+          item.sugar === customSugar &&
+          item.ice === customIce &&
+          item.temp === customTemp &&
+          item.boba === customBoba
+      );
+
+      if (index !== -1) {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], quantity: updated[index].quantity + 1 };
+        return updated;
+      }
+
+      return [
         ...prev,
         {
           drink,
@@ -163,17 +181,37 @@ export default function OrderPage() {
           ice: customIce,
           temp: customTemp,
           boba: customBoba,
+          quantity: 1,
         },
-      ]);
-      setCartOpen(true);
-    },
-    [customSize, customSugar, customIce, customTemp, customBoba]
-  );
+      ];
+    });
 
+    setCartOpen(true);
+  },
+  [customSize, customSugar, customIce, customTemp, customBoba]
+);
   const removeFromCart = useCallback((index: number) => setCart((prev) => prev.filter((_, i) => i !== index)), []);
   const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + Number(item.drink.price), 0), [cart]);
 
-  // --- NEW: Submit Order ---
+const incrementCartItem = (index: number) => {
+  setCart((prev) => {
+    const updated = [...prev];
+    updated[index] = { ...updated[index], quantity: updated[index].quantity + 1 };
+    return updated;
+  });
+};
+const decrementCartItem = (index: number) => {
+  setCart((prev) => {
+    const updated = [...prev];
+    if (updated[index].quantity > 1) {
+      updated[index] = { ...updated[index], quantity: updated[index].quantity - 1 };
+      return updated;
+    } else {
+      return updated.filter((_, i) => i !== index);
+    }
+  });
+};
+
   const submitOrder = useCallback(async () => {
     if (cart.length === 0) return;
 
@@ -181,7 +219,7 @@ export default function OrderPage() {
       const payload = {
         items: cart.map((item) => ({
           item_id: item.drink.item_id,
-          quantity: 1,
+          quantity: item.quantity,
           price: item.drink.price,
           size: item.size,
           sugar: item.sugar,
@@ -344,7 +382,10 @@ export default function OrderPage() {
             <li key={index} className="cart-item">
               <div className="cart-item-info">
                 <span className="cart-item-name">{item.drink.icon} {display(item.drink.name)}</span>
-                <span className="cart-item-price">${Number(item.drink.price).toFixed(2)}</span>
+                <span className="cart-item-price">
+                  ${ (item.drink.price * item.quantity).toFixed(2) }  
+                  {item.quantity > 1 && <span className="cart-item-qty"> ({item.quantity}×)</span>}
+                </span>
                 <ul className="cart-item-customizations">
                   <li>Size: {item.size}</li>
                   <li>Sugar: {item.sugar}</li>
@@ -354,6 +395,9 @@ export default function OrderPage() {
                 </ul>
               </div>
               <button className="cart-remove" onClick={() => removeFromCart(index)}>{display("Remove")}</button>
+              <button className="decrement" onClick={() => decrementCartItem(index)}>−</button>
+              <button className="increment" onClick={() => incrementCartItem(index)}>+</button>
+
             </li>
           ))}
         </ul>
