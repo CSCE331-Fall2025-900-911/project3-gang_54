@@ -15,7 +15,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     // ✅ REAL AUTH FOR VERCEL
-    fetch("/api/session")
+    fetch("/api/auth/session")
       .then((res) => res.json())
       .then((data) => {
         if (!data?.user) {
@@ -23,10 +23,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        if (!data.user.roles?.includes("cashier")) {
-          router.push("/");
-          return;
+        const roles = data.user.roles || [];
+
+      // allow cashier OR manager
+      if (!roles.includes("cashier") && !roles.includes("manager")) {
+        router.push("/");
+        return;
         }
+
 
         setLoading(false);
       })
