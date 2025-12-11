@@ -10,7 +10,8 @@ type CategoryId =
   | "milk-tea"
   | "fruit-tea"
   | "sparkling"
-  | "dessert";
+  | "dessert"
+  | "coffee";
 
 interface Category {
   id: CategoryId;
@@ -48,6 +49,7 @@ const categories: Category[] = [
   { id: "fruit-tea", label: "Fruit Tea", helper: "Bright, juicy infusions" },
   { id: "sparkling", label: "Sparkling", helper: "Fizz-forward refreshers" },
   { id: "dessert", label: "Dessert Bar", helper: "Sweet treats & creamy finishes" },
+  { id: "coffee", label: "Coffee", helper: "Rich, aromatic caffeinated classics" },
 ];
 
 const BASE_TRANSLATABLE_STRINGS = [
