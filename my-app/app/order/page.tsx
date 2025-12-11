@@ -6,7 +6,6 @@ import { useTranslation } from "../hooks/useTranslation";
 type CategoryId =
   | "all"
   | "seasonal"
-  | "classics"
   | "milk-tea"
   | "fruit-tea"
   | "sparkling"
@@ -44,7 +43,6 @@ interface CartItem {
 const categories: Category[] = [
   { id: "all", label: "All Drinks" },
   { id: "seasonal", label: "Seasonal Limited", helper: "Cozy & limited-time pours" },
-  { id: "classics", label: "Classic Tea", helper: "Original recipes everyone loves" },
   { id: "milk-tea", label: "Milk Tea", helper: "Silky, slow-steeped blends" },
   { id: "fruit-tea", label: "Fruit Tea", helper: "Bright, juicy infusions" },
   { id: "sparkling", label: "Sparkling", helper: "Fizz-forward refreshers" },
