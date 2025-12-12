@@ -303,16 +303,7 @@ export default function CashierPOS() {
         <div className="col-span-2">
           <label className="font-semibold mb-2 block">Toppings</label>
           <div className="flex flex-wrap gap-2">
-            {[
-              "Pearls",
-              "Mini Boba",
-              "Crystal Boba",
-              "Lychee Jelly",
-              "Mango Jelly",
-              "Pudding",
-              "Grass Jelly",
-              "None",
-            ].map((b) => (
+            {["Pearls", "None"].map((b) => (
               <button
                 key={b}
                 onClick={() => setBoba(b)}
