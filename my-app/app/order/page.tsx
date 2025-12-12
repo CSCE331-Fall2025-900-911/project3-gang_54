@@ -193,7 +193,7 @@ const addToCart = useCallback(
   [customSize, customSugar, customIce, customTemp, customBoba]
 );
   const removeFromCart = useCallback((index: number) => setCart((prev) => prev.filter((_, i) => i !== index)), []);
-  const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + Number(item.drink.price), 0), [cart]);
+  const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + Number(item.drink.price) * Number(item.quantity) , 0), [cart]);
 
 const incrementCartItem = (index: number) => {
   setCart((prev) => {
