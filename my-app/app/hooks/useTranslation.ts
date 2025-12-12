@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslationContext } from "../contexts/TranslationContext";
@@ -11,15 +11,31 @@ export const LANGUAGE_OPTIONS: Array<{ code: LanguageCode; label: string }> = [
   { code: "zh", label: "中文" },
 ];
 
+function chunkArray<T>(arr: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    chunks.push(arr.slice(i, i + size));
+  }
+  return chunks;
+}
+
 export function useTranslation(texts: string[]) {
   const { language, setLanguage: setGlobalLanguage } = useTranslationContext();
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [isTranslating, setIsTranslating] = useState(false);
   const [translationError, setTranslationError] = useState<string | null>(null);
-  const translationsCache = useRef<Partial<Record<LanguageCode, Record<string, string>>>>({});
+  const translationsCache = useRef<
+    Partial<Record<LanguageCode, Record<string, string>>>
+  >({});
 
-  const TRANSLATABLE_STRINGS = useMemo(() => Array.from(new Set(texts)), [texts]);
-  const stringsKey = useMemo(() => TRANSLATABLE_STRINGS.sort().join("|"), [TRANSLATABLE_STRINGS]);
+  const TRANSLATABLE_STRINGS = useMemo(
+    () => Array.from(new Set(texts)),
+    [texts]
+  );
+  const stringsKey = useMemo(
+    () => TRANSLATABLE_STRINGS.sort().join("|"),
+    [TRANSLATABLE_STRINGS]
+  );
 
   // Only clear cache when the actual strings change (not just reference)
   useEffect(() => {
@@ -48,17 +64,17 @@ export function useTranslation(texts: string[]) {
 
     // Check cache for current language
     const cached = translationsCache.current[language];
-    
+
     // Find missing strings that need translation
-    const missingStrings = cached 
-      ? TRANSLATABLE_STRINGS.filter(str => !(str in cached))
+    const missingStrings = cached
+      ? TRANSLATABLE_STRINGS.filter((str) => !(str in cached))
       : TRANSLATABLE_STRINGS;
 
     // If we have cached translations, use them immediately (even if incomplete)
     if (cached && Object.keys(cached).length > 0) {
       // Filter to only include strings we currently need
       const relevantTranslations: Record<string, string> = {};
-      TRANSLATABLE_STRINGS.forEach(str => {
+      TRANSLATABLE_STRINGS.forEach((str) => {
         if (str in cached) {
           relevantTranslations[str] = cached[str];
         }
@@ -79,48 +95,56 @@ export function useTranslation(texts: string[]) {
         setIsTranslating(true);
         setTranslationError(null);
 
-        console.log(`[Translation] Fetching translations for ${missingStrings.length} missing strings (${TRANSLATABLE_STRINGS.length} total) in ${language}`);
+        const BATCH_SIZE = 40; // safely under Google limits
+        const batches = chunkArray(missingStrings, BATCH_SIZE);
 
-        const response = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ texts: missingStrings, targetLanguage: language }),
-          signal: abortController.signal,
-        });
+        console.log(
+          `[Translation] Translating ${missingStrings.length} strings in ${batches.length} batches (${language})`
+        );
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-          console.error("[Translation] API error:", errorData);
-          throw new Error(errorData.error || errorData.details || "Translation request failed.");
+        const mergedTranslations: Record<string, string> = {};
+
+        for (const batch of batches) {
+          if (cancelled || abortController.signal.aborted) return;
+
+          const response = await fetch("/api/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              texts: batch,
+              targetLanguage: language,
+            }),
+            signal: abortController.signal,
+          });
+
+          if (!response.ok) {
+            const errorData = await response
+              .json()
+              .catch(() => ({ error: "Unknown error" }));
+            console.error("[Translation] API error:", errorData);
+            throw new Error(errorData.error || "Translation request failed.");
+          }
+
+          const data = await response.json();
+          if (!data.translations) {
+            throw new Error("Missing translations in response.");
+          }
+
+          Object.assign(mergedTranslations, data.translations);
         }
-
-        const data = (await response.json()) as { translations?: Record<string, string>; error?: string };
-        if (data.error) {
-          console.error("[Translation] Error in response:", data.error);
-          throw new Error(data.error);
-        }
-        if (!data.translations) {
-          console.error("[Translation] No translations in response");
-          throw new Error("Translation data missing.");
-        }
-
-        console.log(`[Translation] Received ${Object.keys(data.translations).length} new translations`);
 
         if (!cancelled) {
-          // Merge with existing cache
           translationsCache.current[language] = {
             ...translationsCache.current[language],
-            ...data.translations,
+            ...mergedTranslations,
           };
-          
-          // Update translations state with all cached translations for current strings
+
           const allTranslations: Record<string, string> = {};
-          TRANSLATABLE_STRINGS.forEach(str => {
-            if (str in translationsCache.current[language]!) {
-              allTranslations[str] = translationsCache.current[language]![str];
-            }
+          TRANSLATABLE_STRINGS.forEach((str) => {
+            const cachedValue = translationsCache.current[language]?.[str];
+            if (cachedValue) allTranslations[str] = cachedValue;
           });
-          
+
           setTranslations(allTranslations);
           setIsTranslating(false);
         }
@@ -128,9 +152,10 @@ export function useTranslation(texts: string[]) {
         if (cancelled || abortController.signal.aborted) return;
         const err = error instanceof Error ? error.message : "Unknown error";
         console.error("[Translation] Translation failed:", err);
-        setTranslationError(`Translation unavailable: ${err}. Showing original text.`);
+        setTranslationError(
+          `Translation unavailable: ${err}. Showing original text.`
+        );
         setIsTranslating(false);
-        // Don't clear translations on error - keep what we have
       }
     }
 
