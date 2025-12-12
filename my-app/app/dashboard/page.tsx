@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import styles from "./dashboard.module.css";
-import { useTranslation, LANGUAGE_OPTIONS } from "../hooks/useTranslation";
+import { useTranslation } from "../hooks/useTranslation";
 
 type View =
   | "dashboard"
@@ -39,44 +39,6 @@ export default function ManagerDashboard() {
   return (
     // <div className={styles.dashboardPage}>
       <div className={styles.container}>
-        <section
-          className="dashboard-language"
-          aria-label="Language selection"
-          style={{
-            marginBottom: "20px",
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            justifyContent: "flex-end",
-            paddingRight: "20px",
-          }}
-        >
-          <label htmlFor="dashboard-language-select">
-            {display("Language")}
-          </label>
-          <select
-            id="dashboard-language-select"
-            value={language}
-            onChange={(event) =>
-              setLanguage(event.target.value as "en" | "es" | "zh")
-            }
-            style={{
-              padding: "8px 16px",
-              borderRadius: "999px",
-              border: "1px solid rgba(255,255,255,0.3)",
-              background: "rgba(0,0,0,0.2)",
-              color: "#fff",
-            }}
-          >
-            {LANGUAGE_OPTIONS.map((option) => (
-              <option key={option.code} value={option.code}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          {isTranslating && <span>{display("Translating…")}</span>}
-        </section>
-
         {view === "dashboard" ? (
           <>
             <h1 className={styles.title}>{display("Manager Dashboard")}</h1>

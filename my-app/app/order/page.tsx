@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation, LANGUAGE_OPTIONS } from "../hooks/useTranslation";
+import { useTranslation } from "../hooks/useTranslation";
 
 type CategoryId =
   | "all"
@@ -247,23 +247,6 @@ const decrementCartItem = (index: number) => {
 
   return (
     <main className="order-page">
-      <section className="order-language" aria-label="Language selection" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'flex-end', padding: '0 20px' }}>
-        <label htmlFor="order-language-select">{display("Language")}</label>
-        <select
-          id="order-language-select"
-          value={language}
-          onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
-          style={{ padding: '8px 16px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.1)', color: 'white' }}
-        >
-          {LANGUAGE_OPTIONS.map((option) => (
-            <option key={option.code} value={option.code}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        {isTranslating && <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>{display("Translating…")}</span>}
-        {translationError && <span style={{ fontSize: '0.9rem', color: '#ff6b6b' }}>{translationError}</span>}
-      </section>
       <section className="order-hero" aria-labelledby="order-heading">
         <p className="order-kicker">{display("In-store kiosk")}</p>
         <h1 id="order-heading">{display("Craft your ShareTea drink")}</h1>

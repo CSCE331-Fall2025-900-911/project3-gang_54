@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation, LANGUAGE_OPTIONS } from "../hooks/useTranslation";
+import { useTranslation } from "../hooks/useTranslation";
 
 declare global {
   interface Window {
@@ -209,23 +209,6 @@ export default function LoginPage() {
 
   return (
     <main className="login-shell">
-      <section className="login-language" aria-label="Language selection" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center' }}>
-        <label htmlFor="login-language-select">{display("Language")}</label>
-        <select
-          id="login-language-select"
-          value={language}
-          onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
-          style={{ padding: '8px 16px', borderRadius: '999px', border: '1px solid rgba(0,0,0,0.2)' }}
-        >
-          {LANGUAGE_OPTIONS.map((option) => (
-            <option key={option.code} value={option.code}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        {isTranslating && <span>{display("Translating…")}</span>}
-      </section>
-
       <section className="login-card" aria-label="ShareTea sign in options">
         <div className="login-card__intro">
           <p className="badge">{display("Staff & Customers")}</p>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useTranslation, LANGUAGE_OPTIONS } from "./hooks/useTranslation";
+import { useTranslation } from "./hooks/useTranslation";
 export const SYSTEM_MESSAGE = {
   role: "system",
   content: `
@@ -123,33 +123,6 @@ export default function Home() {
 
   return (
     <main className="home-container">
-      {/* Language selector */}
-      <section className="home-language" aria-label="Language selection" style={{ marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <label htmlFor="home-language-select" style={{ color: '#fff', fontSize: '16px', fontWeight: '500' }}>{display("Language")}</label>
-        <select
-          id="home-language-select"
-          value={language}
-          onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
-          style={{ 
-            padding: '10px 20px', 
-            borderRadius: '8px', 
-            border: '2px solid rgba(255, 153, 0, 0.3)',
-            background: 'rgba(255, 153, 0, 0.1)',
-            color: '#fff',
-            fontSize: '16px',
-            cursor: 'pointer',
-            outline: 'none'
-          }}
-        >
-          {LANGUAGE_OPTIONS.map((option) => (
-            <option key={option.code} value={option.code} style={{ background: '#1a1a1a', color: '#fff' }}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        {isTranslating && <span style={{ color: '#ff9900', fontSize: '14px' }}>{display("Translating…")}</span>}
-      </section>
-
       {/* Home content */}
       <div className="home-box">
         <h1 className="title-heading">{display("Welcome to ShareTea")}</h1>
