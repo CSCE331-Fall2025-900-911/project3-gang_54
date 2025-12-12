@@ -75,6 +75,23 @@ const BASE_TRANSLATABLE_STRINGS = [
   "Total:",
   "Checkout",
   "View Cart",
+  // Customization popup strings
+  "Size",
+  "Sweetness",
+  "Ice Level",
+  "Temperature",
+  "Toppings",
+  "Small",
+  "Medium",
+  "Large",
+  "None",
+  "Less",
+  "Normal",
+  "Extra",
+  "Hot",
+  "Cold",
+  "Pearls",
+  "Add to Order",
 ];
 
 export default function OrderPage() {
@@ -440,7 +457,7 @@ const decrementCartItem = (index: number) => {
               <div className="customize-option-group">
                 <label className="customize-option-label">
                   <span className="customize-option-icon">📏</span>
-                  Size
+                  {display("Size")}
                 </label>
                 <div className="customize-option-buttons">
                   {["Small", "Medium", "Large"].map((size) => (
@@ -450,7 +467,7 @@ const decrementCartItem = (index: number) => {
                       className={`customize-option-button ${customSize === size ? "active" : ""}`}
                       onClick={() => setCustomSize(size)}
                     >
-                      {size}
+                      {display(size)}
                     </button>
                   ))}
                 </div>
@@ -459,7 +476,7 @@ const decrementCartItem = (index: number) => {
               <div className="customize-option-group">
                 <label className="customize-option-label">
                   <span className="customize-option-icon">🍬</span>
-                  Sweetness
+                  {display("Sweetness")}
                 </label>
                 <div className="customize-option-buttons">
                   {["None", "Less", "Normal", "Extra"].map((sugar) => (
@@ -469,7 +486,7 @@ const decrementCartItem = (index: number) => {
                       className={`customize-option-button ${customSugar === sugar ? "active" : ""}`}
                       onClick={() => setCustomSugar(sugar)}
                     >
-                      {sugar}
+                      {display(sugar)}
                     </button>
                   ))}
                 </div>
@@ -478,7 +495,7 @@ const decrementCartItem = (index: number) => {
               <div className="customize-option-group">
                 <label className="customize-option-label">
                   <span className="customize-option-icon">🧊</span>
-                  Ice Level
+                  {display("Ice Level")}
                 </label>
                 <div className="customize-option-buttons">
                   {["None", "Less", "Medium", "Extra"].map((ice) => (
@@ -488,7 +505,7 @@ const decrementCartItem = (index: number) => {
                       className={`customize-option-button ${customIce === ice ? "active" : ""}`}
                       onClick={() => setCustomIce(ice)}
                     >
-                      {ice}
+                      {display(ice)}
                     </button>
                   ))}
                 </div>
@@ -497,7 +514,7 @@ const decrementCartItem = (index: number) => {
               <div className="customize-option-group">
                 <label className="customize-option-label">
                   <span className="customize-option-icon">🌡️</span>
-                  Temperature
+                  {display("Temperature")}
                 </label>
                 <div className="customize-option-buttons">
                   {["Hot", "Cold"].map((temp) => (
@@ -507,7 +524,7 @@ const decrementCartItem = (index: number) => {
                       className={`customize-option-button ${customTemp === temp ? "active" : ""}`}
                       onClick={() => setCustomTemp(temp)}
                     >
-                      {temp}
+                      {display(temp)}
                     </button>
                   ))}
                 </div>
@@ -516,7 +533,7 @@ const decrementCartItem = (index: number) => {
               <div className="customize-option-group">
                 <label className="customize-option-label">
                   <span className="customize-option-icon">🧋</span>
-                  Toppings
+                  {display("Toppings")}
                 </label>
                 <div className="customize-option-buttons">
                   {["None", "Pearls"].map((boba) => (
@@ -526,7 +543,7 @@ const decrementCartItem = (index: number) => {
                       className={`customize-option-button ${customBoba === boba ? "active" : ""}`}
                       onClick={() => setCustomBoba(boba)}
                     >
-                      {boba}
+                      {display(boba)}
                     </button>
                   ))}
                 </div>
@@ -541,7 +558,7 @@ const decrementCartItem = (index: number) => {
                   setCustomizeOpen(false);
                 }}
               >
-                Add to Order • ${Number(selectedDrink.price).toFixed(2)}
+                {display("Add to Order")} • ${Number(selectedDrink.price).toFixed(2)}
               </button>
             </div>
           </div>
