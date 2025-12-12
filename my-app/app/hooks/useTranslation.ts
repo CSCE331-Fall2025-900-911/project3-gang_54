@@ -137,17 +137,17 @@ export function useTranslation(texts: string[]) {
             ...data.translations,
           };
           
-          // Update translations state with all cached translations for current strings
-          // Use the latest strings to avoid stale closures
-          const latestStrings = TRANSLATABLE_STRINGS;
+          // Update translations state with all cached translations for CURRENT strings
+          // Use currentStrings (captured at effect start) to ensure we're consistent
+          // If strings changed during fetch, a new effect will run to handle the new strings
           const allTranslations: Record<string, string> = {};
-          latestStrings.forEach(str => {
+          currentStrings.forEach(str => {
             if (str in translationsCache.current[currentLanguage]!) {
               allTranslations[str] = translationsCache.current[currentLanguage]![str];
             }
           });
           
-          console.log(`[useTranslation] Setting ${Object.keys(allTranslations).length} translations for ${latestStrings.length} strings`);
+          console.log(`[useTranslation] Setting ${Object.keys(allTranslations).length} translations for ${currentStrings.length} strings`);
           setTranslations(allTranslations);
           setIsTranslating(false);
         }
