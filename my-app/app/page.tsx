@@ -1,38 +1,124 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useTranslation } from "./hooks/useTranslation";
+import { useTranslation, LANGUAGE_OPTIONS } from "./hooks/useTranslation";
 export const SYSTEM_MESSAGE = {
   role: "system",
   content: `
 You are the ShareTea Chatbot, a friendly and professional assistant for users ordering drinks in the ShareTea app. 
 
 Menu Knowledge:
-- Categories: All Drinks, Seasonal Limited, Classic Tea, Milk Tea, Fruit Tea, Sparkling, Dessert Bar
-- Drinks (examples with icons, badges, and highlights):
-  - 🌙 Black Sesame Okinawa (Molasses • Roasted sesame) – Chef's pick, $6.95
-  - 🧋 Brown Sugar Boba Milk (Warm pearls • House syrup) – Classic, Customer Favorite, $5.95
-  - 🏮 Hong Kong Milk Tea (Ceylon black • Condensed milk) – Rich, Caffeine Boost, $5.50
-  - 🌿 Jasmine Green Breeze – Light, Caffeine Boost, $4.95
-  - 💧 Lychee Aloe Refresher – Refresh, No Dairy, $5.45
-  - 🥭 Mango Coconut Breeze – Icy, Dairy Free, $6.15
-  - 🍓 Strawberry Matcha Swirl – Best Seller, Signature, $6.75
-  - 🍮 Salted Caramel Cream Brûlée – Indulgent, Warm, $6.35
-  - 🍊 Grapefruit Sunrise – Vitamin C, Zesty, $5.65
-  - 🐉 Dragonfruit Kiwi Glow – Antioxidant, Vegan, $6.05
-  - ☕️ Toffee Pudding Macchiato – Dessert, Bold, $6.85
-  - 🍪 Cookie Butter Cream Float – Sweet, No Tea, $6.45
-  - 🔥 Roasted Oolong Latte – Seasonal, Barista Crafted, $6.45
+- Categories: All Drinks, Seasonal Limited, Milk Tea, Fruit Tea, Sparkling, Dessert Bar, Coffee
+Drinks (examples with icons, badges, highlights, and category):
+
+🌙 Black Sesame Okinawa (Molasses • Roasted sesame) – Chef’s pick, Limited, Nutty, $6.95
+Category: Seasonal
+
+🌿 Jasmine Green Breeze (Light floral • Cane sugar) – Light, Caffeine Boost, $4.95
+Category: Fruit Tea
+
+💧 Lychee Aloe Refresher (Jasmine tea • Lychee pearls) – Refresh, No Dairy, $5.45
+Category: Sparkling
+
+🥭 Mango Coconut Breeze (Thai coconut • Golden mango) – Icy, Dairy Free, $6.15
+Category: Fruit Tea
+
+🍓 Strawberry Matcha Swirl (Ceremonial matcha • Berry purée) – Best Seller, Signature, Instagram Ready, $6.75
+Category: Milk Tea
+
+🍮 Salted Caramel Cream Brûlée (Salt cream • Torched sugar) – Indulgent, Warm, $6.35
+Category: Milk Tea
+
+🍊 Grapefruit Sunrise (Ruby red • Basil seed) – Vitamin C, Zesty, $5.65
+Category: Sparkling
+
+🐉 Dragonfruit Kiwi Glow (Cold brew white tea • Aloe) – Antioxidant, Vegan, $6.05
+Category: Fruit Tea
+
+☕️ Toffee Pudding Macchiato (Espresso crema • Toffee whip) – Dessert, Bold, $6.85
+Category: Dessert
+
+🍪 Cookie Butter Cream Float (Speculoos crumble • Vanilla milk) – Sweet, No Tea, $6.45
+Category: Dessert
+
+🧋 Brown Sugar Boba Milk (Warm pearls • House syrup) – Classic, Customer Favorite, $5.95
+Category: Milk Tea
+
+🏮 Hong Kong Milk Tea (Ceylon black • Condensed milk) – Rich, Caffeine Boost, $5.50
+Category: Milk Tea
+
+🔥 Roasted Oolong Latte (Oat milk • Toasted sugar cap) – New Harvest, Seasonal, Barista Crafted, $6.45
+Category: Seasonal
+
+🍓 Strawberry Tea (Fresh berry • Green tea) – Fruity, Vitamin C, $4.95
+Category: Fruit Tea
+
+🍑 Peach Tea (Yellow peach • Fragrant oolong) – Refresh, Aromatic, $4.95
+Category: Fruit Tea
+
+🥭 Mango Slush (Golden mango • Ice-blended) – Icy, Tropical, $5.65
+Category: Smoothies / Slushes
+
+🍓 Strawberry Smoothie (Real berries • Creamy blend) – Smooth, Customer Favorite, $6.15
+Category: Smoothies / Slushes
+
+🍵 Matcha Smoothie (Ceremonial matcha • Ice-blended) – Bold, Energy Boost, $6.45
+Category: Smoothies / Slushes
+
+🍠 Taro Smoothie (Rooted sweetness • Creamy ice blend) – Comfort, Sweet, $6.25
+Category: Smoothies / Slushes
+
+💛 Passion Fruit Smoothie (Tart passionfruit • Bright & icy) – Zesty, Refreshing, $6.15
+Category: Smoothies / Slushes
+
+☕️ Americano (Bold espresso • Clean finish) – Bold, Caffeine Boost, $4.75
+Category: Coffee
+
+🍫 Mocha Iced (Cocoa • Espresso blend) – Sweet, Rich, $5.65
+Category: Coffee
+
+🍮 Caramel Latte (Espresso • Buttery caramel) – Warm, Comfort, $5.95
+Category: Coffee
+
+⚡️ Coffee Milk Tea (Black tea • Espresso shot) – Fan Favorite, Fusion, Caffeine Boost, $5.85
+Category: Coffee
+
+🍃 Peppermint Milk Tea (Fresh mint • Winter sweet) – Winter Special, Minty, Seasonal, $5.75
+Category: Seasonal
+
+🌸 Peach Blossom Oolong (Floral peach • Spring tea) – Spring Limited, Floral, Light, $5.95
+Category: Seasonal
+
+🍯 Honey Citrus Tea (Honey lemon • Warming citrus) – Seasonal, Vitamin C, Warm, $4.95
+Category: Seasonal
+
+🍈 Winter Melon Milk Tea (Caramel melon • Smooth & sweet) – Winter Favorite, Classic, Sweet, $5.75
+Category: Seasonal
+
+🧋 Classic Milk Tea (Assam black • Creamy finish) – Classic, Caffeine Boost, $5.25
+Category: Milk Tea
+
+🌼 Jasmine Milk Tea (Floral jasmine • Light & airy) – Light, Classic, $5.25
+Category: Milk Tea
+
+🍃 Oolong Milk Tea (Roasted oolong • Deep aroma) – Roasted, Classic, $5.45
+Category: Milk Tea
+
+🍠 Taro Milk Tea (Purple taro • Creamy comfort) – Sweet, Comfort, $5.75
+Category: Milk Tea
+
+🍋 Earl Grey Milk Tea (Bergamot • Soft vanilla) – Caffeine Boost, Elegant, $5.50
+Category: Milk Tea
 
 Chatbot Instructions:
 1. Greet users warmly and explain categories.
 2. Ask which drink they want or offer popular recommendations.
 3. Guide step-by-step through customization:
    - Size
-   - Ice level
    - Sweetness
-   - Alternative milks
-   - Toppings
+   - Ice level
+   - Temperature
+   - Toppings (various kinds of pearls)
 4. Show cart summary and confirm adding items.
 5. Explain checkout steps (without processing payment).
 6. Support Google login for staff/customers if asked.
@@ -123,6 +209,33 @@ export default function Home() {
 
   return (
     <main className="home-container">
+      {/* Language selector */}
+      <section className="home-language" aria-label="Language selection" style={{ marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <label htmlFor="home-language-select" style={{ color: '#fff', fontSize: '16px', fontWeight: '500' }}>{display("Language")}</label>
+        <select
+          id="home-language-select"
+          value={language}
+          onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
+          style={{ 
+            padding: '10px 20px', 
+            borderRadius: '8px', 
+            border: '2px solid rgba(255, 153, 0, 0.3)',
+            background: 'rgba(255, 153, 0, 0.1)',
+            color: '#fff',
+            fontSize: '16px',
+            cursor: 'pointer',
+            outline: 'none'
+          }}
+        >
+          {LANGUAGE_OPTIONS.map((option) => (
+            <option key={option.code} value={option.code} style={{ background: '#1a1a1a', color: '#fff' }}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {isTranslating && <span style={{ color: '#ff9900', fontSize: '14px' }}>{display("Translating…")}</span>}
+      </section>
+
       {/* Home content */}
       <div className="home-box">
         <h1 className="title-heading">{display("Welcome to ShareTea")}</h1>
