@@ -47,7 +47,14 @@ export function useTranslation(texts: string[]) {
     let cancelled = false;
     const abortController = new AbortController();
 
-    if (language === "en") {
+    // Capture current values to avoid stale closures
+    const currentStrings = TRANSLATABLE_STRINGS;
+    const currentLanguage = language;
+
+    console.log(`[useTranslation] Effect triggered - language: ${currentLanguage}, stringsKey length: ${stringsKey.length}, strings count: ${currentStrings.length}`);
+
+    if (currentLanguage === "en") {
+      console.log(`[useTranslation] Language is English, clearing translations`);
       setTranslations({});
       setTranslationError(null);
       setIsTranslating(false);
@@ -55,7 +62,8 @@ export function useTranslation(texts: string[]) {
     }
 
     // Skip if no strings to translate
-    if (TRANSLATABLE_STRINGS.length === 0) {
+    if (currentStrings.length === 0) {
+      console.log(`[useTranslation] No strings to translate`);
       setTranslations({});
       setTranslationError(null);
       setIsTranslating(false);
@@ -79,7 +87,12 @@ export function useTranslation(texts: string[]) {
           relevantTranslations[str] = cached[str];
         }
       });
-      setTranslations(relevantTranslations);
+      console.log(`[useTranslation] Using ${Object.keys(relevantTranslations).length} cached translations out of ${currentStrings.length} needed`);
+      if (!cancelled) {
+        setTranslations(relevantTranslations);
+      }
+    } else {
+      console.log(`[useTranslation] No cached translations found for language ${currentLanguage}`);
     }
 
     // If all strings are cached, we're done
@@ -164,7 +177,7 @@ export function useTranslation(texts: string[]) {
       cancelled = true;
       abortController.abort();
     };
-  }, [language, stringsKey, TRANSLATABLE_STRINGS]);
+  }, [language, stringsKey]);
 
   const display = useCallback(
     (text: string | undefined | null) => {
