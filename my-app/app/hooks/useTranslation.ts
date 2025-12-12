@@ -139,7 +139,7 @@ export function useTranslation(texts: string[]) {
       cancelled = true;
       abortController.abort();
     };
-  }, [language, stringsKey, TRANSLATABLE_STRINGS]);
+  }, [language, stringsKey]);
 
   const display = useCallback(
     (text: string | undefined | null) => {
