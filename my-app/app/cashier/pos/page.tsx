@@ -22,12 +22,14 @@ interface CartItem {
 }
 
 const CATEGORIES = [
+  { label: "All Drinks", value: "all" },
   { label: "Milk Tea", value: "milk-tea" },
   { label: "Fruit Tea", value: "fruit-tea" },
   { label: "Sparkling", value: "sparkling" },
   { label: "Dessert", value: "dessert" },
   { label: "Seasonal", value: "seasonal" },
-  { label: "Coffee", value: "coffee" }
+  { label: "Coffee", value: "coffee" },
+  { label: "Smoothies", value: "smoothies" }
 
 ];
 
@@ -143,7 +145,7 @@ export default function CashierPOS() {
           {/* 🔥 MAKE THIS SECTION SCROLLABLE + FIXED HEIGHT */}
           <div className="grid grid-cols-4 gap-3 overflow-y-auto" style={{ maxHeight: "70vh" }}>
             {items
-              .filter((item) => item.category === category.toLowerCase().replace(" ", "-"))
+              .filter((item) =>  category === "all" || item.category === category.toLowerCase().replace(" ", "-"))
               .map((item) => (
                 <button
                   key={item.item_id}
