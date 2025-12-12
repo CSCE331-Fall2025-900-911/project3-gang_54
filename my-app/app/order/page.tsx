@@ -8,6 +8,7 @@ type CategoryId =
   | "seasonal"
   | "milk-tea"
   | "fruit-tea"
+  | "smoothies"
   | "sparkling"
   | "dessert"
   | "coffee";
@@ -45,6 +46,7 @@ const categories: Category[] = [
   { id: "seasonal", label: "Seasonal Limited", helper: "Cozy & limited-time pours" },
   { id: "milk-tea", label: "Milk Tea", helper: "Silky, slow-steeped blends" },
   { id: "fruit-tea", label: "Fruit Tea", helper: "Bright, juicy infusions" },
+  { id: "smoothies", label: "Smoothies", helper: "Fruity, refreshing ice-blended favorites" },
   { id: "sparkling", label: "Sparkling", helper: "Fizz-forward refreshers" },
   { id: "dessert", label: "Dessert Bar", helper: "Sweet treats & creamy finishes" },
   { id: "coffee", label: "Coffee", helper: "Rich, aromatic caffeinated classics" },
