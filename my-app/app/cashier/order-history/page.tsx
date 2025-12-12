@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslation } from "../../hooks/useTranslation";
+import { useTranslation, LANGUAGE_OPTIONS } from "../../hooks/useTranslation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -55,6 +55,8 @@ export default function OrderHistoryPage() {
     "Toppings",
     "Quantity",
     "Select an order to view details",
+    "Language",
+    "Translating…",
   ];
 
   const { language, setLanguage, display, isTranslating } = useTranslation(TRANSLATABLE_STRINGS);
@@ -149,6 +151,22 @@ export default function OrderHistoryPage() {
 
   return (
     <main style={{ padding: "40px", maxWidth: "1400px", margin: "0 auto" }}>
+      <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", justifyContent: "flex-end" }}>
+        <label htmlFor="order-history-language-select">{display("Language")}</label>
+        <select
+          id="order-history-language-select"
+          value={language}
+          onChange={(event) => setLanguage(event.target.value as "en" | "es" | "zh")}
+          style={{ padding: '8px 16px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.1)', color: 'white' }}
+        >
+          {LANGUAGE_OPTIONS.map((option) => (
+            <option key={option.code} value={option.code}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {isTranslating && <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>{display("Translating…")}</span>}
+      </div>
       <div style={{ marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1 style={{ fontSize: "2rem", margin: 0 }}>{display("Order History")}</h1>
         <Link

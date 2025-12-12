@@ -61,18 +61,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No valid text strings provided for translation." }, { status: 400 });
     }
 
+    // Map language codes to Google Translate API format
+    const languageMap: Record<string, string> = {
+      "en": "en",
+      "es": "es",
+      "zh": "zh-CN", // Chinese Simplified
+    };
+    const apiLanguage = languageMap[targetLanguage] || targetLanguage;
+
     // Google Translate API v2 requires form-urlencoded format
     const params = new URLSearchParams();
     validTexts.forEach((text) => {
       params.append("q", text);
     });
-    params.append("target", targetLanguage);
+    params.append("target", apiLanguage);
     params.append("source", "en");
     params.append("format", "text");
 
     const apiUrl = `${GOOGLE_TRANSLATE_ENDPOINT}?key=${encodeURIComponent(apiKey)}`;
     
-    console.log(`Calling Google Translate API with ${validTexts.length} texts to translate to ${targetLanguage}`);
+    console.log(`[Translate API] Calling with ${validTexts.length} texts to translate from en to ${apiLanguage} (requested: ${targetLanguage})`);
     
     const response = await fetch(apiUrl, {
       method: "POST",
