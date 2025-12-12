@@ -1012,11 +1012,127 @@ body.a11y-mode a {
   color: black !important;
   border: 2px solid white !important;
 }
-/* LARGE TEXT MODE */
-.a11y-large-text * {
-  font-size: 1.25em !important;
-  line-height: 1.4 !important;
+/* LARGE TEXT MODE - Only apply to text elements, not buttons/icons/inputs */
+.a11y-large-text {
+  font-size: 1.15em;
 }
+
+.a11y-large-text h1,
+.a11y-large-text h2,
+.a11y-large-text h3,
+.a11y-large-text h4,
+.a11y-large-text h5,
+.a11y-large-text h6,
+.a11y-large-text p,
+.a11y-large-text span:not([aria-hidden]),
+.a11y-large-text li,
+.a11y-large-text label,
+.a11y-large-text td,
+.a11y-large-text th,
+.a11y-large-text div:not(button):not(.button):not([role="button"]):not([aria-hidden]) {
+  font-size: 1.2em !important;
+  line-height: 1.5 !important;
+}
+
+/* Headings get slightly larger proportional scaling */
+.a11y-large-text h1 {
+  font-size: 1.4em !important;
+}
+
+.a11y-large-text h2 {
+  font-size: 1.35em !important;
+}
+
+.a11y-large-text h3 {
+  font-size: 1.3em !important;
+}
+
+/* Keep buttons, inputs, and icons at normal size */
+.a11y-large-text button,
+.a11y-large-text .button,
+.a11y-large-text input,
+.a11y-large-text select,
+.a11y-large-text textarea,
+.a11y-large-text [aria-hidden],
+.a11y-large-text img,
+.a11y-large-text svg,
+.a11y-large-text .order-icon,
+.a11y-large-text .customize-popup-icon,
+.a11y-large-text .order-recommendations__icon {
+  font-size: inherit !important;
+}
+
+/* Adjust spacing for better readability */
+.a11y-large-text p,
+.a11y-large-text li {
+  margin-bottom: 0.75em;
+}
+
+.a11y-large-text h1,
+.a11y-large-text h2,
+.a11y-large-text h3 {
+  margin-bottom: 0.5em;
+  margin-top: 0.75em;
+}
+
+/* Home page specific adjustments */
+.a11y-large-text .home-box h1 {
+  font-size: 1.3em !important;
+}
+
+.a11y-large-text .home-box p {
+  font-size: 1.15em !important;
+}
+
+.a11y-large-text .home-buttons .button {
+  font-size: 1em !important;
+  padding: 12px 24px !important;
+}
+
+.a11y-large-text .weather-text {
+  font-size: 1.15em !important;
+}
+
+/* Login page specific adjustments */
+.a11y-large-text .login-card__intro h1 {
+  font-size: 1.3em !important;
+}
+
+.a11y-large-text .login-card__intro p {
+  font-size: 1.15em !important;
+}
+
+.a11y-large-text .login-perks h3 {
+  font-size: 1.2em !important;
+}
+
+.a11y-large-text .login-perks p {
+  font-size: 1.1em !important;
+}
+
+.a11y-large-text .login-panel__title {
+  font-size: 1.2em !important;
+}
+
+.a11y-large-text .login-panel__status {
+  font-size: 1.1em !important;
+}
+
+.a11y-large-text .login-session__welcome,
+.a11y-large-text .login-session__email {
+  font-size: 1.1em !important;
+}
+
+.a11y-large-text .secondary-btn,
+.a11y-large-text .ghost-btn {
+  font-size: 1em !important;
+  padding: 10px 20px !important;
+}
+
+.a11y-large-text .login-google__note {
+  font-size: 1.1em !important;
+}
+
 /* TRANSLATION: Spanish Mode */
 .a11y-spanish .translate-en {
   display: none;
@@ -2544,11 +2660,127 @@ body.a11y-mode a {
   color: black !important;
   border: 2px solid white !important;
 }
-/* LARGE TEXT MODE */
-.a11y-large-text * {
-  font-size: 1.25em !important;
-  line-height: 1.4 !important;
+/* LARGE TEXT MODE - Only apply to text elements, not buttons/icons/inputs */
+.a11y-large-text {
+  font-size: 1.15em;
 }
+
+.a11y-large-text h1,
+.a11y-large-text h2,
+.a11y-large-text h3,
+.a11y-large-text h4,
+.a11y-large-text h5,
+.a11y-large-text h6,
+.a11y-large-text p,
+.a11y-large-text span:not([aria-hidden]),
+.a11y-large-text li,
+.a11y-large-text label,
+.a11y-large-text td,
+.a11y-large-text th,
+.a11y-large-text div:not(button):not(.button):not([role="button"]):not([aria-hidden]) {
+  font-size: 1.2em !important;
+  line-height: 1.5 !important;
+}
+
+/* Headings get slightly larger proportional scaling */
+.a11y-large-text h1 {
+  font-size: 1.4em !important;
+}
+
+.a11y-large-text h2 {
+  font-size: 1.35em !important;
+}
+
+.a11y-large-text h3 {
+  font-size: 1.3em !important;
+}
+
+/* Keep buttons, inputs, and icons at normal size */
+.a11y-large-text button,
+.a11y-large-text .button,
+.a11y-large-text input,
+.a11y-large-text select,
+.a11y-large-text textarea,
+.a11y-large-text [aria-hidden],
+.a11y-large-text img,
+.a11y-large-text svg,
+.a11y-large-text .order-icon,
+.a11y-large-text .customize-popup-icon,
+.a11y-large-text .order-recommendations__icon {
+  font-size: inherit !important;
+}
+
+/* Adjust spacing for better readability */
+.a11y-large-text p,
+.a11y-large-text li {
+  margin-bottom: 0.75em;
+}
+
+.a11y-large-text h1,
+.a11y-large-text h2,
+.a11y-large-text h3 {
+  margin-bottom: 0.5em;
+  margin-top: 0.75em;
+}
+
+/* Home page specific adjustments */
+.a11y-large-text .home-box h1 {
+  font-size: 1.3em !important;
+}
+
+.a11y-large-text .home-box p {
+  font-size: 1.15em !important;
+}
+
+.a11y-large-text .home-buttons .button {
+  font-size: 1em !important;
+  padding: 12px 24px !important;
+}
+
+.a11y-large-text .weather-text {
+  font-size: 1.15em !important;
+}
+
+/* Login page specific adjustments */
+.a11y-large-text .login-card__intro h1 {
+  font-size: 1.3em !important;
+}
+
+.a11y-large-text .login-card__intro p {
+  font-size: 1.15em !important;
+}
+
+.a11y-large-text .login-perks h3 {
+  font-size: 1.2em !important;
+}
+
+.a11y-large-text .login-perks p {
+  font-size: 1.1em !important;
+}
+
+.a11y-large-text .login-panel__title {
+  font-size: 1.2em !important;
+}
+
+.a11y-large-text .login-panel__status {
+  font-size: 1.1em !important;
+}
+
+.a11y-large-text .login-session__welcome,
+.a11y-large-text .login-session__email {
+  font-size: 1.1em !important;
+}
+
+.a11y-large-text .secondary-btn,
+.a11y-large-text .ghost-btn {
+  font-size: 1em !important;
+  padding: 10px 20px !important;
+}
+
+.a11y-large-text .login-google__note {
+  font-size: 1.1em !important;
+}
+
 /* TRANSLATION: Spanish Mode */
 .a11y-spanish .translate-en {
   display: none;
