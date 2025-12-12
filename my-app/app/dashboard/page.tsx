@@ -129,16 +129,44 @@ export default function ManagerDashboard() {
 function ManageMenuView() {
   type MenuItem = {
     item_id: number;
-    item_name: string;
+    name: string;
+    subtitle: string | null;
+    description: string | null;
     price: number;
+    tags: string[];
+    category: string | null;
+    icon: string | null;
+    badge: string | null;
   };
+
+  const normalizeTags = (tags: any): string[] => {
+    if (Array.isArray(tags)) return tags.map((t) => String(t)).filter((t) => t.length > 0);
+    if (typeof tags === "string") {
+      const s = tags.trim();
+      if (!s) return [];
+      const inner = s.startsWith("{") && s.endsWith("}") ? s.slice(1, -1) : s;
+      return inner
+        .split(",")
+        .map((x) => x.trim())
+        .filter((x) => x.length > 0);
+    }
+    return [];
+  };
+
+  const tagsToString = (tags: any) => normalizeTags(tags).join(", ");
 
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [newName, setNewName] = useState("");
+  const [newSubtitle, setNewSubtitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
   const [newPrice, setNewPrice] = useState("");
+  const [newTags, setNewTags] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newIcon, setNewIcon] = useState("");
+  const [newBadge, setNewBadge] = useState("");
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -149,7 +177,18 @@ function ManageMenuView() {
         const res = await fetch("/api/menu_items");
         if (!res.ok) throw new Error("Failed to load menu items");
         const data = await res.json();
-        setItems(data);
+        const normalized: MenuItem[] = (Array.isArray(data) ? data : []).map((r: any) => ({
+          item_id: Number(r.item_id),
+          name: String(r.name ?? ""),
+          subtitle: r.subtitle == null ? null : String(r.subtitle),
+          description: r.description == null ? null : String(r.description),
+          price: Number(r.price) || 0,
+          tags: normalizeTags(r.tags),
+          category: r.category == null ? null : String(r.category),
+          icon: r.icon == null ? null : String(r.icon),
+          badge: r.badge == null ? null : String(r.badge),
+        }));
+        setItems(normalized);
       } catch (err: any) {
         setError(err.message ?? "Error loading items");
       } finally {
@@ -161,7 +200,7 @@ function ManageMenuView() {
 
   const handleCellChange = (
     id: number,
-    field: "item_name" | "price",
+    field: "name" | "subtitle" | "description" | "price" | "tags" | "category" | "icon" | "badge",
     value: string
   ) => {
     setItems((prev) =>
@@ -169,7 +208,12 @@ function ManageMenuView() {
         item.item_id === id
           ? {
               ...item,
-              [field]: field === "price" ? Number(value) || 0 : value,
+              [field]:
+                field === "price"
+                  ? Number(value) || 0
+                  : field === "tags"
+                  ? normalizeTags(value)
+                  : value,
             }
           : item
       )
@@ -179,25 +223,55 @@ function ManageMenuView() {
   const handleAdd = async () => {
     const name = newName.trim();
     const priceNum = Number(newPrice);
+
     if (!name || Number.isNaN(priceNum)) {
       alert("Enter valid name and price");
       return;
     }
 
+    const payload = {
+      name,
+      subtitle: newSubtitle.trim() ? newSubtitle.trim() : null,
+      description: newDescription.trim() ? newDescription.trim() : null,
+      price: priceNum,
+      tags: normalizeTags(newTags),
+      category: newCategory.trim() ? newCategory.trim() : null,
+      icon: newIcon.trim() ? newIcon.trim() : null,
+      badge: newBadge.trim() ? newBadge.trim() : null,
+    };
+
     try {
       const res = await fetch("/api/menu_items", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, price: priceNum }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error("Failed to add item");
 
-      const created: MenuItem = await res.json();
+      const createdRaw = await res.json();
+      const created: MenuItem = {
+        item_id: Number(createdRaw.item_id),
+        name: String(createdRaw.name ?? ""),
+        subtitle: createdRaw.subtitle == null ? null : String(createdRaw.subtitle),
+        description: createdRaw.description == null ? null : String(createdRaw.description),
+        price: Number(createdRaw.price) || 0,
+        tags: normalizeTags(createdRaw.tags),
+        category: createdRaw.category == null ? null : String(createdRaw.category),
+        icon: createdRaw.icon == null ? null : String(createdRaw.icon),
+        badge: createdRaw.badge == null ? null : String(createdRaw.badge),
+      };
+
       setItems((prev) => [...prev, created]);
 
       setNewName("");
+      setNewSubtitle("");
+      setNewDescription("");
       setNewPrice("");
+      setNewTags("");
+      setNewCategory("");
+      setNewIcon("");
+      setNewBadge("");
     } catch (err: any) {
       alert(err.message ?? "Error adding item");
     }
@@ -211,27 +285,46 @@ function ManageMenuView() {
     const item = items.find((i) => i.item_id === selectedId);
     if (!item) return;
 
-    const name = item.item_name.trim();
+    const name = item.name.trim();
     const priceNum = Number(item.price);
     if (!name || Number.isNaN(priceNum)) {
       alert("Invalid values on selected row");
       return;
     }
 
+    const payload = {
+      id: selectedId,
+      name,
+      subtitle: item.subtitle == null ? null : String(item.subtitle),
+      description: item.description == null ? null : String(item.description),
+      price: priceNum,
+      tags: normalizeTags(item.tags),
+      category: item.category == null ? null : String(item.category),
+      icon: item.icon == null ? null : String(item.icon),
+      badge: item.badge == null ? null : String(item.badge),
+    };
+
     try {
       const res = await fetch("/api/menu_items", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: selectedId,
-          name,
-          price: priceNum,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error("Failed to update item");
       const data = await res.json();
-      setItems(data);
+      const normalized: MenuItem[] = (Array.isArray(data) ? data : []).map((r: any) => ({
+        item_id: Number(r.item_id),
+        name: String(r.name ?? ""),
+        subtitle: r.subtitle == null ? null : String(r.subtitle),
+        description: r.description == null ? null : String(r.description),
+        price: Number(r.price) || 0,
+        tags: normalizeTags(r.tags),
+        category: r.category == null ? null : String(r.category),
+        icon: r.icon == null ? null : String(r.icon),
+        badge: r.badge == null ? null : String(r.badge),
+      }));
+      setItems(normalized);
       alert("Item updated successfully");
     } catch (err: any) {
       alert(err.message ?? "Error updating item");
@@ -264,13 +357,20 @@ function ManageMenuView() {
       {loading && <p className={styles.helperText}>Loading menu items...</p>}
       {error && <p className={styles.helperText}>Error: {error}</p>}
 
-      <div className={styles.tablePlaceholder}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className={`${styles.tablePlaceholder} ${styles.tableWrapper}`}>
+        <table>
           <thead>
             <tr>
               <th style={{ textAlign: "left", padding: "8px" }}>ID</th>
               <th style={{ textAlign: "left", padding: "8px" }}>Name</th>
+              <th style={{ textAlign: "left", padding: "8px" }}>Subtitle</th>
+              <th style={{ textAlign: "left", padding: "8px" }}>Description</th>
               <th style={{ textAlign: "left", padding: "8px" }}>Price</th>
+              <th style={{ textAlign: "left", padding: "8px" }}>Tags</th>
+              <th style={{ textAlign: "left", padding: "8px" }}>Category</th>
+              <th style={{ textAlign: "left", padding: "8px" }}>Icon</th>
+              <th style={{ textAlign: "left", padding: "8px" }}>Badge</th>
+              <th style={{ textAlign: "left", padding: "8px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -285,18 +385,31 @@ function ManageMenuView() {
                 }}
               >
                 <td style={{ padding: "8px" }}>{item.item_id}</td>
+
                 <td style={{ padding: "8px" }}>
                   <input
                     type="text"
-                    value={item.item_name}
-                    onChange={(e) =>
-                      handleCellChange(
-                        item.item_id,
-                        "item_name",
-                        e.target.value
-                      )
-                    }
-                    style={{ width: "100%" }}
+                    value={item.name}
+                    onChange={(e) => handleCellChange(item.item_id, "name", e.target.value)}
+                    className={styles.inputField}
+                  />
+                </td>
+
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={item.subtitle ?? ""}
+                    onChange={(e) => handleCellChange(item.item_id, "subtitle", e.target.value)}
+                    className={styles.inputField}
+                  />
+                </td>
+
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={item.description ?? ""}
+                    onChange={(e) => handleCellChange(item.item_id, "description", e.target.value)}
+                    className={styles.inputField}
                   />
                 </td>
 
@@ -305,10 +418,45 @@ function ManageMenuView() {
                     type="number"
                     step="0.01"
                     value={item.price}
-                    onChange={(e) =>
-                      handleCellChange(item.item_id, "price", e.target.value)
-                    }
-                    style={{ width: "100%" }}
+                    onChange={(e) => handleCellChange(item.item_id, "price", e.target.value)}
+                    className={styles.inputField}
+                  />
+                </td>
+
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={tagsToString(item.tags)}
+                    onChange={(e) => handleCellChange(item.item_id, "tags", e.target.value)}
+                    className={styles.inputField}
+                    placeholder="e.g. Limited, Nutty"
+                  />
+                </td>
+
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={item.category ?? ""}
+                    onChange={(e) => handleCellChange(item.item_id, "category", e.target.value)}
+                    className={styles.inputField}
+                  />
+                </td>
+
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={item.icon ?? ""}
+                    onChange={(e) => handleCellChange(item.item_id, "icon", e.target.value)}
+                    className={styles.inputField}
+                  />
+                </td>
+
+                <td style={{ padding: "8px" }}>
+                  <input
+                    type="text"
+                    value={item.badge ?? ""}
+                    onChange={(e) => handleCellChange(item.item_id, "badge", e.target.value)}
+                    className={styles.inputField}
                   />
                 </td>
 
@@ -341,6 +489,7 @@ function ManageMenuView() {
           display: "flex",
           alignItems: "center",
           gap: "12px",
+          flexWrap: "wrap",
         }}
       >
         <input
@@ -352,11 +501,59 @@ function ManageMenuView() {
         />
 
         <input
+          type="text"
+          placeholder="Subtitle"
+          value={newSubtitle}
+          onChange={(e) => setNewSubtitle(e.target.value)}
+          className={styles.inputField}
+        />
+
+        <input
+          type="text"
+          placeholder="Description"
+          value={newDescription}
+          onChange={(e) => setNewDescription(e.target.value)}
+          className={styles.inputField}
+        />
+
+        <input
           type="number"
           step="0.01"
           placeholder="Price"
           value={newPrice}
           onChange={(e) => setNewPrice(e.target.value)}
+          className={styles.inputField}
+        />
+
+        <input
+          type="text"
+          placeholder="Tags (comma-separated)"
+          value={newTags}
+          onChange={(e) => setNewTags(e.target.value)}
+          className={styles.inputField}
+        />
+
+        <input
+          type="text"
+          placeholder="Category"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+          className={styles.inputField}
+        />
+
+        <input
+          type="text"
+          placeholder="Icon"
+          value={newIcon}
+          onChange={(e) => setNewIcon(e.target.value)}
+          className={styles.inputField}
+        />
+
+        <input
+          type="text"
+          placeholder="Badge"
+          value={newBadge}
+          onChange={(e) => setNewBadge(e.target.value)}
           className={styles.inputField}
         />
 

@@ -1,93 +1,124 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Client } from "pg";
 
-export async function GET() {
-  const client = new Client({
+function normalizeTags(tags: any): string[] {
+  if (Array.isArray(tags)) return tags.map((t) => String(t)).filter((t) => t.length > 0);
+  if (typeof tags === "string") {
+    const s = tags.trim();
+    if (!s) return [];
+    const inner = s.startsWith("{") && s.endsWith("}") ? s.slice(1, -1) : s;
+    return inner
+      .split(",")
+      .map((x) => x.trim())
+      .filter((x) => x.length > 0);
+  }
+  return [];
+}
+
+function makeClient() {
+  return new Client({
     user: process.env.DB_user,
     host: process.env.DB_host,
     database: process.env.DB_name,
     password: process.env.DB_password,
     port: 5432,
   });
+}
 
+export async function GET() {
+  const client = makeClient();
   try {
     await client.connect();
-    const result = await client.query("SELECT * FROM items");
+    const result = await client.query("SELECT * FROM menu_items ORDER BY item_id ASC");
     return NextResponse.json(result.rows);
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   } finally {
     await client.end();
   }
 }
 
 export async function POST(request: NextRequest) {
-  // const { name, category, price } = await request.json();
-  const { name, price } = await request.json();
+  const body = await request.json();
+  const {
+    name,
+    subtitle = null,
+    description = null,
+    price,
+    tags = [],
+    category = null,
+    icon = null,
+    badge = null,
+  } = body ?? {};
 
-  const client = new Client({
-    user: process.env.DB_user,
-    host: process.env.DB_host,
-    database: process.env.DB_name,
-    password: process.env.DB_password,
-    port: 5432,
-  });
+  const client = makeClient();
 
   try {
     await client.connect();
+
     const insertResult = await client.query(
-      // "INSERT INTO menu_items (item_name, category, price) VALUES ($1, $2, $3) RETURNING item_id, item_name, category, price",
-      // [name, category, price]
-      "INSERT INTO items (item_name, price) VALUES ($1, $2) RETURNING item_id, item_name, price",
-      [name, price]
+      "INSERT INTO menu_items (name, subtitle, description, price, tags, category, icon, badge) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+      [
+        name,
+        subtitle,
+        description,
+        price,
+        normalizeTags(tags),
+        category,
+        icon,
+        badge,
+      ]
     );
 
-    const createdRow = insertResult.rows[0];
-    return NextResponse.json(createdRow, { status: 201 });
+    return NextResponse.json(insertResult.rows[0], { status: 201 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   } finally {
     await client.end();
   }
 }
 
 export async function PUT(request: NextRequest) {
-  // const { id, name, category, price } = await request.json();
-  const { id, name, price } = await request.json();
+  const body = await request.json();
+  const {
+    id,
+    name,
+    subtitle = null,
+    description = null,
+    price,
+    tags = [],
+    category = null,
+    icon = null,
+    badge = null,
+  } = body ?? {};
 
-  const client = new Client({
-    user: process.env.DB_user,
-    host: process.env.DB_host,
-    database: process.env.DB_name,
-    password: process.env.DB_password,
-    port: 5432,
-  });
+  const client = makeClient();
 
   try {
     await client.connect();
+
     await client.query(
-      // "UPDATE menu_items SET item_name = $1, category = $2, price = $3 WHERE item_id = $4",
-      // [name, category, price, id]
-      "UPDATE items SET item_name = $1, price = $2 WHERE item_id = $3",
-      [name, price, id]
+      "UPDATE menu_items SET name = $1, subtitle = $2, description = $3, price = $4, tags = $5, category = $6, icon = $7, badge = $8 WHERE item_id = $9",
+      [
+        name,
+        subtitle,
+        description,
+        price,
+        normalizeTags(tags),
+        category,
+        icon,
+        badge,
+        id,
+      ]
     );
 
-    const updatedResult = await client.query("SELECT * FROM items");
+    const updatedResult = await client.query("SELECT * FROM menu_items ORDER BY item_id ASC");
     return NextResponse.json(updatedResult.rows);
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   } finally {
     await client.end();
   }
@@ -95,26 +126,15 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const { id } = await request.json();
-
-  const client = new Client({
-    user: process.env.DB_user,
-    host: process.env.DB_host,
-    database: process.env.DB_name,
-    password: process.env.DB_password,
-    port: 5432,
-  });
+  const client = makeClient();
 
   try {
     await client.connect();
-    await client.query("DELETE FROM items WHERE item_id = $1", [id]);
-
+    await client.query("DELETE FROM menu_items WHERE item_id = $1", [id]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   } finally {
     await client.end();
   }

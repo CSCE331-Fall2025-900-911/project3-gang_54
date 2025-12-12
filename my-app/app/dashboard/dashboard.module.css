@@ -178,7 +178,8 @@
 }
 
 .tableWrapper table {
-  min-width: 1200px;
+  min-width: 1600px;
+  border-collapse: collapse;
 }
 
 .container input::placeholder,
